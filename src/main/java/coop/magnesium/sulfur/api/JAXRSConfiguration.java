@@ -34,7 +34,7 @@ public class JAXRSConfiguration extends Application {
         beanConfig.setBasePath(endpointsProperties.getProperty("rest.api.path"));
         beanConfig.setResourcePackage("coop.magnesium.sulfur.api");
         beanConfig.setDescription("Sulfur");
-        beanConfig.setTitle("Sulfur");
+        beanConfig.setTitle("Sulfur backend");
         beanConfig.setContact("rsperoni@mgcoders.com");
         beanConfig.setScan(true);
         beanConfig.setPrettyPrint(true);

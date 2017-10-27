@@ -6,6 +6,8 @@ import coop.magnesium.sulfur.utils.KeyGenerator;
 import coop.magnesium.sulfur.utils.PasswordUtils;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -33,6 +35,7 @@ import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
 @Produces(APPLICATION_JSON)
 @Consumes(APPLICATION_JSON)
 @Transactional
+@Api(description = "Users", tags = "users")
 public class UserService {
 
     @Inject
@@ -45,6 +48,7 @@ public class UserService {
     @POST
     @Path("/login")
     @Consumes(APPLICATION_FORM_URLENCODED)
+    @ApiOperation(value = "Authenticate user", response = String.class)
     public Response authenticateUser(@FormParam("email") String email,
                                      @FormParam("password") String password) {
         try {
@@ -71,6 +75,8 @@ public class UserService {
     }
 
     @POST
+    //TODO: solo admin
+    @ApiOperation(value = "Create user", response = String.class)
     public Response create(SulfurUser sulfurUser) {
         sulfurUser.setPassword(PasswordUtils.digestPassword(sulfurUser.getPassword()));
         //TODO:insert sulfurUser
@@ -79,6 +85,8 @@ public class UserService {
 
 
     @GET
+    //TODO: debe autenticarse
+    @ApiOperation(value = "Get users", response = SulfurUser.class, responseContainer = "List")
     public Response findAllUsers() {
         List<SulfurUser> allSulfurUsers = new ArrayList<>(); //TODO: fetch users
         if (allSulfurUsers == null)
