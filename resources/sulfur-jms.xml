@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<messaging-deployment xmlns="urn:jboss:messaging-activemq-deployment:1.0">
+    <server name="default">
+        <jms-destinations>
+            <jms-queue name="notificacionesQueue">
+                <entry name="queue/notificacionesQueue"/>
+                <entry name="java:jboss/exported/jms/queue/notificacionesQueue"/>
+            </jms-queue>
+            <jms-queue name="autorizacionesQueue">
+                <entry name="queue/autorizacionesQueue"/>
+                <entry name="java:jboss/exported/jms/queue/autorizacionesQueue"/>
+            </jms-queue>
+        </jms-destinations>
+    </server>
+</messaging-deployment>

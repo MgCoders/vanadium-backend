@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasources>
+    <datasource jta="true" jndi-name="java:jboss/sulfur" pool-name="sulfur" enabled="true" use-ccm="true">
+        <connection-url>
+        </connection-url>
+        <!--<url-delimiter>|</url-delimiter>-->
+        <driver-class>org.postgresql.Driver</driver-class>
+        <driver>postgresql-42.1.4.jar</driver>
+        <security>
+            <user-name></user-name>
+            <password></password>
+        </security>
+        <validation>
+            <valid-connection-checker
+                    class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker"/>
+            <background-validation>true</background-validation>
+            <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter"/>
+            <!-- I don't know what this does but someone on my DevOps
+                team said to set it this way. :) -->
+            <validate-on-match>false</validate-on-match>
+
+
+            <!-- sets the frequency the background thread will check each connection.
+            The lower this setting, the quicker it will find a bad connection
+            but it will be more chatty sending the validations to the server -->
+            <background-validation-millis>60000</background-validation-millis>
+
+            <!-- fast fail will mark all the connections invalid as soon as
+            it finds a bad one. This will make it clear the pool quicker
+            if all connections are reset at once such as a restart. Fast
+            fail would be trouble though if you had a setup where the database
+            sometimes selectively kills a single connection, such as killing long
+            running queries. -->
+            <use-fast-fail>true</use-fast-fail>
+            <check-valid-connection-sql>select 1</check-valid-connection-sql>
+        </validation>
+    </datasource>
+</datasources>

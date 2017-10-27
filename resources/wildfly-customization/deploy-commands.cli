@@ -1,0 +1,6 @@
+# Mark the commands below to be run as a batch
+batch
+
+deploy sulfur.war
+# Execute the batch
+run-batch

@@ -1,0 +1,25 @@
+version: '3.1'
+
+services:
+
+    wildfly:
+      build: .
+      ports:
+        - 127.0.0.1:8080:8080
+        - 127.0.0.1:9990:9990
+      links:
+        - db
+
+    db:
+        image: postgres
+        restart: always
+        environment:
+            POSTGRES_USER: sulfur_user
+            POSTGRES_PASSWORD: sulfur_pass
+            POSTGRES_DB: sulfur
+
+    adminer:
+        image: adminer
+        restart: always
+        ports:
+            - 8081:8080
