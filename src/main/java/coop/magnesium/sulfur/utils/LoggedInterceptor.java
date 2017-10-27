@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 public class LoggedInterceptor implements Serializable {
 
     @Inject
-    private transient Logger logger;
+    private Logger logger;
 
     public LoggedInterceptor() {
     }

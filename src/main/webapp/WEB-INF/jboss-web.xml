@@ -1,3 +1,3 @@
 <jboss-web>
-    <context-root>${app.path}</context-root>
+    <context-root>sulfur</context-root>
 </jboss-web>

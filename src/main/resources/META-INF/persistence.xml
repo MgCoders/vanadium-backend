@@ -7,11 +7,11 @@
     <persistence-unit name="sulfur" transaction-type="JTA">
         <jta-data-source>java:jboss/sulfur</jta-data-source>
         <properties>
-            <property name="hibernate.hbm2ddl.auto" value="validate"/>
-            <property
-                    name="hibernate.connection.provider_disables_autocommit"
-                    value="true"
-            />
+            <property name="hibernate.archive.autodetection" value="class" />
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect" />
+            <!-- <property name="hibernate.show_sql" value="true"/> -->
+            <property name="hibernate.flushMode" value="FLUSH_AUTO" />
+            <property name="hibernate.hbm2ddl.auto" value="create-drop" />
         </properties>
     </persistence-unit>
 </persistence>

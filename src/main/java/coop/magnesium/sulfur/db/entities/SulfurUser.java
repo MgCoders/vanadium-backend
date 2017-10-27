@@ -3,13 +3,14 @@ package coop.magnesium.sulfur.db.entities;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.Serializable;
 
 /**
  * Created by rsperoni on 05/05/17.
  */
 @Entity
-public class User implements Serializable {
+public class SulfurUser implements Serializable {
 
     @Id
     private String id;
@@ -18,7 +19,7 @@ public class User implements Serializable {
     private String role = Role.USER.name();
 
 
-    public User() {
+    public SulfurUser() {
     }
 
     public String getRole() {
@@ -55,7 +56,7 @@ public class User implements Serializable {
 
     @Override
     public String toString() {
-        return "User{" +
+        return "SulfurUser{" +
                 "id='" + id + '\'' +
                 ", email='" + email + '\'' +
                 '}';

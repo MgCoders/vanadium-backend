@@ -7,6 +7,12 @@
 
 JBOSS_HOME=/opt/jboss/wildfly
 JBOSS_CLI=$JBOSS_HOME/bin/jboss-cli.sh
+export DB_HOST=$1
+export DB_NAME=$2
+export DB_USER=$3
+export DB_PASS=$4
+export LOGSTASH_HOST=$5
+printenv > /opt/jboss/env.properties
 
 function wait_for_server() {
   until `$JBOSS_CLI -c "ls /deployment" &> /dev/null`; do
@@ -20,8 +26,9 @@ $JBOSS_HOME/bin/standalone.sh > /dev/null &
 echo "=> Waiting for the server to boot"
 wait_for_server
 
-echo "=> Executing the commands"
-$JBOSS_CLI -c --file=`dirname "$0"`/commands.cli
+echo "=> Executing the commands for customization"
+$JBOSS_CLI -c --file=`dirname "$0"`/commands.cli --properties=env.properties
+
 
 echo "=> Shutting down WildFly"
-$JBOSS_CLI -c "/host=master:shutdown"
+$JBOSS_CLI -c "shutdown"

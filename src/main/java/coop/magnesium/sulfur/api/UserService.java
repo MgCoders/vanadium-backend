@@ -1,7 +1,7 @@
 package coop.magnesium.sulfur.api;
 
 
-import coop.magnesium.sulfur.db.entities.User;
+import coop.magnesium.sulfur.db.entities.SulfurUser;
 import coop.magnesium.sulfur.utils.KeyGenerator;
 import coop.magnesium.sulfur.utils.PasswordUtils;
 import io.jsonwebtoken.Jwts;
@@ -49,14 +49,14 @@ public class UserService {
                                      @FormParam("password") String password) {
         try {
 
-            // Authenticate the user using the credentials provided
-            User user = authenticate(email, password);
+            // Authenticate the sulfurUser using the credentials provided
+            SulfurUser sulfurUser = authenticate(email, password);
 
             //Info que quiero guardar en token
             Map<String, Object> map = new HashMap<>();
-            map.put("role", user.getRole());
+            map.put("role", sulfurUser.getRole());
 
-            // Issue a token for the user
+            // Issue a token for the sulfurUser
             String token = issueToken(email, map);
 
             // Return the token on the response
@@ -71,29 +71,29 @@ public class UserService {
     }
 
     @POST
-    public Response create(User user) {
-        user.setPassword(PasswordUtils.digestPassword(user.getPassword()));
-        //TODO:insert user
-        return Response.created(uriInfo.getAbsolutePathBuilder().path(user.getEmail()).build()).build();
+    public Response create(SulfurUser sulfurUser) {
+        sulfurUser.setPassword(PasswordUtils.digestPassword(sulfurUser.getPassword()));
+        //TODO:insert sulfurUser
+        return Response.created(uriInfo.getAbsolutePathBuilder().path(sulfurUser.getEmail()).build()).build();
     }
 
 
     @GET
     public Response findAllUsers() {
-        List<User> allUsers = new ArrayList<>(); //TODO: fetch users
-        if (allUsers == null)
+        List<SulfurUser> allSulfurUsers = new ArrayList<>(); //TODO: fetch users
+        if (allSulfurUsers == null)
             return Response.status(NOT_FOUND).build();
-        return Response.ok(allUsers).build();
+        return Response.ok(allSulfurUsers).build();
     }
 
 
-    private User authenticate(String email, String password) throws Exception {
-        User user = null; //TODO: find user
+    private SulfurUser authenticate(String email, String password) throws Exception {
+        SulfurUser sulfurUser = null; //TODO: find sulfurUser
 
-        if (user == null)
-            throw new SecurityException("Invalid user/password");
+        if (sulfurUser == null)
+            throw new SecurityException("Invalid sulfurUser/password");
 
-        return user;
+        return sulfurUser;
     }
 
     private String issueToken(String login, Map<String, Object> claims) {
