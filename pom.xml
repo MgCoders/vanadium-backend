@@ -127,7 +127,7 @@
             <id>desarrollo</id>
             <properties>
                 <jboss.host>127.0.0.1</jboss.host>
-                <jboss.port>8180</jboss.port>
+                <jboss.port>8080</jboss.port>
                 <app.path>sulfur</app.path>
             </properties>
             <activation>
@@ -139,14 +139,6 @@
             <properties>
                 <jboss.host>desmercado</jboss.host>
                 <jboss.port>8080</jboss.port>
-                <app.path>sulfur</app.path>
-            </properties>
-        </profile>
-        <profile>
-            <id>prod</id>
-            <properties>
-                <jboss.host>localhost</jboss.host>
-                <pinter.host>localhost</pinter.host>
                 <app.path>sulfur</app.path>
             </properties>
         </profile>

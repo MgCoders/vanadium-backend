@@ -15,7 +15,7 @@ import java.util.Properties;
  *
  * @author airhacks.com
  */
-@ApplicationPath("/")
+@ApplicationPath("/api")
 public class JAXRSConfiguration extends Application {
 
     @Inject
