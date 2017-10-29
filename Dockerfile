@@ -1,3 +1,8 @@
+FROM maven:3.5-jdk-8 as BUILD
+COPY src /usr/src/myapp/src
+COPY pom.xml /usr/src/myapp
+RUN mvn -f /usr/src/myapp/pom.xml clean package
+
 FROM jboss/wildfly:10.1.0.Final
 ARG DB_HOST
 ARG DB_NAME
@@ -13,5 +18,5 @@ RUN ["chmod","+x","/opt/jboss/wildfly/customization/execute.sh"]
 USER jboss
 RUN /opt/jboss/wildfly/customization/execute.sh $DB_HOST $DB_NAME $DB_USER $DB_PASS $LOGSTASH_HOST
 RUN rm -rf /opt/jboss/wildfly/standalone/configuration/standalone_xml_history/current
-ADD ./target/sulfur.war /opt/jboss/wildfly/standalone/deployments/
+COPY --from=BUILD /usr/src/myapp/target/sulfur.war /opt/jboss/wildfly/standalone/deployments/
 CMD ["/opt/jboss/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement","0.0.0.0"]
