@@ -253,3 +253,4 @@ buildNumber.properties
 /sulfur.iml
 !/resources/logstash-gelf-1.11.1.tar.gz
 !/resources/postgresql-42.1.4.jar
+/.env

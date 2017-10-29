@@ -4,6 +4,14 @@ services:
 
     wildfly:
       image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:latest
+      build:
+        context: .
+        args:
+          DB_HOST: ${DB_HOST}
+          DB_NAME: ${DB_NAME}
+          DB_USER: ${DB_USER}
+          DB_PASS: ${DB_PASS}
+          LOGSTASH_HOST: ${LOGSTASH_HOST}
       environment:
         DB_HOST: ${DB_HOST}
         DB_NAME: ${DB_NAME}
@@ -15,3 +23,9 @@ services:
         LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
       ports:
         - 8080
+
+
+networks:
+ default:
+   external:
+     name: nginx-proxy
