@@ -3,7 +3,7 @@ os: linux
 
 files:
  - source: /
-   destination: /home/ubuntu/omicflows-backend-deploy
+   destination: /home/ubuntu/sulfur-backend-deploy
 
 permissions:
  - object: /
@@ -12,6 +12,10 @@ permissions:
    group: ubuntu
 
 hooks:
+  BeforeInstall:
+    - location: download_conf.sh
+      timeout: 60
+      runas: root
   AfterInstall:
     - location: stop_server.sh
       timeout: 300
