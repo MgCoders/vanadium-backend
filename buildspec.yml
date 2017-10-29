@@ -10,7 +10,7 @@ phases:
         - echo Installing awscli
         - apk -v --update add python py-pip groff less mailcap && pip install --upgrade awscli s3cmd python-magic && apk -v --purge del py-pip && rm /var/cache/apk/*
         - echo Logging in to Amazon ECR...
-        - $(aws ecr get-login --region $AWS_DEFAULT_REGION)
+        - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
     build:
       commands:
         - echo Build started on `date`
