@@ -4,14 +4,7 @@ services:
 
     wildfly:
       image: sulfur-backend
-      build:
-        context: .
-        args:
-          DB_HOST: db
-          DB_NAME: sulfur
-          DB_USER: sulfur_user
-          DB_PASS: sulfur_pass
-          LOGSTASH_HOST: logstash
+      build: .
       environment:
         DB_HOST: db
         DB_NAME: sulfur
@@ -24,7 +17,8 @@ services:
       links:
         - db
       volumes:
-        - ./target/sulfur.war:/opt/jboss/wildfly/standalone/deployments/sulfur.war
+        - m2:/root/.m2
+        - ./resources/deployments:/opt/jboss/wildfly/standalone/deployments
 
     db:
         image: postgres
@@ -39,3 +33,6 @@ services:
         restart: always
         ports:
             - 8081:8080
+
+volumes:
+  m2:

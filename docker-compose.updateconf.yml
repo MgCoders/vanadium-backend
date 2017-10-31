@@ -7,4 +7,4 @@ services:
         context: .
         dockerfile: Dockerfile.update.wildfly.conf
       volumes:
-        - ./resources/wildfly-configuration:/opt/jboss/wildfly/standalone/configuration:Z
+        - ./resources/wildfly-configuration:/tmp/generated
