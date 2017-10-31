@@ -254,3 +254,6 @@ buildNumber.properties
 !/resources/logstash-gelf-1.11.1.tar.gz
 !/resources/postgresql-42.1.4.jar
 /.env
+!/resources/wildfly-configuration/wildfly-conf.tar.gz
+!/resources/wildfly-configuration/postgresql-42.1.4.module.tar.gz
+/resources/deployments/sulfur.war.deployed

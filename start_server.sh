@@ -5,4 +5,4 @@ echo Logging in to Amazon ECR...
 $(aws ecr get-login --region $AWS_DEFAULT_REGION)
 cp ../conf/sulfur-backend-deploy.env /home/ubuntu/sulfur-backend-deploy/.env
 cd /home/ubuntu/sulfur-backend-deploy
-docker-compose -f docker-compose.production.yml build && docker-compose -f docker-compose.production.yml up -d wildfly
+docker-compose -f docker-compose.production.yml pull && docker-compose -f docker-compose.production.yml up -d

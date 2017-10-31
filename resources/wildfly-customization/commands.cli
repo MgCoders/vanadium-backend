@@ -3,7 +3,7 @@ batch
 
 
 /subsystem=logging/custom-handler=GelfLogger/:add(module=biz.paluch.logging,class=biz.paluch.logging.gelf.wildfly.WildFlyGelfLogHandler,properties={ \
-       host="udp:${env.LOGSTASH_HOST}", \
+       host="udp:${env.LOGSTASH_HOST:none}", \
        port="5000", \
        version="1.0", \
        facility="java-test", \
@@ -24,7 +24,7 @@ batch
 
 module add --name=org.postgresql --resources=postgresql-42.1.4.jar --dependencies=javax.api,javax.transaction.api
 /subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource)
-data-source add --jndi-name=java:jboss/sulfur --name=sulfur --connection-url=jdbc:postgresql://${env.DB_HOST}:5432/${env.DB_NAME} --driver-name=postgresql --user-name=${env.DB_USER} --password=${env.DB_PASS}
+data-source add --jndi-name=java:jboss/sulfur --name=sulfur --connection-url=jdbc:postgresql://${env.DB_HOST:none}:5432/${env.DB_NAME:none} --driver-name=postgresql --user-name=${env.DB_USER:none} --password=${env.DB_PASS:none}
 
 
 # Execute the batch
