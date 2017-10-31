@@ -17,3 +17,13 @@
 
     `http://host:port/sulfur/api/status`
     
+
+## Configuration
+
+* Regenerate standalone.xml
+
+    `docker-compose -f docker-compose.updateconf.yml up`
+    
+## Production
+
+* 
