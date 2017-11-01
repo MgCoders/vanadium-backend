@@ -4,7 +4,6 @@ import coop.magnesium.sulfur.utils.PropertiesFromFile;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
-
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -47,7 +46,7 @@ public class Status {
         sb.append("<span>VERSION=" + endpointsProperties.getProperty("project.version") + "</span></br>");
         sb.append("<span>NODO=" + jbossNodeName + "</span></br>");
         sb.append("<span>LOGS=" + "<a href=''>Ver logs</a></span></br>");
-        sb.append("<span><a href=http://" + endpointsProperties.getProperty("rest.api.host") + "/" + endpointsProperties.getProperty("rest.api.path") +"/swagger.json>Swagger</a></span></br>");
+        sb.append("<span><a href=" + endpointsProperties.getProperty("rest.api.path") + "/swagger.json>Swagger</a></span></br>");
         sb.append("</pre>");
         sb.append("</html>");
         return sb.toString();
