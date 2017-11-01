@@ -5,29 +5,24 @@ env:
     IMAGE_TAG: "no_version"
 
 phases:
-    install:
-      commands:
-        - echo Installing awscli
-        - apk -v --update add python py-pip groff less mailcap && pip install --upgrade awscli s3cmd python-magic && apk -v --purge del py-pip && rm /var/cache/apk/*
-        - echo Start docker
-        - nohup /usr/local/bin/dockerd --host=unix:///var/run/docker.sock --host=tcp://0.0.0.0:2375 --storage-driver=overlay&
-        - timeout -t 15 sh -c "until docker info; do echo .; sleep 1; done"
     pre_build:
       commands:
         - echo Logging in to Amazon ECR...
-        - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
+        - $(aws ecr get-login --region $AWS_DEFAULT_REGION)
+        - export IMAGE_TAG=$(xmllint --xpath "//*[local-name()='project']/*[local-name()='version']/text()" pom.xml)
     build:
       commands:
         - echo Build started on `date`
-        - export IMAGE_TAG=$(xmllint --xpath "//*[local-name()='project']/*[local-name()='version']/text()" pom.xml)
+        - echo building artifact with maven
+        - docker run -it --rm -v "$(pwd)":/usr/src/mymaven -w /usr/src/mymaven maven:3.3-jdk-8 mvn clean package
         - echo Building the Docker image version $IMAGE_TAG ...
-        - docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG .
-        - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+        - docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/sulfur-backend:latest .
+        - docker tag $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/sulfur-backend:latest . $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/sulfur-backend:$IMAGE_TAG
     post_build:
       commands:
         - echo Build completed on `date`
         - echo Pushing the Docker image...
-        - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+        - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/sulfur-backend:$IMAGE_TAG
 
 artifacts:
   files:
