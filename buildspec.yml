@@ -26,4 +26,8 @@ phases:
 
 artifacts:
   files:
-    - '**/*'
+    - 'stop_server.sh'
+    - 'start_server.sh'
+    - 'check_service.sh'
+    - 'appspec.yml'
+    - 'docker-compose.production.yml'
