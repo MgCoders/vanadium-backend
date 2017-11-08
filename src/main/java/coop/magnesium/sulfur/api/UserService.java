@@ -1,8 +1,8 @@
 package coop.magnesium.sulfur.api;
 
 
-import coop.magnesium.sulfur.api.aux.JWTTokenNeeded;
-import coop.magnesium.sulfur.api.aux.RoleNeeded;
+import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
+import coop.magnesium.sulfur.api.utils.RoleNeeded;
 import coop.magnesium.sulfur.db.dao.UserDao;
 import coop.magnesium.sulfur.db.entities.Role;
 import coop.magnesium.sulfur.db.entities.SulfurUser;

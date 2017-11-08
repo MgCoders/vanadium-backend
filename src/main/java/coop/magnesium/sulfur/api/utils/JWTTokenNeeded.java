@@ -1,4 +1,4 @@
-package coop.magnesium.sulfur.api.aux;
+package coop.magnesium.sulfur.api.utils;
 
 import javax.ws.rs.NameBinding;
 import java.lang.annotation.Retention;

@@ -1,4 +1,4 @@
-package coop.magnesium.sulfur.api.aux;
+package coop.magnesium.sulfur.api.utils;
 
 import coop.magnesium.sulfur.db.entities.Role;
 import coop.magnesium.sulfur.utils.KeyGenerator;
