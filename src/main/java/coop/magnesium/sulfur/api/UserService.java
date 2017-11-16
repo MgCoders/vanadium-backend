@@ -3,9 +3,9 @@ package coop.magnesium.sulfur.api;
 
 import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
 import coop.magnesium.sulfur.api.utils.RoleNeeded;
-import coop.magnesium.sulfur.db.dao.UserDao;
+import coop.magnesium.sulfur.db.dao.ColaboradorDao;
+import coop.magnesium.sulfur.db.entities.Colaborador;
 import coop.magnesium.sulfur.db.entities.Role;
-import coop.magnesium.sulfur.db.entities.SulfurUser;
 import coop.magnesium.sulfur.utils.KeyGenerator;
 import coop.magnesium.sulfur.utils.Logged;
 import coop.magnesium.sulfur.utils.PasswordUtils;
@@ -45,7 +45,7 @@ import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
 @Produces(APPLICATION_JSON)
 @Consumes(APPLICATION_JSON)
 @Transactional
-@Api(description = "Users", tags = "users")
+@Api(description = "Aplication users service", tags = "users")
 public class UserService {
 
     @Inject
@@ -55,7 +55,7 @@ public class UserService {
     @Inject
     private Logger logger;
     @EJB
-    private UserDao userDao;
+    private ColaboradorDao colaboradorDao;
 
     @POST
     @Path("/login")
@@ -67,7 +67,7 @@ public class UserService {
         try {
 
             // Authenticate the sulfurUser using the credentials provided
-            SulfurUser sulfurUser = authenticate(email, password);
+            Colaborador sulfurUser = authenticate(email, password);
 
             //Info que quiero guardar en token
             Map<String, Object> map = new HashMap<>();
@@ -94,9 +94,9 @@ public class UserService {
     //TODO: solo admin
     @Logged
     @ApiOperation(value = "Create user", response = String.class)
-    public Response createUser(SulfurUser sulfurUser) {
+    public Response createUser(Colaborador sulfurUser) {
         sulfurUser.setPassword(PasswordUtils.digestPassword(sulfurUser.getPassword()));
-        userDao.save(sulfurUser);
+        colaboradorDao.save(sulfurUser);
         return Response.created(uriInfo.getAbsolutePathBuilder().path(sulfurUser.getEmail()).build()).build();
     }
 
@@ -104,17 +104,17 @@ public class UserService {
     @GET
     @JWTTokenNeeded
     @RoleNeeded({Role.USER, Role.ADMIN})
-    @ApiOperation(value = "Get users", response = SulfurUser.class, responseContainer = "List")
+    @ApiOperation(value = "Get users", response = Colaborador.class, responseContainer = "List")
     public Response findAllUsers() {
-        List<SulfurUser> allSulfurUsers = userDao.findAll();
+        List<Colaborador> allSulfurUsers = colaboradorDao.findAll();
         if (allSulfurUsers == null)
             return Response.status(NOT_FOUND).build();
         return Response.ok(allSulfurUsers).build();
     }
 
 
-    private SulfurUser authenticate(String email, String password) throws Exception {
-        SulfurUser sulfurUser = userDao.findById(email);
+    private Colaborador authenticate(String email, String password) throws Exception {
+        Colaborador sulfurUser = colaboradorDao.findById(email);
         if (sulfurUser == null)
             throw new MagnesiumNotFoundException("User not found");
         if (!PasswordUtils.digestPassword(password).equals(sulfurUser.getPassword()))
