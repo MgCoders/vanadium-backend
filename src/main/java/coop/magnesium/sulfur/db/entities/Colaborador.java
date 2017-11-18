@@ -68,7 +68,8 @@ public class Colaborador {
         return "Colaborador{" +
                 "email='" + email + '\'' +
                 ", nombre='" + nombre + '\'' +
-                ", cargo=" + cargo +
+                ", cargo=" + cargo.getNombre() +
+                ", password='" + password + '\'' +
                 ", role='" + role + '\'' +
                 '}';
     }

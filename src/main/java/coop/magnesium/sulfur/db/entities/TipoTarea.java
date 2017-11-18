@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @Entity
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Proyecto {
+public class TipoTarea {
 
     @Id
     @GeneratedValue
@@ -51,7 +51,7 @@ public class Proyecto {
 
     @Override
     public String toString() {
-        return "Proyecto{" +
+        return "TipoTarea{" +
                 "id=" + id +
                 ", codigo='" + codigo + '\'' +
                 ", nombre='" + nombre + '\'' +

@@ -1,6 +1,6 @@
 package coop.magnesium.sulfur.db.dao;
 
-import coop.magnesium.sulfur.db.entities.Tarea;
+import coop.magnesium.sulfur.db.entities.TipoTarea;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -10,14 +10,14 @@ import javax.persistence.PersistenceContext;
  * Created by rsperoni on 28/10/17.
  */
 @Stateless
-public class TareaDao extends AbstractDao<Tarea, String> {
+public class TareaDao extends AbstractDao<TipoTarea, String> {
 
     @PersistenceContext
     EntityManager em;
 
     @Override
-    public Class<Tarea> getEntityClass() {
-        return Tarea.class;
+    public Class<TipoTarea> getEntityClass() {
+        return TipoTarea.class;
     }
 
     @Override
