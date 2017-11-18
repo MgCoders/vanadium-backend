@@ -7,7 +7,7 @@ env:
 phases:
     pre_build:
       commands:
-        - echo Logging in to Amazon ECR...
+        - echo Logging horaIn to Amazon ECR...
         - $(aws ecr get-login --region $AWS_DEFAULT_REGION)
         - export IMAGE_TAG=$(xmllint --xpath "//*[local-name()='project']/*[local-name()='version']/text()" pom.xml)
     build:

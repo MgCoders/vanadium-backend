@@ -15,8 +15,8 @@ public class ExtraTests {
     @Test
     public void HoraSubtotalTest() {
         Hora hora = new Hora();
-        hora.setIn(LocalTime.now());
-        hora.setOut(hora.getIn().plusHours(3L).plusMinutes(5L));
+        hora.setHoraIn(LocalTime.now());
+        hora.setHoraOut(hora.getHoraIn().plusHours(3L).plusMinutes(5L));
         hora.calcularSubtotal();
         assertEquals(LocalTime.of(3, 05), hora.getSubtotal());
     }

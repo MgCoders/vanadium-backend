@@ -1,28 +1,36 @@
 package coop.magnesium.sulfur.db.entities;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 /**
  * Created by rsperoni on 16/11/17.
  */
 @Entity
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
+@JsonAutoDetect
 public class Cargo {
 
     @Id
-    @GeneratedValue
-    @XmlTransient
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotNull
     private String nombre;
+    @NotNull
     private BigDecimal precioHora;
+
+    public Cargo() {
+    }
+
+    public Cargo(String nombre, BigDecimal precioHora) {
+        this.nombre = nombre;
+        this.precioHora = precioHora;
+    }
 
     public Long getId() {
         return id;

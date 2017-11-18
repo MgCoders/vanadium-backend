@@ -3,6 +3,10 @@ package coop.magnesium.sulfur.db.dao;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +44,15 @@ public abstract class AbstractDao<E, ID extends Serializable> {
             query.setParameter(entry.getKey(), entry.getValue());
         }
         return (List<E>) query.getResultList();
+    }
+
+    public List<E> findByField(final String fieldName, final String fieldValue) {
+        CriteriaBuilder cb = getEntityManager().getCriteriaBuilder();
+        CriteriaQuery<E> cq = cb.createQuery(getEntityClass());
+        Root<E> tag = cq.from(getEntityClass());
+        cq.where(cb.equal(tag.get(fieldName), fieldValue));
+        TypedQuery<E> query = getEntityManager().createQuery(cq);
+        return query.getResultList();
     }
 
     public int countAll() {

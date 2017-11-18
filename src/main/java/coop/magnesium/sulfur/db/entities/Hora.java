@@ -2,9 +2,7 @@ package coop.magnesium.sulfur.db.entities;
 
 
 import javax.persistence.*;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.*;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -21,22 +19,40 @@ public class Hora {
     @GeneratedValue
     private Long id;
     private LocalDate dia;
-    private LocalTime in;
-    private LocalTime out;
+    private LocalTime horaIn;
+    private LocalTime horaOut;
     private LocalTime subtotal;
 
+    @XmlTransient
     @ManyToOne
     private Proyecto proyecto;
+    @XmlTransient
     @ManyToOne
     private TipoTarea tipoTarea;
+    @XmlTransient
     @ManyToOne
     private Colaborador colaborador;
 
     @PrePersist
     @PreUpdate
     public void calcularSubtotal() {
-        Duration duration = Duration.between(in, out);
+        Duration duration = Duration.between(horaIn, horaOut);
         this.subtotal = LocalTime.ofNanoOfDay(duration.toNanos());
+    }
+
+    @XmlElement
+    public Long getProyectoId() {
+        return proyecto.getId();
+    }
+
+    @XmlElement
+    public Long getTipoTareaId() {
+        return tipoTarea.getId();
+    }
+
+    @XmlElement
+    public Long getColaboradorId() {
+        return colaborador.getId();
     }
 
     public Colaborador getColaborador() {
@@ -63,20 +79,20 @@ public class Hora {
         this.dia = dia;
     }
 
-    public LocalTime getIn() {
-        return in;
+    public LocalTime getHoraIn() {
+        return horaIn;
     }
 
-    public void setIn(LocalTime in) {
-        this.in = in;
+    public void setHoraIn(LocalTime horaIn) {
+        this.horaIn = horaIn;
     }
 
-    public LocalTime getOut() {
-        return out;
+    public LocalTime getHoraOut() {
+        return horaOut;
     }
 
-    public void setOut(LocalTime out) {
-        this.out = out;
+    public void setHoraOut(LocalTime horaOut) {
+        this.horaOut = horaOut;
     }
 
     public LocalTime getSubtotal() {
@@ -108,8 +124,8 @@ public class Hora {
         return "Hora{" +
                 "id=" + id +
                 ", dia=" + dia +
-                ", in=" + in +
-                ", out=" + out +
+                ", horaIn=" + horaIn +
+                ", horaOut=" + horaOut +
                 ", subtotal=" + subtotal +
                 ", proyecto=" + proyecto.getCodigo() +
                 ", tipoTarea=" + tipoTarea.getCodigo() +

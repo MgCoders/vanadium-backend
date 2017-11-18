@@ -1,15 +1,13 @@
 package coop.magnesium.sulfur.api;
 
 
-import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
-import coop.magnesium.sulfur.api.utils.RoleNeeded;
 import coop.magnesium.sulfur.db.dao.ColaboradorDao;
 import coop.magnesium.sulfur.db.entities.Colaborador;
-import coop.magnesium.sulfur.db.entities.Role;
 import coop.magnesium.sulfur.utils.KeyGenerator;
 import coop.magnesium.sulfur.utils.Logged;
 import coop.magnesium.sulfur.utils.PasswordUtils;
-import coop.magnesium.sulfur.utils.ex.MagnesiumNotFoundException;
+import coop.magnesium.sulfur.utils.ex.MagnesiumBdMultipleResultsException;
+import coop.magnesium.sulfur.utils.ex.MagnesiumBdNotFoundException;
 import coop.magnesium.sulfur.utils.ex.MagnesiumSecurityException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -28,14 +26,11 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static javax.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
 
 /**
@@ -65,23 +60,16 @@ public class UserService {
     public Response authenticateUser(@FormParam("email") String email,
                                      @FormParam("password") String password) {
         try {
-
             // Authenticate the sulfurUser using the credentials provided
             Colaborador sulfurUser = authenticate(email, password);
-
             //Info que quiero guardar en token
             Map<String, Object> map = new HashMap<>();
             map.put("role", sulfurUser.getRole());
-
             // Issue a token for the sulfurUser
             String token = issueToken(email, map);
-
-            // Return the token on the response
-            String json = "{\"token\":" + "\"Bearer " + token + "\"}";
-            //return Response.ok(json).build();
-            return Response.ok(json).header(AUTHORIZATION, "Bearer " + token).build();
-
-        } catch (MagnesiumNotFoundException | MagnesiumSecurityException e) {
+            sulfurUser.setToken(token);
+            return Response.ok(sulfurUser).build();
+        } catch (MagnesiumSecurityException | MagnesiumBdMultipleResultsException | MagnesiumBdNotFoundException e) {
             logger.warning(e.getMessage());
             return Response.status(UNAUTHORIZED).build();
         } catch (Exception e) {
@@ -90,33 +78,9 @@ public class UserService {
         }
     }
 
-    @POST
-    //TODO: solo admin
-    @Logged
-    @ApiOperation(value = "Create user", response = String.class)
-    public Response createUser(Colaborador sulfurUser) {
-        sulfurUser.setPassword(PasswordUtils.digestPassword(sulfurUser.getPassword()));
-        colaboradorDao.save(sulfurUser);
-        return Response.created(uriInfo.getAbsolutePathBuilder().path(sulfurUser.getEmail()).build()).build();
-    }
 
-
-    @GET
-    @JWTTokenNeeded
-    @RoleNeeded({Role.USER, Role.ADMIN})
-    @ApiOperation(value = "Get users", response = Colaborador.class, responseContainer = "List")
-    public Response findAllUsers() {
-        List<Colaborador> allSulfurUsers = colaboradorDao.findAll();
-        if (allSulfurUsers == null)
-            return Response.status(NOT_FOUND).build();
-        return Response.ok(allSulfurUsers).build();
-    }
-
-
-    private Colaborador authenticate(String email, String password) throws Exception {
-        Colaborador sulfurUser = colaboradorDao.findById(email);
-        if (sulfurUser == null)
-            throw new MagnesiumNotFoundException("User not found");
+    private Colaborador authenticate(String email, String password) throws MagnesiumBdNotFoundException, MagnesiumBdMultipleResultsException, MagnesiumSecurityException {
+        Colaborador sulfurUser = colaboradorDao.findByEmail(email);
         if (!PasswordUtils.digestPassword(password).equals(sulfurUser.getPassword()))
             throw new MagnesiumSecurityException("Invalid sulfurUser/password");
         return sulfurUser;

@@ -131,7 +131,7 @@
     </dependencyManagement>
     <!-- Profiles -->
     <profiles>
-        <!-- Seperate profiles are provided for running tests, including Arquillian tests that execute in a specified container -->
+        <!-- Seperate profiles are provided for running tests, including Arquillian tests that exechoraIne in a specified container -->
         <profile>
             <id>desarrollo</id>
             <properties>

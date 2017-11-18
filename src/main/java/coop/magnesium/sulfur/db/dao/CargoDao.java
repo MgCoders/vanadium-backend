@@ -10,7 +10,7 @@ import javax.persistence.PersistenceContext;
  * Created by rsperoni on 28/10/17.
  */
 @Stateless
-public class CargoDao extends AbstractDao<Cargo, String> {
+public class CargoDao extends AbstractDao<Cargo, Long> {
 
     @PersistenceContext
     EntityManager em;

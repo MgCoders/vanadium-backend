@@ -7,7 +7,6 @@ import javax.persistence.Id;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * Created by rsperoni on 16/11/17.
@@ -19,7 +18,6 @@ public class Proyecto {
 
     @Id
     @GeneratedValue
-    @XmlTransient
     private Long id;
     @Column(unique = true)
     private String codigo;
