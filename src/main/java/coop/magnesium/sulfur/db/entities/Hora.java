@@ -1,8 +1,13 @@
 package coop.magnesium.sulfur.db.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.persistence.*;
-import javax.xml.bind.annotation.*;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -11,25 +16,30 @@ import java.time.LocalTime;
  * Created by rsperoni on 17/11/17.
  */
 @Entity
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
+@JsonAutoDetect
 public class Hora {
 
     @Id
     @GeneratedValue
     private Long id;
+    @NotNull
     private LocalDate dia;
+    @NotNull
     private LocalTime horaIn;
+    @NotNull
     private LocalTime horaOut;
     private LocalTime subtotal;
 
-    @XmlTransient
+    @NotNull
+    @Valid
     @ManyToOne
     private Proyecto proyecto;
-    @XmlTransient
+    @NotNull
+    @Valid
     @ManyToOne
     private TipoTarea tipoTarea;
-    @XmlTransient
+    @NotNull
+    @Valid
     @ManyToOne
     private Colaborador colaborador;
 
@@ -40,20 +50,6 @@ public class Hora {
         this.subtotal = LocalTime.ofNanoOfDay(duration.toNanos());
     }
 
-    @XmlElement
-    public Long getProyectoId() {
-        return proyecto.getId();
-    }
-
-    @XmlElement
-    public Long getTipoTareaId() {
-        return tipoTarea.getId();
-    }
-
-    @XmlElement
-    public Long getColaboradorId() {
-        return colaborador.getId();
-    }
 
     public Colaborador getColaborador() {
         return colaborador;
@@ -95,10 +91,12 @@ public class Hora {
         this.horaOut = horaOut;
     }
 
+    @JsonProperty
     public LocalTime getSubtotal() {
         return subtotal;
     }
 
+    @JsonIgnore
     public void setSubtotal(LocalTime subtotal) {
         this.subtotal = subtotal;
     }

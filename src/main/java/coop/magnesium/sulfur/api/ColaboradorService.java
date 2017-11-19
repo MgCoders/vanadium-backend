@@ -93,7 +93,7 @@ public class ColaboradorService {
     //@JWTTokenNeeded
     //@RoleNeeded({Role.USER, Role.ADMIN})
     @ApiOperation(value = "Edit colaborador", response = Colaborador.class)
-    public Response edit(@PathParam("id") Long id, Colaborador colaborador) {
+    public Response edit(@PathParam("id") Long id, @Valid Colaborador colaborador) {
         try {
             if (colaboradorDao.findById(id) == null) throw new MagnesiumNotFoundException("Colaborador no encontrado");
             colaborador.setId(id);
