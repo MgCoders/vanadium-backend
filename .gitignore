@@ -257,3 +257,4 @@ buildNumber.properties
 !/resources/wildfly-configuration/wildfly-conf.tar.gz
 !/resources/wildfly-configuration/postgresql-42.1.4.module.tar.gz
 /resources/deployments/sulfur.war.deployed
+/node_modules/
