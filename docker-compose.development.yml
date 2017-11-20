@@ -21,7 +21,6 @@ services:
 
     db:
         image: postgres
-        restart: always
         environment:
             POSTGRES_USER: sulfur_user
             POSTGRES_PASSWORD: sulfur_pass
@@ -29,6 +28,7 @@ services:
 
     adminer:
         image: adminer
-        restart: always
+        links:
+                - db
         ports:
             - 8081:8080

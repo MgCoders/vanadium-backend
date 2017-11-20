@@ -1,4 +1,4 @@
-package coop.magnesium.sulfur.api.aux;
+package coop.magnesium.sulfur.api.utils;
 
 import coop.magnesium.sulfur.utils.KeyGenerator;
 import io.jsonwebtoken.Jwts;

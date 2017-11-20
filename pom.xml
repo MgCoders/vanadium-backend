@@ -96,9 +96,11 @@
         <version.org.jboss.arquillian>1.1.5.Final</version.org.jboss.arquillian>
         <version.shrinkwrap.resolvers>2.2.6</version.shrinkwrap.resolvers>
         <version.org.wildfly>2.0.2.Final</version.org.wildfly>
-        <version.junit>4.12</version.junit>
+        <version.junit>4.11</version.junit>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <version.jacoco>0.7.8</version.jacoco>
+        <version.arquillian_jacoco>1.0.0.Alpha9</version.arquillian_jacoco>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -131,14 +133,14 @@
     </dependencyManagement>
     <!-- Profiles -->
     <profiles>
-        <!-- Seperate profiles are provided for running tests, including Arquillian tests that execute in a specified container -->
+        <!-- Seperate profiles are provided for running tests, including Arquillian tests that exechoraIne in a specified container -->
         <profile>
             <id>desarrollo</id>
             <properties>
                 <jboss.host>127.0.0.1</jboss.host>
                 <jboss.port>8080</jboss.port>
-                <app.path>sulfur</app.path>
-                <app.api.url>localhost:8080/api</app.api.url>
+                <rest.base.path>api</rest.base.path>
+                <rest.base.host>localhost:8080</rest.base.host>
             </properties>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -149,8 +151,8 @@
             <properties>
                 <jboss.host>https://sulfur.mgcoders.com</jboss.host>
                 <jboss.port>80</jboss.port>
-                <app.path>sulfur</app.path>
-                <app.api.url>https://sulfur.mgcoders.com/api</app.api.url>
+                <rest.base.path>api</rest.base.path>
+                <rest.base.host>sulfur.mgcoders.com</rest.base.host>
             </properties>
         </profile>
         <!-- Arquillian WildFly managed profile -->
@@ -196,6 +198,46 @@
                                         </artifactItem>
                                     </artifactItems>
                                 </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>jacoco</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>org.jacoco.core</artifactId>
+                    <version>${version.jacoco}</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.arquillian.extension</groupId>
+                    <artifactId>arquillian-jacoco</artifactId>
+                    <version>${version.arquillian_jacoco}</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>${version.jacoco}</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>report</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
                             </execution>
                         </executions>
                     </plugin>
