@@ -1,8 +1,11 @@
 package coop.magnesium.sulfur.api;
 
 
+import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
+import coop.magnesium.sulfur.api.utils.RoleNeeded;
 import coop.magnesium.sulfur.db.dao.CargoDao;
 import coop.magnesium.sulfur.db.entities.Cargo;
+import coop.magnesium.sulfur.db.entities.Role;
 import coop.magnesium.sulfur.db.entities.TipoTarea;
 import coop.magnesium.sulfur.utils.Logged;
 import coop.magnesium.sulfur.utils.ex.MagnesiumBdAlredyExistsException;
@@ -41,8 +44,12 @@ public class CargoService {
     @ApiOperation(value = "Create Cargo", response = Cargo.class)
     public Response create(@Valid Cargo cargo) {
         try {
-            Cargo cargoExists = cargoDao.findById(cargo.getId());
-            if (cargoExists != null) throw new MagnesiumBdAlredyExistsException("Cargo ya existe");
+            Cargo cargoExists = cargo.getId() != null ? cargoDao.findById(cargo.getId()) : null;
+            if (cargoExists != null) throw new MagnesiumBdAlredyExistsException("Id ya existe");
+
+            if (cargoDao.findByField("codigo", cargo.getCodigo()).size() > 0)
+                throw new MagnesiumBdAlredyExistsException("Código existe");
+
             cargo = cargoDao.save(cargo);
             return Response.status(Response.Status.CREATED).entity(cargo).build();
         } catch (MagnesiumBdAlredyExistsException exists) {
@@ -56,8 +63,8 @@ public class CargoService {
 
 
     @GET
-    //@JWTTokenNeeded
-    //@RoleNeeded({Role.USER, Role.ADMIN})
+    @JWTTokenNeeded
+    @RoleNeeded({Role.USER, Role.ADMIN})
     @ApiOperation(value = "Get cargos", response = Cargo.class, responseContainer = "List")
     public Response findAll() {
         List<Cargo> cargoList = cargoDao.findAll();
@@ -66,8 +73,8 @@ public class CargoService {
 
     @GET
     @Path("{id}")
-    //@JWTTokenNeeded
-    //@RoleNeeded({Role.USER, Role.ADMIN})
+    @JWTTokenNeeded
+    @RoleNeeded({Role.USER, Role.ADMIN})
     @ApiOperation(value = "Get Cargo", response = TipoTarea.class)
     public Response find(@PathParam("id") Long id) {
         Cargo cargo = cargoDao.findById(id);
@@ -77,8 +84,8 @@ public class CargoService {
 
     @PUT
     @Path("{id}")
-    //@JWTTokenNeeded
-    //@RoleNeeded({Role.USER, Role.ADMIN})
+    @JWTTokenNeeded
+    @RoleNeeded({Role.USER, Role.ADMIN})
     @ApiOperation(value = "Edit cargo", response = Cargo.class)
     public Response edit(@PathParam("id") Long id, @Valid Cargo cargo) {
         try {

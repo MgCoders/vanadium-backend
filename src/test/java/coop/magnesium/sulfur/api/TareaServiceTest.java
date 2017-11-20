@@ -75,4 +75,6 @@ public class TareaServiceTest {
                 .post(Entity.json(tipoTarea));
         assertEquals(Response.Status.CONFLICT.getStatusCode(), response.getStatus());
     }
+
+
 }

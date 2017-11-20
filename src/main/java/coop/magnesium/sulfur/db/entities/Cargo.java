@@ -2,10 +2,7 @@ package coop.magnesium.sulfur.db.entities;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
@@ -22,14 +19,26 @@ public class Cargo {
     @NotNull
     private String nombre;
     @NotNull
+    @Column(unique = true)
+    private String codigo;
+    @NotNull
     private BigDecimal precioHora;
 
     public Cargo() {
     }
 
-    public Cargo(String nombre, BigDecimal precioHora) {
+    public Cargo(String codigo, String nombre, BigDecimal precioHora) {
+        this.codigo = codigo;
         this.nombre = nombre;
         this.precioHora = precioHora;
+    }
+
+    public String getCodigo() {
+        return codigo;
+    }
+
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
     }
 
     public Long getId() {
