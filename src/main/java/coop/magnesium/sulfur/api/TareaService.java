@@ -42,6 +42,8 @@ public class TareaService {
 
     @POST
     @Logged
+    @JWTTokenNeeded
+    @RoleNeeded({Role.USER, Role.ADMIN})
     @ApiOperation(value = "Create Tipo Tarea", response = TipoTarea.class)
     @ApiResponses(value = {
             @ApiResponse(code = 409, message = "Código o Id ya existe"),

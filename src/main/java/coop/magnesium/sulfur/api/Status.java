@@ -19,7 +19,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 /**
  * Created by rsperoni on 14/09/17.
  */
-@Api(description = "Status", tags = "status")
+@Api(description = "System Status", tags = "status")
 @Path("/status")
 @Produces(APPLICATION_JSON)
 @Consumes(APPLICATION_JSON)

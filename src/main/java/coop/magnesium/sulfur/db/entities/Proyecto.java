@@ -26,6 +26,14 @@ public class Proyecto {
     @NotNull
     private String nombre;
 
+    public Proyecto() {
+    }
+
+    public Proyecto(String codigo, String nombre) {
+        this.codigo = codigo;
+        this.nombre = nombre;
+    }
+
     public Long getId() {
         return id;
     }

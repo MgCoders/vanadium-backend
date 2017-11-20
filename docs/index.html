@@ -16,12 +16,30 @@
         <button class="close-button" aria-label="Close menu" type="button" data-drawer-close>
           <span aria-hidden="true">×</span>
         </button>
+          <div id="logo">
+              <img src="images/logo-magnesium-firma.png" title="Sulfur backend"/></div>
         <nav id="nav" role="navigation">
           <h5>API Reference</h5>
           <a href="#introduction">Introduction</a>
           <h5>Operations</h5>
           <section>
-              <a href="#tag-colaboradores">colaboradores</a>
+              <a href="#tag-auth">auth</a>
+              <ul>
+                  <li>
+                      <a href="#operation--users-login-post"> Authenticate user </a>
+                  </li>
+              </ul>
+          </section>
+            <section>
+                <a href="#tag-status">status</a>
+                <ul>
+                    <li>
+                        <a href="#operation--status-get"> Get system status </a>
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <a href="#tag-colaboradores">colaboradores</a>
             <ul>
               <li>
                   <a href="#operation--colaboradores-get"> Get colaboradores </a>
@@ -34,48 +52,6 @@
                 </li>
                 <li>
                     <a href="#operation--colaboradores--id--put"> Edit colaborador </a>
-              </li>
-            </ul>
-          </section>
-          <section>
-            <a href="#tag-proyectos">proyectos</a>
-            <ul>
-              <li>
-                <a href="#operation--proyectos-get"> Get proyectos </a>
-              </li>
-              <li>
-                <a href="#operation--proyectos-post"> Create Proyecto </a>
-              </li>
-              <li>
-                <a href="#operation--proyectos--id--get"> Get tipo Tarea </a>
-              </li>
-              <li>
-                <a href="#operation--proyectos--id--put"> Edit proyecto </a>
-              </li>
-            </ul>
-          </section>
-          <section>
-              <a href="#tag-auth">auth</a>
-            <ul>
-              <li>
-                  <a href="#operation--users-login-post"> Authenticate user </a>
-              </li>
-            </ul>
-          </section>
-          <section>
-              <a href="#tag-horas">horas</a>
-            <ul>
-              <li>
-                  <a href="#operation--horas-get"> Get horas </a>
-              </li>
-              <li>
-                  <a href="#operation--horas-post"> Create hora </a>
-              </li>
-              <li>
-                  <a href="#operation--horas--id--get"> Get hora </a>
-              </li>
-              <li>
-                  <a href="#operation--horas--id--put"> Edit hora </a>
               </li>
             </ul>
           </section>
@@ -113,11 +89,37 @@
               </li>
             </ul>
           </section>
-            <section>
-                <a href="#tag-status">status</a>
-                <ul>
-                    <li>
-                        <a href="#operation--status-get"> Get system status </a>
+          <section>
+              <a href="#tag-horas">horas</a>
+            <ul>
+              <li>
+                  <a href="#operation--horas-get"> Get horas </a>
+              </li>
+              <li>
+                  <a href="#operation--horas-post"> Create hora </a>
+              </li>
+              <li>
+                  <a href="#operation--horas--id--get"> Get hora </a>
+              </li>
+              <li>
+                  <a href="#operation--horas--id--put"> Edit hora </a>
+              </li>
+            </ul>
+          </section>
+          <section>
+              <a href="#tag-proyectos">proyectos</a>
+            <ul>
+              <li>
+                  <a href="#operation--proyectos-get"> Get proyectos </a>
+              </li>
+              <li>
+                  <a href="#operation--proyectos-post"> Create Proyecto </a>
+              </li>
+              <li>
+                  <a href="#operation--proyectos--id--get"> Get tipo Tarea </a>
+              </li>
+              <li>
+                  <a href="#operation--proyectos--id--put"> Edit proyecto </a>
               </li>
             </ul>
           </section>
@@ -127,6 +129,7 @@
           <a href="#definition-Hora"> Hora </a>
           <a href="#definition-LocalTime"> LocalTime </a>
           <a href="#definition-Era"> Era </a>
+            <a href="#definition-MagnesiumStatus"> MagnesiumStatus </a>
           <a href="#definition-IsoChronology"> IsoChronology </a>
           <a href="#definition-TipoTarea"> TipoTarea </a>
           <a href="#definition-LocalDate"> LocalDate </a>
@@ -152,7 +155,7 @@
                 <section>
                   <h5>API Endpoint</h5>
                     <!-- <div class="hljs"> -->
-                    <pre><code>https://https://sulfur.mgcoders.com/api</code></pre>
+                    <pre><code>https://sulfur.mgcoders.com/api</code></pre>
                   <!-- </div> -->
                   <h5>Schemes:
                       <span>https</span>
@@ -164,6 +167,186 @@
               </div>
             </div>
           </div>
+            <h1 id="tag-auth" class="swagger-summary-tag" data-traverse-target="tag-auth">auth</h1>
+            <div id="operation--users-login-post" class="operation panel"
+                 data-traverse-target="operation--users-login-post">
+                <!-- <section class="operation-tags row"> -->
+                <!-- <div class="doc-copy"> -->
+                <div class="operation-tags">
+                    <a class="label" href="#tag-auth">auth</a>
+                    <!---->
+                </div>
+                <!-- </div> -->
+                <!-- </section> -->
+                <h2 class="operation-title">
+                    <span class="operation-summary">Authenticate user</span>
+                </h2>
+                <div class="doc-row">
+                    <div class="doc-copy">
+                        <section class="swagger-operation-path">
+                            <span class="operation-method">POST</span>
+                            <span class="operation-path">/users/login</span>
+                        </section>
+                    </div>
+                </div>
+                <div class="doc-row">
+                    <div class="doc-copy">
+                        <section class="swagger-request-params">
+                            <div class="prop-row prop-group">
+                                <div class="prop-name">
+                                    <div class="prop-title">email</div>
+                                </div>
+                                <div class="prop-value">
+                                    <p class="no-description">(no description)</p>
+                                </div>
+                            </div>
+                            <div class="prop-row prop-inner">
+                                <div class="prop-name param-label">type</div>
+                                <div class="prop-value">
+                                    <span class="json-property-type">string</span>
+                                    <span class="json-property-range" title="Value limits"></span>
+                                </div>
+                            </div>
+                            <div class="prop-row prop-inner">
+                                <div class="prop-name param-label">in</div>
+                                <div class="prop-value">formData</div>
+                            </div>
+                            <div class="prop-row prop-group">
+                                <div class="prop-name">
+                                    <div class="prop-title">password</div>
+                                </div>
+                                <div class="prop-value">
+                                    <p class="no-description">(no description)</p>
+                                </div>
+                            </div>
+                            <div class="prop-row prop-inner">
+                                <div class="prop-name param-label">type</div>
+                                <div class="prop-value">
+                                    <span class="json-property-type">string</span>
+                                    <span class="json-property-range" title="Value limits"></span>
+                                </div>
+                            </div>
+                            <div class="prop-row prop-inner">
+                                <div class="prop-name param-label">in</div>
+                                <div class="prop-value">formData</div>
+                            </div>
+                        </section>
+                    </div>
+                    <div class="doc-examples"></div>
+                </div>
+                <div class="doc-row">
+                    <div class="doc-copy">
+                        <section class="swagger-responses">
+                            <div class="prop-row prop-group">
+                                <div class="prop-name">
+                                    <div class="prop-title">200 OK</div>
+                                    <div class="prop-ref">
+                        <span class="">
+                          <a class="json-schema-ref" href="#/definitions/Colaborador">Colaborador</a>
+                        </span>
+                                    </div>
+                                    <!-- <span class="swagger-global"></span> <span class="json-schema-reference"><a href=""></a></span> -->
+                                </div>
+                                <div class="prop-value">
+                                    <p>successful operation</p>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <div class="doc-examples">
+                        <h5>Response Content-Types:
+                            <span>application/json</span>
+                        </h5>
+                        <section>
+                            <h5>Response Example
+                                <span>(200 OK)</span>
+                            </h5>
+                            <!-- <div class="hljs"> -->
+                            <pre><code class="hljs lang-json">{
+  <span class="hljs-attr">&quot;id&quot;</span>: <span class="hljs-string">&quot;integer (int64)&quot;</span>,
+  <span class="hljs-attr">&quot;email&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
+  <span class="hljs-attr">&quot;nombre&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
+  <span class="hljs-attr">&quot;cargo&quot;</span>: {
+    <span class="hljs-attr">&quot;id&quot;</span>: <span class="hljs-string">&quot;integer (int64)&quot;</span>,
+    <span class="hljs-attr">&quot;nombre&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
+    <span class="hljs-attr">&quot;codigo&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
+    <span class="hljs-attr">&quot;precioHora&quot;</span>: <span class="hljs-string">&quot;number (double)&quot;</span>
+  },
+  <span class="hljs-attr">&quot;role&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
+  <span class="hljs-attr">&quot;token&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>
+}
+</code></pre>
+                            <!-- </div> -->
+                        </section>
+                    </div>
+                </div>
+            </div>
+            <h1 id="tag-status" class="swagger-summary-tag" data-traverse-target="tag-status">status</h1>
+            <div id="operation--status-get" class="operation panel" data-traverse-target="operation--status-get">
+                <!-- <section class="operation-tags row"> -->
+                <!-- <div class="doc-copy"> -->
+                <div class="operation-tags">
+                    <a class="label" href="#tag-status">status</a>
+                    <!---->
+                </div>
+                <!-- </div> -->
+                <!-- </section> -->
+                <h2 class="operation-title">
+                    <span class="operation-summary">Get system status</span>
+                </h2>
+                <div class="doc-row">
+                    <div class="doc-copy">
+                        <section class="swagger-operation-path">
+                            <span class="operation-method">GET</span>
+                            <span class="operation-path">/status</span>
+                        </section>
+                    </div>
+                </div>
+                <div class="doc-row">
+                    <div class="doc-copy"></div>
+                    <div class="doc-examples"></div>
+                </div>
+                <div class="doc-row">
+                    <div class="doc-copy">
+                        <section class="swagger-responses">
+                            <div class="prop-row prop-group">
+                                <div class="prop-name">
+                                    <div class="prop-title">200 OK</div>
+                                    <div class="prop-ref">
+                        <span class="">
+                          <a class="json-schema-ref" href="#/definitions/MagnesiumStatus">MagnesiumStatus</a>
+                        </span>
+                                    </div>
+                                    <!-- <span class="swagger-global"></span> <span class="json-schema-reference"><a href=""></a></span> -->
+                                </div>
+                                <div class="prop-value">
+                                    <p>successful operation</p>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <div class="doc-examples">
+                        <h5>Response Content-Types:
+                            <span>application/json</span>
+                        </h5>
+                        <section>
+                            <h5>Response Example
+                                <span>(200 OK)</span>
+                            </h5>
+                            <!-- <div class="hljs"> -->
+                            <pre><code class="hljs lang-json">{
+  <span class="hljs-attr">&quot;project&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
+  <span class="hljs-attr">&quot;version&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
+  <span class="hljs-attr">&quot;node&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
+  <span class="hljs-attr">&quot;swaggerUrl&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
+  <span class="hljs-attr">&quot;docsUrl&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>
+}
+</code></pre>
+                            <!-- </div> -->
+                        </section>
+                    </div>
+                </div>
+            </div>
             <h1 id="tag-colaboradores" class="swagger-summary-tag" data-traverse-target="tag-colaboradores">
                 colaboradores</h1>
             <div id="operation--colaboradores-get" class="operation panel"
@@ -576,24 +759,24 @@
               </div>
             </div>
           </div>
-            <h1 id="tag-proyectos" class="swagger-summary-tag" data-traverse-target="tag-proyectos">proyectos</h1>
-            <div id="operation--proyectos-get" class="operation panel" data-traverse-target="operation--proyectos-get">
+            <h1 id="tag-tareas" class="swagger-summary-tag" data-traverse-target="tag-tareas">tareas</h1>
+            <div id="operation--tareas-get" class="operation panel" data-traverse-target="operation--tareas-get">
             <!-- <section class="operation-tags row"> -->
             <!-- <div class="doc-copy"> -->
             <div class="operation-tags">
-                <a class="label" href="#tag-proyectos">proyectos</a>
+                <a class="label" href="#tag-tareas">tareas</a>
               <!---->
             </div>
             <!-- </div> -->
             <!-- </section> -->
             <h2 class="operation-title">
-                <span class="operation-summary">Get proyectos</span>
+                <span class="operation-summary">Get tipos tarea</span>
             </h2>
             <div class="doc-row">
               <div class="doc-copy">
                 <section class="swagger-operation-path">
                   <span class="operation-method">GET</span>
-                    <span class="operation-path">/proyectos</span>
+                    <span class="operation-path">/tareas</span>
                 </section>
               </div>
             </div>
@@ -609,7 +792,7 @@
                       <div class="prop-title">200 OK</div>
                       <div class="prop-ref">
                         <span class="json-schema-ref-array">
-                          <a class="json-schema-ref" href="#/definitions/Proyecto">Proyecto</a>
+                          <a class="json-schema-ref" href="#/definitions/TipoTarea">TipoTarea</a>
                         </span>
                       </div>
                       <!-- <span class="swagger-global"></span> <span class="json-schema-reference"><a href=""></a></span> -->
@@ -641,24 +824,23 @@
               </div>
             </div>
           </div>
-            <div id="operation--proyectos-post" class="operation panel"
-                 data-traverse-target="operation--proyectos-post">
+            <div id="operation--tareas-post" class="operation panel" data-traverse-target="operation--tareas-post">
             <!-- <section class="operation-tags row"> -->
             <!-- <div class="doc-copy"> -->
             <div class="operation-tags">
-                <a class="label" href="#tag-proyectos">proyectos</a>
+                <a class="label" href="#tag-tareas">tareas</a>
               <!---->
             </div>
             <!-- </div> -->
             <!-- </section> -->
             <h2 class="operation-title">
-                <span class="operation-summary">Create Proyecto</span>
+                <span class="operation-summary">Create Tipo Tarea</span>
             </h2>
             <div class="doc-row">
               <div class="doc-copy">
                 <section class="swagger-operation-path">
                   <span class="operation-method">POST</span>
-                    <span class="operation-path">/proyectos</span>
+                    <span class="operation-path">/tareas</span>
                 </section>
               </div>
             </div>
@@ -669,7 +851,7 @@
                     <div class="prop-name">
                       <div class="swagger-request-model">
                         <span class="">
-                          <a class="json-schema-ref" href="#/definitions/Proyecto">Proyecto</a>
+                          <a class="json-schema-ref" href="#/definitions/TipoTarea">TipoTarea</a>
                         </span>
                       </div>
                     </div>
@@ -704,7 +886,7 @@
                       <div class="prop-title">200 OK</div>
                       <div class="prop-ref">
                         <span class="">
-                          <a class="json-schema-ref" href="#/definitions/Proyecto">Proyecto</a>
+                          <a class="json-schema-ref" href="#/definitions/TipoTarea">TipoTarea</a>
                         </span>
                       </div>
                       <!-- <span class="swagger-global"></span> <span class="json-schema-reference"><a href=""></a></span> -->
@@ -713,6 +895,22 @@
                       <p>successful operation</p>
                     </div>
                   </div>
+                    <div class="prop-row prop-group">
+                        <div class="prop-name">
+                            <div class="prop-title">409 Conflict</div>
+                        </div>
+                        <div class="prop-value">
+                            <p>Código o Id ya existe</p>
+                        </div>
+                    </div>
+                    <div class="prop-row prop-group">
+                        <div class="prop-name">
+                            <div class="prop-title">500 Internal Server Error</div>
+                        </div>
+                        <div class="prop-value">
+                            <p>Error interno</p>
+                        </div>
+                    </div>
                 </section>
               </div>
               <div class="doc-examples">
@@ -734,12 +932,12 @@
               </div>
             </div>
           </div>
-            <div id="operation--proyectos--id--get" class="operation panel"
-                 data-traverse-target="operation--proyectos--id--get">
+            <div id="operation--tareas--id--get" class="operation panel"
+                 data-traverse-target="operation--tareas--id--get">
             <!-- <section class="operation-tags row"> -->
             <!-- <div class="doc-copy"> -->
             <div class="operation-tags">
-                <a class="label" href="#tag-proyectos">proyectos</a>
+                <a class="label" href="#tag-tareas">tareas</a>
               <!---->
             </div>
             <!-- </div> -->
@@ -751,7 +949,7 @@
               <div class="doc-copy">
                 <section class="swagger-operation-path">
                   <span class="operation-method">GET</span>
-                    <span class="operation-path">/proyectos/{id}</span>
+                    <span class="operation-path">/tareas/{id}</span>
                 </section>
               </div>
             </div>
@@ -791,7 +989,7 @@
                       <div class="prop-title">200 OK</div>
                       <div class="prop-ref">
                         <span class="">
-                          <a class="json-schema-ref" href="#/definitions/Proyecto">Proyecto</a>
+                          <a class="json-schema-ref" href="#/definitions/TipoTarea">TipoTarea</a>
                         </span>
                       </div>
                       <!-- <span class="swagger-global"></span> <span class="json-schema-reference"><a href=""></a></span> -->
@@ -800,6 +998,14 @@
                       <p>successful operation</p>
                     </div>
                   </div>
+                    <div class="prop-row prop-group">
+                        <div class="prop-name">
+                            <div class="prop-title">404 Not Found</div>
+                        </div>
+                        <div class="prop-value">
+                            <p>Id no encontrado</p>
+                        </div>
+                    </div>
                 </section>
               </div>
               <div class="doc-examples">
@@ -821,24 +1027,24 @@
               </div>
             </div>
           </div>
-            <div id="operation--proyectos--id--put" class="operation panel"
-                 data-traverse-target="operation--proyectos--id--put">
+            <div id="operation--tareas--id--put" class="operation panel"
+                 data-traverse-target="operation--tareas--id--put">
             <!-- <section class="operation-tags row"> -->
             <!-- <div class="doc-copy"> -->
             <div class="operation-tags">
-                <a class="label" href="#tag-proyectos">proyectos</a>
+                <a class="label" href="#tag-tareas">tareas</a>
               <!---->
             </div>
             <!-- </div> -->
             <!-- </section> -->
             <h2 class="operation-title">
-                <span class="operation-summary">Edit proyecto</span>
+                <span class="operation-summary">Edit tipo area</span>
             </h2>
             <div class="doc-row">
               <div class="doc-copy">
                 <section class="swagger-operation-path">
                   <span class="operation-method">PUT</span>
-                    <span class="operation-path">/proyectos/{id}</span>
+                    <span class="operation-path">/tareas/{id}</span>
                 </section>
               </div>
             </div>
@@ -849,7 +1055,7 @@
                     <div class="prop-name">
                       <div class="swagger-request-model">
                         <span class="">
-                          <a class="json-schema-ref" href="#/definitions/Proyecto">Proyecto</a>
+                          <a class="json-schema-ref" href="#/definitions/TipoTarea">TipoTarea</a>
                         </span>
                       </div>
                     </div>
@@ -907,7 +1113,7 @@
                       <div class="prop-title">200 OK</div>
                       <div class="prop-ref">
                         <span class="">
-                          <a class="json-schema-ref" href="#/definitions/Proyecto">Proyecto</a>
+                          <a class="json-schema-ref" href="#/definitions/TipoTarea">TipoTarea</a>
                         </span>
                       </div>
                       <!-- <span class="swagger-global"></span> <span class="json-schema-reference"><a href=""></a></span> -->
@@ -916,6 +1122,14 @@
                       <p>successful operation</p>
                     </div>
                   </div>
+                    <div class="prop-row prop-group">
+                        <div class="prop-name">
+                            <div class="prop-title">304 Not Modified</div>
+                        </div>
+                        <div class="prop-value">
+                            <p>Error: objeto no modificado</p>
+                        </div>
+                    </div>
                 </section>
               </div>
               <div class="doc-examples">
@@ -937,25 +1151,203 @@
               </div>
             </div>
           </div>
-            <h1 id="tag-auth" class="swagger-summary-tag" data-traverse-target="tag-auth">auth</h1>
-            <div id="operation--users-login-post" class="operation panel"
-                 data-traverse-target="operation--users-login-post">
+            <h1 id="tag-cargos" class="swagger-summary-tag" data-traverse-target="tag-cargos">cargos</h1>
+            <div id="operation--cargos-get" class="operation panel" data-traverse-target="operation--cargos-get">
             <!-- <section class="operation-tags row"> -->
             <!-- <div class="doc-copy"> -->
             <div class="operation-tags">
-                <a class="label" href="#tag-auth">auth</a>
+                <a class="label" href="#tag-cargos">cargos</a>
               <!---->
             </div>
             <!-- </div> -->
             <!-- </section> -->
             <h2 class="operation-title">
-                <span class="operation-summary">Authenticate user</span>
+                <span class="operation-summary">Get cargos</span>
+            </h2>
+                <div class="doc-row">
+                    <div class="doc-copy">
+                        <section class="swagger-operation-path">
+                            <span class="operation-method">GET</span>
+                            <span class="operation-path">/cargos</span>
+                        </section>
+                    </div>
+                </div>
+                <div class="doc-row">
+                    <div class="doc-copy"></div>
+                    <div class="doc-examples"></div>
+                </div>
+                <div class="doc-row">
+                    <div class="doc-copy">
+                        <section class="swagger-responses">
+                            <div class="prop-row prop-group">
+                                <div class="prop-name">
+                                    <div class="prop-title">200 OK</div>
+                                    <div class="prop-ref">
+                        <span class="json-schema-ref-array">
+                          <a class="json-schema-ref" href="#/definitions/Cargo">Cargo</a>
+                        </span>
+                                    </div>
+                                    <!-- <span class="swagger-global"></span> <span class="json-schema-reference"><a href=""></a></span> -->
+                                </div>
+                                <div class="prop-value">
+                                    <p>successful operation</p>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <div class="doc-examples">
+                        <h5>Response Content-Types:
+                            <span>application/json</span>
+                        </h5>
+                        <section>
+                            <h5>Response Example
+                                <span>(200 OK)</span>
+                            </h5>
+                            <!-- <div class="hljs"> -->
+                            <pre><code class="hljs lang-json">[
+  {
+    <span class="hljs-attr">&quot;id&quot;</span>: <span class="hljs-string">&quot;integer (int64)&quot;</span>,
+    <span class="hljs-attr">&quot;nombre&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
+    <span class="hljs-attr">&quot;codigo&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
+    <span class="hljs-attr">&quot;precioHora&quot;</span>: <span class="hljs-string">&quot;number (double)&quot;</span>
+  }
+]
+</code></pre>
+                            <!-- </div> -->
+                        </section>
+                    </div>
+                </div>
+            </div>
+            <div id="operation--cargos-post" class="operation panel" data-traverse-target="operation--cargos-post">
+                <!-- <section class="operation-tags row"> -->
+                <!-- <div class="doc-copy"> -->
+                <div class="operation-tags">
+                    <a class="label" href="#tag-cargos">cargos</a>
+                    <!---->
+                </div>
+                <!-- </div> -->
+                <!-- </section> -->
+                <h2 class="operation-title">
+                    <span class="operation-summary">Create Cargo</span>
             </h2>
             <div class="doc-row">
               <div class="doc-copy">
                 <section class="swagger-operation-path">
                   <span class="operation-method">POST</span>
-                    <span class="operation-path">/users/login</span>
+                    <span class="operation-path">/cargos</span>
+                </section>
+              </div>
+            </div>
+                <div class="doc-row">
+                    <div class="doc-copy">
+                        <section class="swagger-request-body">
+                            <div class="prop-row">
+                                <div class="prop-name">
+                                    <div class="swagger-request-model">
+                        <span class="">
+                          <a class="json-schema-ref" href="#/definitions/Cargo">Cargo</a>
+                        </span>
+                                    </div>
+                                </div>
+                                <div class="prop-value columns small-6">
+                                    <!-- <div class="swagger-request-description"> -->undefined
+                                    <!-- </div> -->
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <div class="doc-examples">
+                        <section>
+                            <h5>Request Content-Types:
+                                <span>application/json</span>
+                            </h5>
+                            <h5>Request Example</h5>
+                            <!-- <div class="hljs"> -->
+                            <pre><code class="hljs lang-json">{
+  <span class="hljs-attr">&quot;id&quot;</span>: <span class="hljs-string">&quot;integer (int64)&quot;</span>,
+  <span class="hljs-attr">&quot;nombre&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
+  <span class="hljs-attr">&quot;codigo&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
+  <span class="hljs-attr">&quot;precioHora&quot;</span>: <span class="hljs-string">&quot;number (double)&quot;</span>
+}
+</code></pre>
+                            <!-- </div> -->
+                        </section>
+                    </div>
+                </div>
+                <div class="doc-row">
+                    <div class="doc-copy">
+                        <section class="swagger-responses">
+                            <div class="prop-row prop-group">
+                                <div class="prop-name">
+                                    <div class="prop-title">200 OK</div>
+                                    <div class="prop-ref">
+                        <span class="">
+                          <a class="json-schema-ref" href="#/definitions/Cargo">Cargo</a>
+                        </span>
+                                    </div>
+                                    <!-- <span class="swagger-global"></span> <span class="json-schema-reference"><a href=""></a></span> -->
+                                </div>
+                                <div class="prop-value">
+                                    <p>successful operation</p>
+                                </div>
+                            </div>
+                            <div class="prop-row prop-group">
+                                <div class="prop-name">
+                                    <div class="prop-title">409 Conflict</div>
+                                </div>
+                                <div class="prop-value">
+                                    <p>Código o Id ya existe</p>
+                                </div>
+                            </div>
+                            <div class="prop-row prop-group">
+                                <div class="prop-name">
+                                    <div class="prop-title">500 Internal Server Error</div>
+                                </div>
+                                <div class="prop-value">
+                                    <p>Error interno</p>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <div class="doc-examples">
+                        <h5>Response Content-Types:
+                            <span>application/json</span>
+                        </h5>
+                        <section>
+                            <h5>Response Example
+                                <span>(200 OK)</span>
+                            </h5>
+                            <!-- <div class="hljs"> -->
+                            <pre><code class="hljs lang-json">{
+  <span class="hljs-attr">&quot;id&quot;</span>: <span class="hljs-string">&quot;integer (int64)&quot;</span>,
+  <span class="hljs-attr">&quot;nombre&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
+  <span class="hljs-attr">&quot;codigo&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
+  <span class="hljs-attr">&quot;precioHora&quot;</span>: <span class="hljs-string">&quot;number (double)&quot;</span>
+}
+</code></pre>
+                            <!-- </div> -->
+                        </section>
+                    </div>
+                </div>
+            </div>
+            <div id="operation--cargos--id--get" class="operation panel"
+                 data-traverse-target="operation--cargos--id--get">
+                <!-- <section class="operation-tags row"> -->
+                <!-- <div class="doc-copy"> -->
+                <div class="operation-tags">
+                    <a class="label" href="#tag-cargos">cargos</a>
+                    <!---->
+                </div>
+                <!-- </div> -->
+                <!-- </section> -->
+                <h2 class="operation-title">
+                    <span class="operation-summary">Get Cargo</span>
+                </h2>
+                <div class="doc-row">
+                    <div class="doc-copy">
+                        <section class="swagger-operation-path">
+                            <span class="operation-method">GET</span>
+                            <span class="operation-path">/cargos/{id}</span>
                 </section>
               </div>
             </div>
@@ -964,7 +1356,8 @@
                 <section class="swagger-request-params">
                   <div class="prop-row prop-group">
                     <div class="prop-name">
-                        <div class="prop-title">email</div>
+                        <div class="prop-title">id</div>
+                        <span class="json-property-required"></span>
                     </div>
                     <div class="prop-value">
                       <p class="no-description">(no description)</p>
@@ -973,36 +1366,146 @@
                   <div class="prop-row prop-inner">
                     <div class="prop-name param-label">type</div>
                     <div class="prop-value">
-                        <span class="json-property-type">string</span>
+                        <span class="json-property-type">integer</span>
+                        <span class="json-property-format">(int64)</span>
                       <span class="json-property-range" title="Value limits"></span>
                     </div>
                   </div>
                   <div class="prop-row prop-inner">
                     <div class="prop-name param-label">in</div>
-                      <div class="prop-value">formData</div>
-                  </div>
-                  <div class="prop-row prop-group">
-                    <div class="prop-name">
-                        <div class="prop-title">password</div>
-                    </div>
-                    <div class="prop-value">
-                      <p class="no-description">(no description)</p>
-                    </div>
-                  </div>
-                  <div class="prop-row prop-inner">
-                    <div class="prop-name param-label">type</div>
-                    <div class="prop-value">
-                        <span class="json-property-type">string</span>
-                      <span class="json-property-range" title="Value limits"></span>
-                    </div>
-                  </div>
-                  <div class="prop-row prop-inner">
-                    <div class="prop-name param-label">in</div>
-                      <div class="prop-value">formData</div>
+                      <div class="prop-value">path</div>
                   </div>
                 </section>
               </div>
                 <div class="doc-examples"></div>
+            </div>
+                <div class="doc-row">
+                    <div class="doc-copy">
+                        <section class="swagger-responses">
+                            <div class="prop-row prop-group">
+                                <div class="prop-name">
+                                    <div class="prop-title">200 OK</div>
+                                    <div class="prop-ref">
+                        <span class="">
+                          <a class="json-schema-ref" href="#/definitions/Cargo">Cargo</a>
+                        </span>
+                                    </div>
+                                    <!-- <span class="swagger-global"></span> <span class="json-schema-reference"><a href=""></a></span> -->
+                                </div>
+                                <div class="prop-value">
+                                    <p>successful operation</p>
+                                </div>
+                            </div>
+                            <div class="prop-row prop-group">
+                                <div class="prop-name">
+                                    <div class="prop-title">404 Not Found</div>
+                                </div>
+                                <div class="prop-value">
+                                    <p>Id no encontrado</p>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <div class="doc-examples">
+                        <h5>Response Content-Types:
+                            <span>application/json</span>
+                        </h5>
+                        <section>
+                            <h5>Response Example
+                                <span>(200 OK)</span>
+                            </h5>
+                            <!-- <div class="hljs"> -->
+                            <pre><code class="hljs lang-json">{
+  <span class="hljs-attr">&quot;id&quot;</span>: <span class="hljs-string">&quot;integer (int64)&quot;</span>,
+  <span class="hljs-attr">&quot;nombre&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
+  <span class="hljs-attr">&quot;codigo&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
+  <span class="hljs-attr">&quot;precioHora&quot;</span>: <span class="hljs-string">&quot;number (double)&quot;</span>
+}
+</code></pre>
+                            <!-- </div> -->
+                        </section>
+                    </div>
+                </div>
+            </div>
+            <div id="operation--cargos--id--put" class="operation panel"
+                 data-traverse-target="operation--cargos--id--put">
+                <!-- <section class="operation-tags row"> -->
+                <!-- <div class="doc-copy"> -->
+                <div class="operation-tags">
+                    <a class="label" href="#tag-cargos">cargos</a>
+                    <!---->
+                </div>
+                <!-- </div> -->
+                <!-- </section> -->
+                <h2 class="operation-title">
+                    <span class="operation-summary">Edit cargo</span>
+                </h2>
+                <div class="doc-row">
+                    <div class="doc-copy">
+                        <section class="swagger-operation-path">
+                            <span class="operation-method">PUT</span>
+                            <span class="operation-path">/cargos/{id}</span>
+                        </section>
+                    </div>
+                </div>
+                <div class="doc-row">
+                    <div class="doc-copy">
+                        <section class="swagger-request-body">
+                            <div class="prop-row">
+                                <div class="prop-name">
+                                    <div class="swagger-request-model">
+                        <span class="">
+                          <a class="json-schema-ref" href="#/definitions/Cargo">Cargo</a>
+                        </span>
+                                    </div>
+                                </div>
+                                <div class="prop-value columns small-6">
+                                    <!-- <div class="swagger-request-description"> -->undefined
+                                    <!-- </div> -->
+                                </div>
+                            </div>
+                        </section>
+                        <section class="swagger-request-params">
+                            <div class="prop-row prop-group">
+                                <div class="prop-name">
+                                    <div class="prop-title">id</div>
+                                    <span class="json-property-required"></span>
+                    </div>
+                    <div class="prop-value">
+                      <p class="no-description">(no description)</p>
+                    </div>
+                  </div>
+                  <div class="prop-row prop-inner">
+                    <div class="prop-name param-label">type</div>
+                    <div class="prop-value">
+                        <span class="json-property-type">integer</span>
+                        <span class="json-property-format">(int64)</span>
+                      <span class="json-property-range" title="Value limits"></span>
+                    </div>
+                  </div>
+                  <div class="prop-row prop-inner">
+                    <div class="prop-name param-label">in</div>
+                      <div class="prop-value">path</div>
+                  </div>
+                </section>
+              </div>
+                    <div class="doc-examples">
+                        <section>
+                            <h5>Request Content-Types:
+                                <span>application/json</span>
+                            </h5>
+                            <h5>Request Example</h5>
+                            <!-- <div class="hljs"> -->
+                            <pre><code class="hljs lang-json">{
+  <span class="hljs-attr">&quot;id&quot;</span>: <span class="hljs-string">&quot;integer (int64)&quot;</span>,
+  <span class="hljs-attr">&quot;nombre&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
+  <span class="hljs-attr">&quot;codigo&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
+  <span class="hljs-attr">&quot;precioHora&quot;</span>: <span class="hljs-string">&quot;number (double)&quot;</span>
+}
+</code></pre>
+                            <!-- </div> -->
+                        </section>
+                    </div>
             </div>
             <div class="doc-row">
               <div class="doc-copy">
@@ -1012,7 +1515,7 @@
                       <div class="prop-title">200 OK</div>
                       <div class="prop-ref">
                         <span class="">
-                          <a class="json-schema-ref" href="#/definitions/Colaborador">Colaborador</a>
+                          <a class="json-schema-ref" href="#/definitions/Cargo">Cargo</a>
                         </span>
                       </div>
                       <!-- <span class="swagger-global"></span> <span class="json-schema-reference"><a href=""></a></span> -->
@@ -1021,6 +1524,14 @@
                       <p>successful operation</p>
                     </div>
                   </div>
+                    <div class="prop-row prop-group">
+                        <div class="prop-name">
+                            <div class="prop-title">304 Not Modified</div>
+                        </div>
+                        <div class="prop-value">
+                            <p>Error: objeto no modificado</p>
+                        </div>
+                    </div>
                 </section>
               </div>
               <div class="doc-examples">
@@ -1033,16 +1544,9 @@
                   </h5>
                   <!-- <div class="hljs"> --><pre><code class="hljs lang-json">{
   <span class="hljs-attr">&quot;id&quot;</span>: <span class="hljs-string">&quot;integer (int64)&quot;</span>,
-  <span class="hljs-attr">&quot;email&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
   <span class="hljs-attr">&quot;nombre&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
-  <span class="hljs-attr">&quot;cargo&quot;</span>: {
-    <span class="hljs-attr">&quot;id&quot;</span>: <span class="hljs-string">&quot;integer (int64)&quot;</span>,
-    <span class="hljs-attr">&quot;nombre&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
-    <span class="hljs-attr">&quot;codigo&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
-    <span class="hljs-attr">&quot;precioHora&quot;</span>: <span class="hljs-string">&quot;number (double)&quot;</span>
-  },
-  <span class="hljs-attr">&quot;role&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
-  <span class="hljs-attr">&quot;token&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>
+  <span class="hljs-attr">&quot;codigo&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
+  <span class="hljs-attr">&quot;precioHora&quot;</span>: <span class="hljs-string">&quot;number (double)&quot;</span>
 }
 </code></pre>
                   <!-- </div> -->
@@ -1112,7 +1616,6 @@
         <span class="hljs-attr">&quot;calendarType&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
         <span class="hljs-attr">&quot;id&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>
       },
-      <span class="hljs-attr">&quot;dayOfYear&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>,
       <span class="hljs-attr">&quot;dayOfWeek&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
       <span class="hljs-attr">&quot;leapYear&quot;</span>: <span class="hljs-string">&quot;boolean&quot;</span>,
       <span class="hljs-attr">&quot;dayOfMonth&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>,
@@ -1120,7 +1623,8 @@
                             class="hljs-string">&quot;integer (int32)&quot;</span>,
       <span class="hljs-attr">&quot;era&quot;</span>: {
         <span class="hljs-attr">&quot;value&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>
-      }
+      },
+      <span class="hljs-attr">&quot;dayOfYear&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>
     },
     <span class="hljs-attr">&quot;horaIn&quot;</span>: {
       <span class="hljs-attr">&quot;hour&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>,
@@ -1224,14 +1728,14 @@
       <span class="hljs-attr">&quot;calendarType&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
       <span class="hljs-attr">&quot;id&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>
     },
-    <span class="hljs-attr">&quot;dayOfYear&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>,
     <span class="hljs-attr">&quot;dayOfWeek&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
     <span class="hljs-attr">&quot;leapYear&quot;</span>: <span class="hljs-string">&quot;boolean&quot;</span>,
     <span class="hljs-attr">&quot;dayOfMonth&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>,
     <span class="hljs-attr">&quot;monthValue&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>,
     <span class="hljs-attr">&quot;era&quot;</span>: {
       <span class="hljs-attr">&quot;value&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>
-    }
+    },
+    <span class="hljs-attr">&quot;dayOfYear&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>
   },
   <span class="hljs-attr">&quot;horaIn&quot;</span>: {
     <span class="hljs-attr">&quot;hour&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>,
@@ -1291,6 +1795,30 @@
                       <p>successful operation</p>
                     </div>
                   </div>
+                    <div class="prop-row prop-group">
+                        <div class="prop-name">
+                            <div class="prop-title">400 Bad Request</div>
+                        </div>
+                        <div class="prop-value">
+                            <p>Objeto inválido</p>
+                        </div>
+                    </div>
+                    <div class="prop-row prop-group">
+                        <div class="prop-name">
+                            <div class="prop-title">409 Conflict</div>
+                        </div>
+                        <div class="prop-value">
+                            <p>Código o Id ya existe</p>
+                        </div>
+                    </div>
+                    <div class="prop-row prop-group">
+                        <div class="prop-name">
+                            <div class="prop-title">500 Internal Server Error</div>
+                        </div>
+                        <div class="prop-value">
+                            <p>Error interno</p>
+                        </div>
+                    </div>
                 </section>
               </div>
               <div class="doc-examples">
@@ -1310,14 +1838,14 @@
       <span class="hljs-attr">&quot;calendarType&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
       <span class="hljs-attr">&quot;id&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>
     },
-    <span class="hljs-attr">&quot;dayOfYear&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>,
     <span class="hljs-attr">&quot;dayOfWeek&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
     <span class="hljs-attr">&quot;leapYear&quot;</span>: <span class="hljs-string">&quot;boolean&quot;</span>,
     <span class="hljs-attr">&quot;dayOfMonth&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>,
     <span class="hljs-attr">&quot;monthValue&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>,
     <span class="hljs-attr">&quot;era&quot;</span>: {
       <span class="hljs-attr">&quot;value&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>
-    }
+    },
+    <span class="hljs-attr">&quot;dayOfYear&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>
   },
   <span class="hljs-attr">&quot;horaIn&quot;</span>: {
     <span class="hljs-attr">&quot;hour&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>,
@@ -1432,6 +1960,14 @@
                       <p>successful operation</p>
                     </div>
                   </div>
+                    <div class="prop-row prop-group">
+                        <div class="prop-name">
+                            <div class="prop-title">404 Not Found</div>
+                        </div>
+                        <div class="prop-value">
+                            <p>Id no encontrado</p>
+                        </div>
+                    </div>
                 </section>
               </div>
               <div class="doc-examples">
@@ -1451,14 +1987,14 @@
       <span class="hljs-attr">&quot;calendarType&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
       <span class="hljs-attr">&quot;id&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>
     },
-    <span class="hljs-attr">&quot;dayOfYear&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>,
     <span class="hljs-attr">&quot;dayOfWeek&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
     <span class="hljs-attr">&quot;leapYear&quot;</span>: <span class="hljs-string">&quot;boolean&quot;</span>,
     <span class="hljs-attr">&quot;dayOfMonth&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>,
     <span class="hljs-attr">&quot;monthValue&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>,
     <span class="hljs-attr">&quot;era&quot;</span>: {
       <span class="hljs-attr">&quot;value&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>
-    }
+    },
+    <span class="hljs-attr">&quot;dayOfYear&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>
   },
   <span class="hljs-attr">&quot;horaIn&quot;</span>: {
     <span class="hljs-attr">&quot;hour&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>,
@@ -1584,14 +2120,14 @@
       <span class="hljs-attr">&quot;calendarType&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
       <span class="hljs-attr">&quot;id&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>
     },
-    <span class="hljs-attr">&quot;dayOfYear&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>,
     <span class="hljs-attr">&quot;dayOfWeek&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
     <span class="hljs-attr">&quot;leapYear&quot;</span>: <span class="hljs-string">&quot;boolean&quot;</span>,
     <span class="hljs-attr">&quot;dayOfMonth&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>,
     <span class="hljs-attr">&quot;monthValue&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>,
     <span class="hljs-attr">&quot;era&quot;</span>: {
       <span class="hljs-attr">&quot;value&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>
-    }
+    },
+    <span class="hljs-attr">&quot;dayOfYear&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>
   },
   <span class="hljs-attr">&quot;horaIn&quot;</span>: {
     <span class="hljs-attr">&quot;hour&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>,
@@ -1651,6 +2187,14 @@
                       <p>successful operation</p>
                     </div>
                   </div>
+                    <div class="prop-row prop-group">
+                        <div class="prop-name">
+                            <div class="prop-title">304 Not Modified</div>
+                        </div>
+                        <div class="prop-value">
+                            <p>Error: objeto no modificado</p>
+                        </div>
+                    </div>
                 </section>
               </div>
               <div class="doc-examples">
@@ -1670,14 +2214,14 @@
       <span class="hljs-attr">&quot;calendarType&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
       <span class="hljs-attr">&quot;id&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>
     },
-    <span class="hljs-attr">&quot;dayOfYear&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>,
     <span class="hljs-attr">&quot;dayOfWeek&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
     <span class="hljs-attr">&quot;leapYear&quot;</span>: <span class="hljs-string">&quot;boolean&quot;</span>,
     <span class="hljs-attr">&quot;dayOfMonth&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>,
     <span class="hljs-attr">&quot;monthValue&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>,
     <span class="hljs-attr">&quot;era&quot;</span>: {
       <span class="hljs-attr">&quot;value&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>
-    }
+    },
+    <span class="hljs-attr">&quot;dayOfYear&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>
   },
   <span class="hljs-attr">&quot;horaIn&quot;</span>: {
     <span class="hljs-attr">&quot;hour&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>,
@@ -1727,24 +2271,24 @@
               </div>
             </div>
           </div>
-            <h1 id="tag-tareas" class="swagger-summary-tag" data-traverse-target="tag-tareas">tareas</h1>
-            <div id="operation--tareas-get" class="operation panel" data-traverse-target="operation--tareas-get">
+            <h1 id="tag-proyectos" class="swagger-summary-tag" data-traverse-target="tag-proyectos">proyectos</h1>
+            <div id="operation--proyectos-get" class="operation panel" data-traverse-target="operation--proyectos-get">
             <!-- <section class="operation-tags row"> -->
             <!-- <div class="doc-copy"> -->
             <div class="operation-tags">
-                <a class="label" href="#tag-tareas">tareas</a>
+                <a class="label" href="#tag-proyectos">proyectos</a>
               <!---->
             </div>
             <!-- </div> -->
             <!-- </section> -->
             <h2 class="operation-title">
-                <span class="operation-summary">Get tipos tarea</span>
+                <span class="operation-summary">Get proyectos</span>
             </h2>
             <div class="doc-row">
               <div class="doc-copy">
                 <section class="swagger-operation-path">
                   <span class="operation-method">GET</span>
-                    <span class="operation-path">/tareas</span>
+                    <span class="operation-path">/proyectos</span>
                 </section>
               </div>
             </div>
@@ -1760,7 +2304,7 @@
                       <div class="prop-title">200 OK</div>
                       <div class="prop-ref">
                         <span class="json-schema-ref-array">
-                          <a class="json-schema-ref" href="#/definitions/TipoTarea">TipoTarea</a>
+                          <a class="json-schema-ref" href="#/definitions/Proyecto">Proyecto</a>
                         </span>
                       </div>
                       <!-- <span class="swagger-global"></span> <span class="json-schema-reference"><a href=""></a></span> -->
@@ -1792,23 +2336,24 @@
               </div>
             </div>
             </div>
-            <div id="operation--tareas-post" class="operation panel" data-traverse-target="operation--tareas-post">
+            <div id="operation--proyectos-post" class="operation panel"
+                 data-traverse-target="operation--proyectos-post">
                 <!-- <section class="operation-tags row"> -->
                 <!-- <div class="doc-copy"> -->
                 <div class="operation-tags">
-                    <a class="label" href="#tag-tareas">tareas</a>
+                    <a class="label" href="#tag-proyectos">proyectos</a>
                     <!---->
                 </div>
                 <!-- </div> -->
                 <!-- </section> -->
                 <h2 class="operation-title">
-                    <span class="operation-summary">Create Tipo Tarea</span>
+                    <span class="operation-summary">Create Proyecto</span>
                 </h2>
                 <div class="doc-row">
                     <div class="doc-copy">
                         <section class="swagger-operation-path">
                             <span class="operation-method">POST</span>
-                            <span class="operation-path">/tareas</span>
+                            <span class="operation-path">/proyectos</span>
                         </section>
                     </div>
                 </div>
@@ -1819,7 +2364,7 @@
                                 <div class="prop-name">
                                     <div class="swagger-request-model">
                         <span class="">
-                          <a class="json-schema-ref" href="#/definitions/TipoTarea">TipoTarea</a>
+                          <a class="json-schema-ref" href="#/definitions/Proyecto">Proyecto</a>
                         </span>
                                     </div>
                                 </div>
@@ -1855,7 +2400,7 @@
                                     <div class="prop-title">200 OK</div>
                                     <div class="prop-ref">
                         <span class="">
-                          <a class="json-schema-ref" href="#/definitions/TipoTarea">TipoTarea</a>
+                          <a class="json-schema-ref" href="#/definitions/Proyecto">Proyecto</a>
                         </span>
                                     </div>
                                     <!-- <span class="swagger-global"></span> <span class="json-schema-reference"><a href=""></a></span> -->
@@ -1902,12 +2447,12 @@
                     </div>
                 </div>
             </div>
-            <div id="operation--tareas--id--get" class="operation panel"
-                 data-traverse-target="operation--tareas--id--get">
+            <div id="operation--proyectos--id--get" class="operation panel"
+                 data-traverse-target="operation--proyectos--id--get">
                 <!-- <section class="operation-tags row"> -->
                 <!-- <div class="doc-copy"> -->
                 <div class="operation-tags">
-                    <a class="label" href="#tag-tareas">tareas</a>
+                    <a class="label" href="#tag-proyectos">proyectos</a>
                     <!---->
                 </div>
                 <!-- </div> -->
@@ -1919,7 +2464,7 @@
                     <div class="doc-copy">
                         <section class="swagger-operation-path">
                             <span class="operation-method">GET</span>
-                            <span class="operation-path">/tareas/{id}</span>
+                            <span class="operation-path">/proyectos/{id}</span>
                         </section>
                     </div>
                 </div>
@@ -1959,7 +2504,7 @@
                                     <div class="prop-title">200 OK</div>
                                     <div class="prop-ref">
                         <span class="">
-                          <a class="json-schema-ref" href="#/definitions/TipoTarea">TipoTarea</a>
+                          <a class="json-schema-ref" href="#/definitions/Proyecto">Proyecto</a>
                         </span>
                                     </div>
                                     <!-- <span class="swagger-global"></span> <span class="json-schema-reference"><a href=""></a></span> -->
@@ -1998,24 +2543,24 @@
                     </div>
                 </div>
             </div>
-            <div id="operation--tareas--id--put" class="operation panel"
-                 data-traverse-target="operation--tareas--id--put">
+            <div id="operation--proyectos--id--put" class="operation panel"
+                 data-traverse-target="operation--proyectos--id--put">
                 <!-- <section class="operation-tags row"> -->
                 <!-- <div class="doc-copy"> -->
                 <div class="operation-tags">
-                    <a class="label" href="#tag-tareas">tareas</a>
+                    <a class="label" href="#tag-proyectos">proyectos</a>
                     <!---->
                 </div>
                 <!-- </div> -->
                 <!-- </section> -->
                 <h2 class="operation-title">
-                    <span class="operation-summary">Edit tipo area</span>
+                    <span class="operation-summary">Edit proyecto</span>
                 </h2>
                 <div class="doc-row">
                     <div class="doc-copy">
                         <section class="swagger-operation-path">
                             <span class="operation-method">PUT</span>
-                            <span class="operation-path">/tareas/{id}</span>
+                            <span class="operation-path">/proyectos/{id}</span>
                         </section>
                     </div>
                 </div>
@@ -2026,7 +2571,7 @@
                                 <div class="prop-name">
                                     <div class="swagger-request-model">
                         <span class="">
-                          <a class="json-schema-ref" href="#/definitions/TipoTarea">TipoTarea</a>
+                          <a class="json-schema-ref" href="#/definitions/Proyecto">Proyecto</a>
                         </span>
                                     </div>
                                 </div>
@@ -2085,7 +2630,7 @@
                                     <div class="prop-title">200 OK</div>
                                     <div class="prop-ref">
                         <span class="">
-                          <a class="json-schema-ref" href="#/definitions/TipoTarea">TipoTarea</a>
+                          <a class="json-schema-ref" href="#/definitions/Proyecto">Proyecto</a>
                         </span>
                                     </div>
                                     <!-- <span class="swagger-global"></span> <span class="json-schema-reference"><a href=""></a></span> -->
@@ -2118,468 +2663,6 @@
   <span class="hljs-attr">&quot;codigo&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
   <span class="hljs-attr">&quot;nombre&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>
 }
-</code></pre>
-                            <!-- </div> -->
-                        </section>
-                    </div>
-                </div>
-            </div>
-            <h1 id="tag-cargos" class="swagger-summary-tag" data-traverse-target="tag-cargos">cargos</h1>
-            <div id="operation--cargos-get" class="operation panel" data-traverse-target="operation--cargos-get">
-                <!-- <section class="operation-tags row"> -->
-                <!-- <div class="doc-copy"> -->
-                <div class="operation-tags">
-                    <a class="label" href="#tag-cargos">cargos</a>
-                    <!---->
-                </div>
-                <!-- </div> -->
-                <!-- </section> -->
-                <h2 class="operation-title">
-                    <span class="operation-summary">Get cargos</span>
-                </h2>
-                <div class="doc-row">
-                    <div class="doc-copy">
-                        <section class="swagger-operation-path">
-                            <span class="operation-method">GET</span>
-                            <span class="operation-path">/cargos</span>
-                        </section>
-                    </div>
-                </div>
-                <div class="doc-row">
-                    <div class="doc-copy"></div>
-                    <div class="doc-examples"></div>
-                </div>
-                <div class="doc-row">
-                    <div class="doc-copy">
-                        <section class="swagger-responses">
-                            <div class="prop-row prop-group">
-                                <div class="prop-name">
-                                    <div class="prop-title">200 OK</div>
-                                    <div class="prop-ref">
-                        <span class="json-schema-ref-array">
-                          <a class="json-schema-ref" href="#/definitions/Cargo">Cargo</a>
-                        </span>
-                                    </div>
-                                    <!-- <span class="swagger-global"></span> <span class="json-schema-reference"><a href=""></a></span> -->
-                                </div>
-                                <div class="prop-value">
-                                    <p>successful operation</p>
-                                </div>
-                            </div>
-                        </section>
-                    </div>
-                    <div class="doc-examples">
-                        <h5>Response Content-Types:
-                            <span>application/json</span>
-                        </h5>
-                        <section>
-                            <h5>Response Example
-                                <span>(200 OK)</span>
-                            </h5>
-                            <!-- <div class="hljs"> -->
-                            <pre><code class="hljs lang-json">[
-  {
-    <span class="hljs-attr">&quot;id&quot;</span>: <span class="hljs-string">&quot;integer (int64)&quot;</span>,
-    <span class="hljs-attr">&quot;nombre&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
-    <span class="hljs-attr">&quot;codigo&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
-    <span class="hljs-attr">&quot;precioHora&quot;</span>: <span class="hljs-string">&quot;number (double)&quot;</span>
-  }
-]
-</code></pre>
-                  <!-- </div> -->
-                </section>
-              </div>
-            </div>
-          </div>
-            <div id="operation--cargos-post" class="operation panel" data-traverse-target="operation--cargos-post">
-            <!-- <section class="operation-tags row"> -->
-            <!-- <div class="doc-copy"> -->
-            <div class="operation-tags">
-                <a class="label" href="#tag-cargos">cargos</a>
-              <!---->
-            </div>
-            <!-- </div> -->
-            <!-- </section> -->
-            <h2 class="operation-title">
-                <span class="operation-summary">Create Cargo</span>
-            </h2>
-            <div class="doc-row">
-              <div class="doc-copy">
-                <section class="swagger-operation-path">
-                  <span class="operation-method">POST</span>
-                    <span class="operation-path">/cargos</span>
-                </section>
-              </div>
-            </div>
-            <div class="doc-row">
-              <div class="doc-copy">
-                <section class="swagger-request-body">
-                  <div class="prop-row">
-                    <div class="prop-name">
-                      <div class="swagger-request-model">
-                        <span class="">
-                          <a class="json-schema-ref" href="#/definitions/Cargo">Cargo</a>
-                        </span>
-                      </div>
-                    </div>
-                    <div class="prop-value columns small-6">
-                      <!-- <div class="swagger-request-description"> -->undefined
-                      <!-- </div> -->
-                    </div>
-                  </div>
-                </section>
-              </div>
-              <div class="doc-examples">
-                <section>
-                  <h5>Request Content-Types:
-                    <span>application/json</span>
-                  </h5>
-                  <h5>Request Example</h5>
-                  <!-- <div class="hljs"> --><pre><code class="hljs lang-json">{
-  <span class="hljs-attr">&quot;id&quot;</span>: <span class="hljs-string">&quot;integer (int64)&quot;</span>,
-  <span class="hljs-attr">&quot;nombre&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
-  <span class="hljs-attr">&quot;codigo&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
-  <span class="hljs-attr">&quot;precioHora&quot;</span>: <span class="hljs-string">&quot;number (double)&quot;</span>
-}
-</code></pre>
-                  <!-- </div> -->
-                </section>
-              </div>
-            </div>
-            <div class="doc-row">
-              <div class="doc-copy">
-                <section class="swagger-responses">
-                  <div class="prop-row prop-group">
-                    <div class="prop-name">
-                      <div class="prop-title">200 OK</div>
-                      <div class="prop-ref">
-                        <span class="">
-                          <a class="json-schema-ref" href="#/definitions/Cargo">Cargo</a>
-                        </span>
-                      </div>
-                      <!-- <span class="swagger-global"></span> <span class="json-schema-reference"><a href=""></a></span> -->
-                    </div>
-                    <div class="prop-value">
-                      <p>successful operation</p>
-                    </div>
-                  </div>
-                    <div class="prop-row prop-group">
-                        <div class="prop-name">
-                            <div class="prop-title">409 Conflict</div>
-                        </div>
-                        <div class="prop-value">
-                            <p>Código o Id ya existe</p>
-                        </div>
-                    </div>
-                    <div class="prop-row prop-group">
-                        <div class="prop-name">
-                            <div class="prop-title">500 Internal Server Error</div>
-                        </div>
-                        <div class="prop-value">
-                            <p>Error interno</p>
-                        </div>
-                    </div>
-                </section>
-              </div>
-              <div class="doc-examples">
-                <h5>Response Content-Types:
-                  <span>application/json</span>
-                </h5>
-                <section>
-                  <h5>Response Example
-                    <span>(200 OK)</span>
-                  </h5>
-                  <!-- <div class="hljs"> --><pre><code class="hljs lang-json">{
-  <span class="hljs-attr">&quot;id&quot;</span>: <span class="hljs-string">&quot;integer (int64)&quot;</span>,
-  <span class="hljs-attr">&quot;nombre&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
-  <span class="hljs-attr">&quot;codigo&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
-  <span class="hljs-attr">&quot;precioHora&quot;</span>: <span class="hljs-string">&quot;number (double)&quot;</span>
-}
-</code></pre>
-                  <!-- </div> -->
-                </section>
-              </div>
-            </div>
-          </div>
-            <div id="operation--cargos--id--get" class="operation panel"
-                 data-traverse-target="operation--cargos--id--get">
-            <!-- <section class="operation-tags row"> -->
-            <!-- <div class="doc-copy"> -->
-            <div class="operation-tags">
-                <a class="label" href="#tag-cargos">cargos</a>
-              <!---->
-            </div>
-            <!-- </div> -->
-            <!-- </section> -->
-            <h2 class="operation-title">
-                <span class="operation-summary">Get Cargo</span>
-            </h2>
-            <div class="doc-row">
-              <div class="doc-copy">
-                <section class="swagger-operation-path">
-                  <span class="operation-method">GET</span>
-                    <span class="operation-path">/cargos/{id}</span>
-                </section>
-              </div>
-            </div>
-            <div class="doc-row">
-              <div class="doc-copy">
-                <section class="swagger-request-params">
-                  <div class="prop-row prop-group">
-                    <div class="prop-name">
-                      <div class="prop-title">id</div>
-                      <span class="json-property-required"></span>
-                    </div>
-                    <div class="prop-value">
-                      <p class="no-description">(no description)</p>
-                    </div>
-                  </div>
-                  <div class="prop-row prop-inner">
-                    <div class="prop-name param-label">type</div>
-                    <div class="prop-value">
-                      <span class="json-property-type">integer</span>
-                      <span class="json-property-format">(int64)</span>
-                      <span class="json-property-range" title="Value limits"></span>
-                    </div>
-                  </div>
-                  <div class="prop-row prop-inner">
-                    <div class="prop-name param-label">in</div>
-                    <div class="prop-value">path</div>
-                  </div>
-                </section>
-              </div>
-              <div class="doc-examples"></div>
-            </div>
-            <div class="doc-row">
-              <div class="doc-copy">
-                <section class="swagger-responses">
-                  <div class="prop-row prop-group">
-                    <div class="prop-name">
-                      <div class="prop-title">200 OK</div>
-                      <div class="prop-ref">
-                        <span class="">
-                          <a class="json-schema-ref" href="#/definitions/Cargo">Cargo</a>
-                        </span>
-                      </div>
-                      <!-- <span class="swagger-global"></span> <span class="json-schema-reference"><a href=""></a></span> -->
-                    </div>
-                    <div class="prop-value">
-                      <p>successful operation</p>
-                    </div>
-                  </div>
-                    <div class="prop-row prop-group">
-                        <div class="prop-name">
-                            <div class="prop-title">404 Not Found</div>
-                        </div>
-                        <div class="prop-value">
-                            <p>Id no encontrado</p>
-                        </div>
-                    </div>
-                </section>
-              </div>
-              <div class="doc-examples">
-                <h5>Response Content-Types:
-                  <span>application/json</span>
-                </h5>
-                <section>
-                  <h5>Response Example
-                    <span>(200 OK)</span>
-                  </h5>
-                  <!-- <div class="hljs"> --><pre><code class="hljs lang-json">{
-  <span class="hljs-attr">&quot;id&quot;</span>: <span class="hljs-string">&quot;integer (int64)&quot;</span>,
-  <span class="hljs-attr">&quot;nombre&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
-  <span class="hljs-attr">&quot;codigo&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
-  <span class="hljs-attr">&quot;precioHora&quot;</span>: <span class="hljs-string">&quot;number (double)&quot;</span>
-}
-</code></pre>
-                  <!-- </div> -->
-                </section>
-              </div>
-            </div>
-          </div>
-            <div id="operation--cargos--id--put" class="operation panel"
-                 data-traverse-target="operation--cargos--id--put">
-            <!-- <section class="operation-tags row"> -->
-            <!-- <div class="doc-copy"> -->
-            <div class="operation-tags">
-                <a class="label" href="#tag-cargos">cargos</a>
-              <!---->
-            </div>
-            <!-- </div> -->
-            <!-- </section> -->
-            <h2 class="operation-title">
-                <span class="operation-summary">Edit cargo</span>
-            </h2>
-            <div class="doc-row">
-              <div class="doc-copy">
-                <section class="swagger-operation-path">
-                  <span class="operation-method">PUT</span>
-                    <span class="operation-path">/cargos/{id}</span>
-                </section>
-              </div>
-            </div>
-            <div class="doc-row">
-              <div class="doc-copy">
-                <section class="swagger-request-body">
-                  <div class="prop-row">
-                    <div class="prop-name">
-                      <div class="swagger-request-model">
-                        <span class="">
-                          <a class="json-schema-ref" href="#/definitions/Cargo">Cargo</a>
-                        </span>
-                      </div>
-                    </div>
-                    <div class="prop-value columns small-6">
-                      <!-- <div class="swagger-request-description"> -->undefined
-                      <!-- </div> -->
-                    </div>
-                  </div>
-                </section>
-                <section class="swagger-request-params">
-                  <div class="prop-row prop-group">
-                    <div class="prop-name">
-                      <div class="prop-title">id</div>
-                      <span class="json-property-required"></span>
-                    </div>
-                    <div class="prop-value">
-                      <p class="no-description">(no description)</p>
-                    </div>
-                  </div>
-                  <div class="prop-row prop-inner">
-                    <div class="prop-name param-label">type</div>
-                    <div class="prop-value">
-                      <span class="json-property-type">integer</span>
-                      <span class="json-property-format">(int64)</span>
-                      <span class="json-property-range" title="Value limits"></span>
-                    </div>
-                  </div>
-                  <div class="prop-row prop-inner">
-                    <div class="prop-name param-label">in</div>
-                    <div class="prop-value">path</div>
-                  </div>
-                </section>
-              </div>
-              <div class="doc-examples">
-                <section>
-                  <h5>Request Content-Types:
-                    <span>application/json</span>
-                  </h5>
-                  <h5>Request Example</h5>
-                  <!-- <div class="hljs"> --><pre><code class="hljs lang-json">{
-  <span class="hljs-attr">&quot;id&quot;</span>: <span class="hljs-string">&quot;integer (int64)&quot;</span>,
-  <span class="hljs-attr">&quot;nombre&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
-  <span class="hljs-attr">&quot;codigo&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
-  <span class="hljs-attr">&quot;precioHora&quot;</span>: <span class="hljs-string">&quot;number (double)&quot;</span>
-}
-</code></pre>
-                  <!-- </div> -->
-                </section>
-              </div>
-            </div>
-            <div class="doc-row">
-              <div class="doc-copy">
-                <section class="swagger-responses">
-                  <div class="prop-row prop-group">
-                    <div class="prop-name">
-                      <div class="prop-title">200 OK</div>
-                      <div class="prop-ref">
-                        <span class="">
-                          <a class="json-schema-ref" href="#/definitions/Cargo">Cargo</a>
-                        </span>
-                      </div>
-                      <!-- <span class="swagger-global"></span> <span class="json-schema-reference"><a href=""></a></span> -->
-                    </div>
-                    <div class="prop-value">
-                      <p>successful operation</p>
-                    </div>
-                  </div>
-                    <div class="prop-row prop-group">
-                        <div class="prop-name">
-                            <div class="prop-title">304 Not Modified</div>
-                        </div>
-                        <div class="prop-value">
-                            <p>Error: objeto no modificado</p>
-                        </div>
-                    </div>
-                </section>
-              </div>
-              <div class="doc-examples">
-                <h5>Response Content-Types:
-                  <span>application/json</span>
-                </h5>
-                <section>
-                  <h5>Response Example
-                    <span>(200 OK)</span>
-                  </h5>
-                  <!-- <div class="hljs"> --><pre><code class="hljs lang-json">{
-  <span class="hljs-attr">&quot;id&quot;</span>: <span class="hljs-string">&quot;integer (int64)&quot;</span>,
-  <span class="hljs-attr">&quot;nombre&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
-  <span class="hljs-attr">&quot;codigo&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
-  <span class="hljs-attr">&quot;precioHora&quot;</span>: <span class="hljs-string">&quot;number (double)&quot;</span>
-}
-</code></pre>
-                    <!-- </div> -->
-                </section>
-              </div>
-            </div>
-            </div>
-            <h1 id="tag-status" class="swagger-summary-tag" data-traverse-target="tag-status">status</h1>
-            <div id="operation--status-get" class="operation panel" data-traverse-target="operation--status-get">
-                <!-- <section class="operation-tags row"> -->
-                <!-- <div class="doc-copy"> -->
-                <div class="operation-tags">
-                    <a class="label" href="#tag-status">status</a>
-                    <!---->
-                </div>
-                <!-- </div> -->
-                <!-- </section> -->
-                <h2 class="operation-title">
-                    <span class="operation-summary">Get system status</span>
-                </h2>
-                <div class="doc-row">
-                    <div class="doc-copy">
-                        <section class="swagger-operation-path">
-                            <span class="operation-method">GET</span>
-                            <span class="operation-path">/status</span>
-                        </section>
-                    </div>
-                </div>
-                <div class="doc-row">
-                    <div class="doc-copy">
-                        <section class="swagger-operation-description">
-                            <p>html</p>
-                        </section>
-                    </div>
-                </div>
-                <div class="doc-row">
-                    <div class="doc-copy"></div>
-                    <div class="doc-examples"></div>
-                </div>
-                <div class="doc-row">
-                    <div class="doc-copy">
-                        <section class="swagger-responses">
-                            <div class="prop-row prop-group">
-                                <div class="prop-name">
-                                    <div class="prop-title">200 OK</div>
-                                    <div class="prop-ref"></div>
-                                    <!-- <span class="swagger-global"></span> <span class="json-schema-reference"><a href=""></a></span> -->
-                                </div>
-                                <div class="prop-value">
-                                    <p>successful operation</p>
-                                </div>
-                            </div>
-                        </section>
-                    </div>
-                    <div class="doc-examples">
-                        <h5>Response Content-Types:
-                            <span>text/html</span>
-                        </h5>
-                        <section>
-                            <h5>Response Example
-                                <span>(200 OK)</span>
-                            </h5>
-                            <!-- <div class="hljs"> -->
-                            <pre><code class="hljs lang-json"><span class="hljs-string">&quot;string&quot;</span>
 </code></pre>
                             <!-- </div> -->
                         </section>
@@ -2795,14 +2878,14 @@
       <span class="hljs-attr">&quot;calendarType&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
       <span class="hljs-attr">&quot;id&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>
     },
-    <span class="hljs-attr">&quot;dayOfYear&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>,
     <span class="hljs-attr">&quot;dayOfWeek&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
     <span class="hljs-attr">&quot;leapYear&quot;</span>: <span class="hljs-string">&quot;boolean&quot;</span>,
     <span class="hljs-attr">&quot;dayOfMonth&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>,
     <span class="hljs-attr">&quot;monthValue&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>,
     <span class="hljs-attr">&quot;era&quot;</span>: {
       <span class="hljs-attr">&quot;value&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>
-    }
+    },
+    <span class="hljs-attr">&quot;dayOfYear&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>
   },
   <span class="hljs-attr">&quot;horaIn&quot;</span>: {
     <span class="hljs-attr">&quot;hour&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>,
@@ -2936,11 +3019,70 @@
   <span class="hljs-attr">&quot;value&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>
 }
 </code></pre>
-                  <!-- </div> -->
+                    <!-- </div> -->
                 </section>
               </div>
             </div>
           </div>
+            <div id="definition-MagnesiumStatus" class="definition panel"
+                 data-traverse-target="definition-MagnesiumStatus">
+                <h2 class="panel-title">
+                    <a name="/definitions/MagnesiumStatus"></a>MagnesiumStatus: object
+                    <!-- <span class="json-property-type"><span class="json-property-type">object</span>
+                    <span class="json-property-range" title="Value limits"></span>
+
+
+                    </span> -->
+                </h2>
+                <div class="doc-row">
+                    <div class="doc-copy">
+                        <section class="json-schema-properties">
+                            <dl>
+                                <dt data-property-name="project">
+                                    <span class="json-property-name">project:</span>
+                                    <span class="json-property-type">string</span>
+                                    <span class="json-property-range" title="Value limits"></span>
+                                </dt>
+                                <dt data-property-name="version">
+                                    <span class="json-property-name">version:</span>
+                                    <span class="json-property-type">string</span>
+                                    <span class="json-property-range" title="Value limits"></span>
+                                </dt>
+                                <dt data-property-name="node">
+                                    <span class="json-property-name">node:</span>
+                                    <span class="json-property-type">string</span>
+                                    <span class="json-property-range" title="Value limits"></span>
+                                </dt>
+                                <dt data-property-name="swaggerUrl">
+                                    <span class="json-property-name">swaggerUrl:</span>
+                                    <span class="json-property-type">string</span>
+                                    <span class="json-property-range" title="Value limits"></span>
+                                </dt>
+                                <dt data-property-name="docsUrl">
+                                    <span class="json-property-name">docsUrl:</span>
+                                    <span class="json-property-type">string</span>
+                                    <span class="json-property-range" title="Value limits"></span>
+                                </dt>
+                            </dl>
+                        </section>
+                    </div>
+                    <div class="doc-examples">
+                        <section>
+                            <h5>Example</h5>
+                            <!-- <div class="hljs"> -->
+                            <pre><code class="hljs lang-json">{
+  <span class="hljs-attr">&quot;project&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
+  <span class="hljs-attr">&quot;version&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
+  <span class="hljs-attr">&quot;node&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
+  <span class="hljs-attr">&quot;swaggerUrl&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
+  <span class="hljs-attr">&quot;docsUrl&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>
+}
+</code></pre>
+                            <!-- </div> -->
+                        </section>
+                    </div>
+                </div>
+            </div>
           <div id="definition-IsoChronology" class="definition panel" data-traverse-target="definition-IsoChronology">
             <h2 class="panel-title">
               <a name="/definitions/IsoChronology"></a>IsoChronology: object
@@ -3075,12 +3217,6 @@
                       </span>
                       <span class="json-property-range" title="Value limits"></span>
                     </dt>
-                    <dt data-property-name="dayOfYear">
-                      <span class="json-property-name">dayOfYear:</span>
-                      <span class="json-property-type">integer</span>
-                      <span class="json-property-format">(int32)</span>
-                      <span class="json-property-range" title="Value limits"></span>
-                    </dt>
                     <dt data-property-name="dayOfWeek">
                       <span class="json-property-name">dayOfWeek:</span>
                       <span class="json-property-type">string</span>
@@ -3121,6 +3257,12 @@
                       </span>
                           <span class="json-property-range" title="Value limits"></span>
                       </dt>
+                      <dt data-property-name="dayOfYear">
+                          <span class="json-property-name">dayOfYear:</span>
+                          <span class="json-property-type">integer</span>
+                          <span class="json-property-format">(int32)</span>
+                          <span class="json-property-range" title="Value limits"></span>
+                      </dt>
                   </dl>
                 </section>
               </div>
@@ -3134,14 +3276,14 @@
     <span class="hljs-attr">&quot;calendarType&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
     <span class="hljs-attr">&quot;id&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>
   },
-  <span class="hljs-attr">&quot;dayOfYear&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>,
   <span class="hljs-attr">&quot;dayOfWeek&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,
   <span class="hljs-attr">&quot;leapYear&quot;</span>: <span class="hljs-string">&quot;boolean&quot;</span>,
   <span class="hljs-attr">&quot;dayOfMonth&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>,
   <span class="hljs-attr">&quot;monthValue&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>,
   <span class="hljs-attr">&quot;era&quot;</span>: {
     <span class="hljs-attr">&quot;value&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>
-  }
+  },
+  <span class="hljs-attr">&quot;dayOfYear&quot;</span>: <span class="hljs-string">&quot;integer (int32)&quot;</span>
 }
 </code></pre>
                   <!-- </div> -->

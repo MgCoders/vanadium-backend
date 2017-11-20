@@ -1,13 +1,18 @@
 package coop.magnesium.sulfur.api;
 
 
+import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
+import coop.magnesium.sulfur.api.utils.RoleNeeded;
 import coop.magnesium.sulfur.db.dao.ProyectoDao;
 import coop.magnesium.sulfur.db.entities.Proyecto;
+import coop.magnesium.sulfur.db.entities.Role;
 import coop.magnesium.sulfur.utils.Logged;
 import coop.magnesium.sulfur.utils.ex.MagnesiumBdAlredyExistsException;
 import coop.magnesium.sulfur.utils.ex.MagnesiumNotFoundException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 import javax.ejb.EJB;
 import javax.inject.Inject;
@@ -37,11 +42,20 @@ public class ProyectoService {
 
     @POST
     @Logged
+    @JWTTokenNeeded
+    @RoleNeeded({Role.USER, Role.ADMIN})
     @ApiOperation(value = "Create Proyecto", response = Proyecto.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 409, message = "Código o Id ya existe"),
+            @ApiResponse(code = 500, message = "Error interno")})
     public Response create(@Valid Proyecto proyecto) {
         try {
-            Proyecto proyectoExists = proyectoDao.findById(proyecto.getId());
-            if (proyectoExists != null) throw new MagnesiumBdAlredyExistsException("Proyecto ya existe");
+            Proyecto proyectoExists = proyecto.getId() != null ? proyectoDao.findById(proyecto.getId()) : null;
+            if (proyectoExists != null) throw new MagnesiumBdAlredyExistsException("Id ya existe");
+
+            if (proyectoDao.findByField("codigo", proyecto.getCodigo()).size() > 0)
+                throw new MagnesiumBdAlredyExistsException("Código ya existe");
+
             proyecto = proyectoDao.save(proyecto);
             return Response.status(Response.Status.CREATED).entity(proyecto).build();
         } catch (MagnesiumBdAlredyExistsException exists) {
@@ -55,8 +69,8 @@ public class ProyectoService {
 
 
     @GET
-    //@JWTTokenNeeded
-    //@RoleNeeded({Role.USER, Role.ADMIN})
+    @JWTTokenNeeded
+    @RoleNeeded({Role.USER, Role.ADMIN})
     @ApiOperation(value = "Get proyectos", response = Proyecto.class, responseContainer = "List")
     public Response findAll() {
         List<Proyecto> proyectoList = proyectoDao.findAll();
@@ -65,9 +79,11 @@ public class ProyectoService {
 
     @GET
     @Path("{id}")
-    //@JWTTokenNeeded
-    //@RoleNeeded({Role.USER, Role.ADMIN})
+    @JWTTokenNeeded
+    @RoleNeeded({Role.USER, Role.ADMIN})
     @ApiOperation(value = "Get tipo Tarea", response = Proyecto.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Id no encontrado")})
     public Response find(@PathParam("id") Long id) {
         Proyecto proyecto = proyectoDao.findById(id);
         if (proyecto == null) return Response.status(Response.Status.NOT_FOUND).build();
@@ -76,9 +92,11 @@ public class ProyectoService {
 
     @PUT
     @Path("{id}")
-    //@JWTTokenNeeded
-    //@RoleNeeded({Role.USER, Role.ADMIN})
+    @JWTTokenNeeded
+    @RoleNeeded({Role.USER, Role.ADMIN})
     @ApiOperation(value = "Edit proyecto", response = Proyecto.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 304, message = "Error: objeto no modificado")})
     public Response edit(@PathParam("id") Long id, @Valid Proyecto proyecto) {
         try {
             if (proyectoDao.findById(id) == null) throw new MagnesiumNotFoundException("Proyecto no encontrado");

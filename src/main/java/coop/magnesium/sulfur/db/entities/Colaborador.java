@@ -36,6 +36,16 @@ public class Colaborador {
     @Transient
     private String token;
 
+    public Colaborador() {
+    }
+
+    public Colaborador(String email, String nombre, Cargo cargo, String password, String role) {
+        this.email = email;
+        this.nombre = nombre;
+        this.cargo = cargo;
+        this.password = password;
+        this.role = role;
+    }
 
     public String getToken() {
         return token;

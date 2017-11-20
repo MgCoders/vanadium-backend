@@ -43,13 +43,24 @@ public class Hora {
     @ManyToOne
     private Colaborador colaborador;
 
+    public Hora() {
+    }
+
+    public Hora(LocalDate dia, LocalTime horaIn, LocalTime horaOut, Proyecto proyecto, TipoTarea tipoTarea, Colaborador colaborador) {
+        this.dia = dia;
+        this.horaIn = horaIn;
+        this.horaOut = horaOut;
+        this.proyecto = proyecto;
+        this.tipoTarea = tipoTarea;
+        this.colaborador = colaborador;
+    }
+
     @PrePersist
     @PreUpdate
     public void calcularSubtotal() {
         Duration duration = Duration.between(horaIn, horaOut);
         this.subtotal = LocalTime.ofNanoOfDay(duration.toNanos());
     }
-
 
     public Colaborador getColaborador() {
         return colaborador;
