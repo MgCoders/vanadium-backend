@@ -1,13 +1,18 @@
 package coop.magnesium.sulfur.api;
 
 
+import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
+import coop.magnesium.sulfur.api.utils.RoleNeeded;
 import coop.magnesium.sulfur.db.dao.TipoTareaDao;
+import coop.magnesium.sulfur.db.entities.Role;
 import coop.magnesium.sulfur.db.entities.TipoTarea;
 import coop.magnesium.sulfur.utils.Logged;
 import coop.magnesium.sulfur.utils.ex.MagnesiumBdAlredyExistsException;
 import coop.magnesium.sulfur.utils.ex.MagnesiumNotFoundException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 import javax.ejb.EJB;
 import javax.inject.Inject;
@@ -38,6 +43,9 @@ public class TareaService {
     @POST
     @Logged
     @ApiOperation(value = "Create Tipo Tarea", response = TipoTarea.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 409, message = "Código o Id ya existe"),
+            @ApiResponse(code = 500, message = "Error interno")})
     public Response create(@Valid TipoTarea tipoTarea) {
         try {
             TipoTarea tipoTareaExists = tipoTarea.getId() != null ? tipoTareaDao.findById(tipoTarea.getId()) : null;
@@ -59,8 +67,8 @@ public class TareaService {
 
 
     @GET
-    //@JWTTokenNeeded
-    //@RoleNeeded({Role.USER, Role.ADMIN})
+    @JWTTokenNeeded
+    @RoleNeeded({Role.USER, Role.ADMIN})
     @ApiOperation(value = "Get tipos tarea", response = TipoTarea.class, responseContainer = "List")
     public Response findAll() {
         List<TipoTarea> tipoTareaList = tipoTareaDao.findAll();
@@ -69,9 +77,11 @@ public class TareaService {
 
     @GET
     @Path("{id}")
-    //@JWTTokenNeeded
-    //@RoleNeeded({Role.USER, Role.ADMIN})
+    @JWTTokenNeeded
+    @RoleNeeded({Role.USER, Role.ADMIN})
     @ApiOperation(value = "Get tipo Tarea", response = TipoTarea.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Id no encontrado")})
     public Response find(@PathParam("id") Long id) {
         TipoTarea tipoTarea = tipoTareaDao.findById(id);
         if (tipoTarea == null) return Response.status(Response.Status.NOT_FOUND).build();
@@ -80,9 +90,11 @@ public class TareaService {
 
     @PUT
     @Path("{id}")
-    //@JWTTokenNeeded
-    //@RoleNeeded({Role.USER, Role.ADMIN})
+    @JWTTokenNeeded
+    @RoleNeeded({Role.USER, Role.ADMIN})
     @ApiOperation(value = "Edit tipo area", response = TipoTarea.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 304, message = "Error: objeto no modificado")})
     public Response edit(@PathParam("id") Long id, @Valid TipoTarea tipoTarea) {
         try {
             if (tipoTareaDao.findById(id) == null) throw new MagnesiumNotFoundException("Tipo de tarea no encontrado");

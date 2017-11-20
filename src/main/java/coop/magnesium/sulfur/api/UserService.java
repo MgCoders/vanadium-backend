@@ -40,7 +40,7 @@ import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
 @Produces(APPLICATION_JSON)
 @Consumes(APPLICATION_JSON)
 @Transactional
-@Api(description = "Aplication users service", tags = "users")
+@Api(description = "Aplication auth service", tags = "auth")
 public class UserService {
 
     @Inject
@@ -55,7 +55,7 @@ public class UserService {
     @POST
     @Path("/login")
     @Consumes(APPLICATION_FORM_URLENCODED)
-    @ApiOperation(value = "Authenticate user", response = String.class)
+    @ApiOperation(value = "Authenticate user", response = Colaborador.class)
     @Logged
     public Response authenticateUser(@FormParam("email") String email,
                                      @FormParam("password") String password) {

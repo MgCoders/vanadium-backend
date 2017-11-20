@@ -29,15 +29,20 @@ public class JAXRSConfiguration extends Application {
     public void init() {
         BeanConfig beanConfig = new BeanConfig();
         beanConfig.setVersion(endpointsProperties.getProperty("project.version"));
-        beanConfig.setSchemes(new String[]{"http"});
-        beanConfig.setHost(endpointsProperties.getProperty("rest.api.host"));
-        beanConfig.setBasePath(endpointsProperties.getProperty("rest.api.path"));
+        beanConfig.setSchemes(new String[]{"https"});
+        beanConfig.setHost(endpointsProperties.getProperty("rest.base.host"));
+        beanConfig.setBasePath(endpointsProperties.getProperty("rest.base.path"));
         beanConfig.setResourcePackage("coop.magnesium.sulfur.api");
-        beanConfig.setDescription("Sulfur");
+        beanConfig.setDescription(getDescription());
         beanConfig.setTitle("Sulfur backend");
-        beanConfig.setContact("rsperoni@mgcoders.com");
+        beanConfig.setContact("rsperoni@magnesium.coop");
         beanConfig.setScan(true);
         beanConfig.setPrettyPrint(true);
+    }
+
+    private String getDescription() {
+        return "El login exitoso de UserService devuelve un Colaborador con un campo \"token\".\n" +
+                "Dicho token se debe incluir como header de las llamadas del resto de las operaciones de cada servicio.";
     }
 
 

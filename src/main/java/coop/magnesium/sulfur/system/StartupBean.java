@@ -3,9 +3,6 @@ package coop.magnesium.sulfur.system;
 import coop.magnesium.sulfur.db.dao.CargoDao;
 import coop.magnesium.sulfur.db.dao.ColaboradorDao;
 import coop.magnesium.sulfur.db.entities.Cargo;
-import coop.magnesium.sulfur.db.entities.Colaborador;
-import coop.magnesium.sulfur.utils.PasswordUtils;
-import coop.magnesium.sulfur.utils.ex.MagnesiumBdMultipleResultsException;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -32,7 +29,7 @@ public class StartupBean {
     @PostConstruct
     public void init() {
         cargoDao.save(new Cargo("JUNIOR", "JUNIOR", new BigDecimal(32.2)));
-        try {
+        /*try {
             if (colaboradorDao.findByEmail("root@magnesium.coop") == null) {
                 Colaborador root = new Colaborador();
                 root.setNombre("Root");
@@ -43,6 +40,6 @@ public class StartupBean {
             }
         } catch (MagnesiumBdMultipleResultsException e) {
             logger.severe(e.getMessage());
-        }
+        }*/
     }
 }

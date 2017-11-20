@@ -1,6 +1,7 @@
 package coop.magnesium.sulfur.api;
 
 import coop.magnesium.sulfur.db.dao.TipoTareaDao;
+import coop.magnesium.sulfur.db.entities.Cargo;
 import coop.magnesium.sulfur.db.entities.TipoTarea;
 import coop.magnesium.sulfur.utils.Logged;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -17,8 +18,10 @@ import org.junit.runner.RunWith;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -74,6 +77,72 @@ public class TareaServiceTest {
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json(tipoTarea));
         assertEquals(Response.Status.CONFLICT.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    @InSequence(4)
+    @RunAsClient
+    public void getTareas(@ArquillianResteasyResource final WebTarget webTarget) {
+        final Response response = webTarget
+                .path("/tareas")
+                .request(MediaType.APPLICATION_JSON)
+                .get();
+        List<TipoTarea> tareaList = response.readEntity(new GenericType<List<TipoTarea>>() {
+        });
+        assertEquals(1, tareaList.size());
+    }
+
+    @Test
+    @InSequence(5)
+    @RunAsClient
+    public void getTarea(@ArquillianResteasyResource final WebTarget webTarget) {
+        final Response response = webTarget
+                .path("/tareas/1")
+                .request(MediaType.APPLICATION_JSON)
+                .get();
+        TipoTarea tarea = response.readEntity(TipoTarea.class);
+        assertEquals(1L, tarea.getId().longValue());
+        assertEquals("TT1", tarea.getCodigo());
+        assertEquals("Tipo tarea 1", tarea.getNombre());
+    }
+
+    @Test
+    @InSequence(5)
+    @RunAsClient
+    public void getTareaNoExiste(@ArquillianResteasyResource final WebTarget webTarget) {
+        final Response response = webTarget
+                .path("/tareas/4")
+                .request(MediaType.APPLICATION_JSON)
+                .get();
+        assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    @InSequence(6)
+    @RunAsClient
+    public void editarTareaExiste(@ArquillianResteasyResource final WebTarget webTarget) {
+        TipoTarea tarea = new TipoTarea("TT1111", "Tipo tarea 1 ok");
+        tarea.setId(1L);
+        final Response response = webTarget
+                .path("/tareas/1")
+                .request(MediaType.APPLICATION_JSON)
+                .put(Entity.json(tarea));
+        Cargo returned = response.readEntity(Cargo.class);
+        assertEquals(tarea.getCodigo(), returned.getCodigo());
+        assertEquals(tarea.getNombre(), returned.getNombre());
+    }
+
+    @Test
+    @InSequence(6)
+    @RunAsClient
+    public void editarTareaNoExiste(@ArquillianResteasyResource final WebTarget webTarget) {
+        TipoTarea tarea = new TipoTarea("TT1111", "Tipo tarea 1 ok");
+        tarea.setId(4L);
+        final Response response = webTarget
+                .path("/tareas/4")
+                .request(MediaType.APPLICATION_JSON)
+                .put(Entity.json(tarea));
+        assertEquals(Response.Status.NOT_MODIFIED.getStatusCode(), response.getStatus());
     }
 
 
