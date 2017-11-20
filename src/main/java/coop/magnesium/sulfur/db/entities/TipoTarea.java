@@ -26,6 +26,14 @@ public class TipoTarea {
     @NotNull
     private String nombre;
 
+    public TipoTarea() {
+    }
+
+    public TipoTarea(String codigo, String nombre) {
+        this.codigo = codigo;
+        this.nombre = nombre;
+    }
+
     public Long getId() {
         return id;
     }

@@ -40,8 +40,12 @@ public class TareaService {
     @ApiOperation(value = "Create Tipo Tarea", response = TipoTarea.class)
     public Response create(@Valid TipoTarea tipoTarea) {
         try {
-            TipoTarea tipoTareaExists = tipoTareaDao.findById(tipoTarea.getId());
-            if (tipoTareaExists != null) throw new MagnesiumBdAlredyExistsException("Tipo Tarea ya existe");
+            TipoTarea tipoTareaExists = tipoTarea.getId() != null ? tipoTareaDao.findById(tipoTarea.getId()) : null;
+            if (tipoTareaExists != null) throw new MagnesiumBdAlredyExistsException("Id ya existe");
+
+            if (tipoTareaDao.findByField("codigo", tipoTarea.getCodigo()).size() > 0)
+                throw new MagnesiumBdAlredyExistsException("Código ya existe");
+
             tipoTarea = tipoTareaDao.save(tipoTarea);
             return Response.status(Response.Status.CREATED).entity(tipoTarea).build();
         } catch (MagnesiumBdAlredyExistsException exists) {

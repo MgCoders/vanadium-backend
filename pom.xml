@@ -96,7 +96,7 @@
         <version.org.jboss.arquillian>1.1.5.Final</version.org.jboss.arquillian>
         <version.shrinkwrap.resolvers>2.2.6</version.shrinkwrap.resolvers>
         <version.org.wildfly>2.0.2.Final</version.org.wildfly>
-        <version.junit>4.12</version.junit>
+        <version.junit>4.11</version.junit>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
