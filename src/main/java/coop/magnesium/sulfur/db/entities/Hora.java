@@ -2,6 +2,7 @@ package coop.magnesium.sulfur.db.entities;
 
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -23,10 +24,13 @@ public class Hora {
     @GeneratedValue
     private Long id;
     @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate dia;
     @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "hh:mm")
     private LocalTime horaIn;
     @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "hh:mm")
     private LocalTime horaOut;
     private LocalTime subtotal;
 
@@ -103,6 +107,7 @@ public class Hora {
     }
 
     @JsonProperty
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "hh:mm")
     public LocalTime getSubtotal() {
         return subtotal;
     }
