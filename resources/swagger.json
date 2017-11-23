@@ -12,16 +12,10 @@
   "basePath": "/api",
   "tags": [
     {
-      "name": "auth"
-    },
-    {
-      "name": "status"
-    },
-    {
       "name": "colaboradores"
     },
     {
-      "name": "tareas"
+      "name": "proyectos"
     },
     {
       "name": "cargos"
@@ -30,7 +24,13 @@
       "name": "horas"
     },
     {
-      "name": "proyectos"
+      "name": "auth"
+    },
+    {
+      "name": "tareas"
+    },
+    {
+      "name": "status"
     }
   ],
   "schemes": [
@@ -872,17 +872,25 @@
           "format": "int64"
         },
         "dia": {
-          "$ref": "#/definitions/LocalDate"
+          "type": "string",
+          "format": "date",
+          "example": "23/01/2017"
         },
         "horaIn": {
-          "$ref": "#/definitions/LocalTime"
+          "type": "string",
+          "format": "date-time",
+          "example": "08:15"
         },
         "horaOut": {
-          "$ref": "#/definitions/LocalTime"
+          "type": "string",
+          "format": "date-time",
+          "example": "17:34"
         },
         "subtotal": {
-          "readOnly": true,
-          "$ref": "#/definitions/LocalTime"
+          "type": "string",
+          "format": "date-time",
+          "example": "08:00",
+          "readOnly": true
         },
         "proyecto": {
           "$ref": "#/definitions/Proyecto"
@@ -892,36 +900,6 @@
         },
         "colaborador": {
           "$ref": "#/definitions/Colaborador"
-        }
-      }
-    },
-    "LocalTime": {
-      "type": "object",
-      "properties": {
-        "hour": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "minute": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "second": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "nano": {
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
-    "Era": {
-      "type": "object",
-      "properties": {
-        "value": {
-          "type": "integer",
-          "format": "int32"
         }
       }
     },
@@ -945,17 +923,6 @@
         }
       }
     },
-    "IsoChronology": {
-      "type": "object",
-      "properties": {
-        "calendarType": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        }
-      }
-    },
     "TipoTarea": {
       "type": "object",
       "required": [
@@ -972,66 +939,6 @@
         },
         "nombre": {
           "type": "string"
-        }
-      }
-    },
-    "LocalDate": {
-      "type": "object",
-      "properties": {
-        "year": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "month": {
-          "type": "string",
-          "enum": [
-            "JANUARY",
-            "FEBRUARY",
-            "MARCH",
-            "APRIL",
-            "MAY",
-            "JUNE",
-            "JULY",
-            "AUGUST",
-            "SEPTEMBER",
-            "OCTOBER",
-            "NOVEMBER",
-            "DECEMBER"
-          ]
-        },
-        "chronology": {
-          "$ref": "#/definitions/IsoChronology"
-        },
-        "dayOfWeek": {
-          "type": "string",
-          "enum": [
-            "MONDAY",
-            "TUESDAY",
-            "WEDNESDAY",
-            "THURSDAY",
-            "FRIDAY",
-            "SATURDAY",
-            "SUNDAY"
-          ]
-        },
-        "leapYear": {
-          "type": "boolean",
-          "default": false
-        },
-        "dayOfMonth": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "monthValue": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "era": {
-          "$ref": "#/definitions/Era"
-        },
-        "dayOfYear": {
-          "type": "integer",
-          "format": "int32"
         }
       }
     },

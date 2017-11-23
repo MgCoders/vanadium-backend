@@ -28,6 +28,7 @@ public class StartupBean {
 
     @PostConstruct
     public void init() {
+
         cargoDao.save(new Cargo("JUNIOR", "JUNIOR", new BigDecimal(32.2)));
         /*try {
             if (colaboradorDao.findByEmail("root@magnesium.coop") == null) {

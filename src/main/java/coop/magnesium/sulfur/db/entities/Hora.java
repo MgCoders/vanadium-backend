@@ -2,11 +2,13 @@ package coop.magnesium.sulfur.db.entities;
 
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.*;
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -17,29 +19,33 @@ import java.time.LocalTime;
  */
 @Entity
 @JsonAutoDetect
+@ApiModel
 public class Hora {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @ApiModelProperty(dataType = "date", example = "23/01/2017")
     private LocalDate dia;
     @NotNull
+    @ApiModelProperty(dataType = "dateTime", example = "08:15")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
     private LocalTime horaIn;
     @NotNull
+    @ApiModelProperty(dataType = "dateTime", example = "17:34")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
     private LocalTime horaOut;
     private LocalTime subtotal;
 
     @NotNull
-    @Valid
     @ManyToOne
     private Proyecto proyecto;
     @NotNull
-    @Valid
     @ManyToOne
     private TipoTarea tipoTarea;
     @NotNull
-    @Valid
     @ManyToOne
     private Colaborador colaborador;
 
@@ -103,6 +109,8 @@ public class Hora {
     }
 
     @JsonProperty
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+    @ApiModelProperty(dataType = "dateTime", example = "08:00")
     public LocalTime getSubtotal() {
         return subtotal;
     }
