@@ -5,6 +5,12 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -28,14 +34,20 @@ public class Hora {
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @ApiModelProperty(dataType = "date", example = "23/01/2017")
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate dia;
     @NotNull
     @ApiModelProperty(dataType = "dateTime", example = "08:15")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+    @JsonDeserialize(using = LocalTimeDeserializer.class)
+    @JsonSerialize(using = LocalTimeSerializer.class)
     private LocalTime horaIn;
     @NotNull
     @ApiModelProperty(dataType = "dateTime", example = "17:34")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+    @JsonDeserialize(using = LocalTimeDeserializer.class)
+    @JsonSerialize(using = LocalTimeSerializer.class)
     private LocalTime horaOut;
     private LocalTime subtotal;
 
@@ -111,6 +123,8 @@ public class Hora {
     @JsonProperty
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
     @ApiModelProperty(dataType = "dateTime", example = "08:00")
+    @JsonDeserialize(using = LocalTimeDeserializer.class)
+    @JsonSerialize(using = LocalTimeSerializer.class)
     public LocalTime getSubtotal() {
         return subtotal;
     }
