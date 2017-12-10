@@ -66,6 +66,7 @@ public class UserService {
             //Info que quiero guardar en token
             Map<String, Object> map = new HashMap<>();
             map.put("role", sulfurUser.getRole());
+            map.put("id", String.valueOf(sulfurUser.getId()));
             // Issue a token for the sulfurUser
             String token = issueToken(email, map);
             sulfurUser.setToken(token);

@@ -1,28 +1,24 @@
 package coop.magnesium.sulfur.db.entities;
 
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import java.io.Serializable;
+import javax.security.auth.Subject;
+import java.security.Principal;
 
 /**
  * Created by rsperoni on 05/05/17.
  */
-@Entity
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
-public class SulfurUser implements Serializable {
+public class SulfurUser implements Principal {
 
-    @Id
-    private String email;
-    private String password;
-    private String role = Role.USER.name();
+    private Long colaboradorId;
+    private String role;
 
 
     public SulfurUser() {
+    }
+
+    public SulfurUser(Long colaboradorId, String role) {
+        this.colaboradorId = colaboradorId;
+        this.role = role;
     }
 
     public String getRole() {
@@ -33,26 +29,21 @@ public class SulfurUser implements Serializable {
         this.role = role;
     }
 
-    public String getEmail() {
-        return email;
+    public Long getColaboradorId() {
+        return colaboradorId;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+    public void setColaboradorId(Long colaboradorId) {
+        this.colaboradorId = colaboradorId;
     }
 
     @Override
-    public String toString() {
-        return "SulfurUser{" +
-                ", email='" + email + '\'' +
-                '}';
+    public String getName() {
+        return String.valueOf(colaboradorId);
+    }
+
+    @Override
+    public boolean implies(Subject subject) {
+        return false;
     }
 }

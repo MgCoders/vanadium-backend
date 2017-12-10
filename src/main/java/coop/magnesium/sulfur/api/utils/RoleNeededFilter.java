@@ -1,6 +1,7 @@
 package coop.magnesium.sulfur.api.utils;
 
 import coop.magnesium.sulfur.db.entities.Role;
+import coop.magnesium.sulfur.db.entities.SulfurUser;
 import coop.magnesium.sulfur.utils.KeyGenerator;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -15,11 +16,13 @@ import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.security.Key;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -74,6 +77,7 @@ public class RoleNeededFilter implements ContainerRequestFilter {
                     .parseClaimsJws(token);
 
             Role rolUsuario = Role.valueOf((String) claimsJws.getBody().get("role"));
+            Long idColaborador = Long.valueOf((String) claimsJws.getBody().get("id"));
             logger.info("##### ROL: " + rolUsuario.name() + " #####");
 
             if (!rolesPermitidos.contains(rolUsuario)) {
@@ -81,10 +85,11 @@ public class RoleNeededFilter implements ContainerRequestFilter {
             }
 
             logger.info("#### AUTORIZADO ####");
+            containerRequestContext.setSecurityContext(new Authorizer(idColaborador, rolUsuario.name()));
 
         } catch (Exception e) {
             logger.severe("#### NO AUTORIZADO ####");
-            containerRequestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+            containerRequestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build());
         }
 
     }
@@ -104,8 +109,32 @@ public class RoleNeededFilter implements ContainerRequestFilter {
         }
     }
 
-    private void checkPermissions(List<Role> allowedRoles) throws Exception {
-        // Check if the user contains one of the allowed roles
-        // Throw an Exception if the user has not permission to execute the method
+    public static class Authorizer implements SecurityContext {
+
+        private SulfurUser sulfurUser;
+
+        public Authorizer(Long colaboradorId, String role) {
+            this.sulfurUser = new SulfurUser(colaboradorId, role);
+        }
+
+        @Override
+        public Principal getUserPrincipal() {
+            return this.sulfurUser;
+        }
+
+        @Override
+        public boolean isUserInRole(String s) {
+            return sulfurUser.getRole().equals(s);
+        }
+
+        @Override
+        public boolean isSecure() {
+            return false;
+        }
+
+        @Override
+        public String getAuthenticationScheme() {
+            return null;
+        }
     }
 }
