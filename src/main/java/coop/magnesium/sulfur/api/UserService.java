@@ -62,6 +62,7 @@ public class UserService {
         try {
             // Authenticate the sulfurUser using the credentials provided
             Colaborador sulfurUser = authenticate(email, password);
+            if (sulfurUser == null) throw new MagnesiumBdNotFoundException("Usuario no existe");
             //Info que quiero guardar en token
             Map<String, Object> map = new HashMap<>();
             map.put("role", sulfurUser.getRole());
