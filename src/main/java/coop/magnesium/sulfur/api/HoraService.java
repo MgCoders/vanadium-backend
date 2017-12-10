@@ -106,8 +106,10 @@ public class HoraService {
     @ApiOperation(value = "Get hora", response = Hora.class)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Id no encontrado")})
-    public Hora find(@PathParam("id") Long id) {
-        return horaDao.findById(id);
+    public Response find(@PathParam("id") Long id) {
+        Hora hora = horaDao.findById(id);
+        if (hora == null) return Response.status(Response.Status.NOT_FOUND).build();
+        return Response.ok(hora).build();
     }
 
     @PUT
