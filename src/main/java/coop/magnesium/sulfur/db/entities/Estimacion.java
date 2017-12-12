@@ -13,6 +13,7 @@ import javax.persistence.*;
 public class Estimacion {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
     private Proyecto proyecto;

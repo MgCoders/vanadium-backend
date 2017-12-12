@@ -30,7 +30,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 /**
  * Created by rsperoni on 05/05/17.
  */
-@Path("/horas")
+@Path("/estimaciones")
 @Produces(APPLICATION_JSON)
 @Consumes(APPLICATION_JSON)
 @Transactional
