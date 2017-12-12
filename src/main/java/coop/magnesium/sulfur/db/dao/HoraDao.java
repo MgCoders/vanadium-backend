@@ -9,7 +9,9 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -31,14 +33,27 @@ public class HoraDao extends AbstractDao<Hora, Long> {
         return em;
     }
 
-    public List<Hora> findAllByColaborador(Colaborador colaborador) {
+    /**
+     * Devuelva horas de colaborador entre fechas ini y fin.
+     *
+     * @param colaborador
+     * @param ini
+     * @param fin
+     * @return
+     */
+    public List<Hora> findAllByColaborador(Colaborador colaborador, LocalDate ini, LocalDate fin) {
         CriteriaBuilder criteriaBuilder = this.getEntityManager().getCriteriaBuilder();
         CriteriaQuery criteriaQuery = criteriaBuilder.createQuery();
         Root entity = criteriaQuery.from(Hora.class);
         criteriaQuery.select(entity);
-        criteriaQuery.where(criteriaBuilder.equal(entity.get("colaborador"), criteriaBuilder.parameter(Colaborador.class, "c")));
+        Predicate colaboradorIsOk = criteriaBuilder.equal(entity.get("colaborador"), criteriaBuilder.parameter(Colaborador.class, "c"));
+        Predicate diaEntreFechas = criteriaBuilder.between(entity.get("dia"), criteriaBuilder.parameter(LocalDate.class, "ini"), criteriaBuilder.parameter(LocalDate.class, "fin"));
+        criteriaQuery.where(criteriaBuilder.and(colaboradorIsOk, diaEntreFechas));
+        criteriaQuery.orderBy(criteriaBuilder.asc(entity.get("dia")));
         Query query = this.getEntityManager().createQuery(criteriaQuery);
         query.setParameter("c", colaborador);
+        query.setParameter("ini", ini);
+        query.setParameter("fin",fin);
         return (List<Hora>) query.getResultList();
     }
 

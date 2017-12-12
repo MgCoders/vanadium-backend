@@ -25,6 +25,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -40,6 +42,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 @Api(description = "Horas service", tags = "horas")
 public class HoraService {
 
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
     @Inject
     private Logger logger;
     @EJB
@@ -50,7 +53,6 @@ public class HoraService {
     private ColaboradorDao colaboradorDao;
     @EJB
     private TipoTareaDao tipoTareaDao;
-
 
     @POST
     @Logged
@@ -112,11 +114,17 @@ public class HoraService {
     }
 
     @GET
-    @Path("user/{id}")
+    @Path("user/{id}/{fecha_ini}/{fecha_fin}")
     @JWTTokenNeeded
     @RoleNeeded({Role.USER, Role.ADMIN})
-    @ApiOperation(value = "Get horas", response = Hora.class, responseContainer = "List")
-    public Response findAllByColaborador(@PathParam("id") Long id, @Context SecurityContext securityContext) {
+    @ApiOperation(value = "Get horas por usuario y fechas", response = Hora.class, responseContainer = "List")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Objeto inválido"),
+            @ApiResponse(code = 401, message = "No Autorizado")})
+    public Response findAllByColaborador(@PathParam("id") Long id,
+                                         @Context SecurityContext securityContext,
+                                         @PathParam("fecha_ini") String fechaIniString,
+                                         @PathParam("fecha_fin") String fechaFinString) {
         try {
             Colaborador colaborador = colaboradorDao.findById(id);
             if (colaborador == null) throw new MagnesiumNotFoundException("Colaborador no encontrado");
@@ -124,12 +132,16 @@ public class HoraService {
             if (!((SulfurUser) securityContext.getUserPrincipal()).getColaboradorId().equals(colaborador.getId())) {
                 throw new MagnesiumSecurityException("Colaborador no coincide");
             }
-            List<Hora> horaList = horaDao.findAllByColaborador(colaborador);
+
+            LocalDate fechaIni = LocalDate.parse(fechaIniString, formatter);
+            LocalDate fechaFin = LocalDate.parse(fechaFinString, formatter);
+
+            List<Hora> horaList = horaDao.findAllByColaborador(colaborador, fechaIni, fechaFin);
             return Response.ok(horaList).build();
         } catch (MagnesiumSecurityException e) {
             logger.warning(e.getMessage());
             return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
-        } catch (MagnesiumNotFoundException e) {
+        } catch (Exception e) {
             logger.warning(e.getMessage());
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
