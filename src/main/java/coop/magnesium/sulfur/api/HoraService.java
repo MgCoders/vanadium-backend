@@ -141,7 +141,7 @@ public class HoraService {
         } catch (MagnesiumSecurityException e) {
             logger.warning(e.getMessage());
             return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
-        } catch (Exception e) {
+        } catch (MagnesiumNotFoundException e) {
             logger.warning(e.getMessage());
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
