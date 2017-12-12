@@ -3,7 +3,8 @@ package coop.magnesium.sulfur.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import coop.magnesium.sulfur.api.utils.ObjectMapperContextResolver;
+import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
+import coop.magnesium.sulfur.api.utils.RoleNeeded;
 import coop.magnesium.sulfur.db.dao.*;
 import coop.magnesium.sulfur.db.entities.*;
 import coop.magnesium.sulfur.utils.Logged;
@@ -24,6 +25,7 @@ import org.junit.runner.RunWith;
 import javax.inject.Inject;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
@@ -32,6 +34,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
@@ -51,7 +54,9 @@ public class HoraServiceTest {
     final Proyecto proyecto = new Proyecto("PP", "PP");
     final TipoTarea tipoTarea = new TipoTarea("TT", "TT");
     final Cargo cargo = new Cargo("CC", "CC", new BigDecimal(32.2));
-    final Colaborador colaborador = new Colaborador("em", "nom", cargo, "pwd", "ADMIN");
+    final Colaborador colaborador_admin = new Colaborador("em", "nom", cargo, "pwd", "ADMIN");
+    final Colaborador colaborador_user = new Colaborador("em1", "nom", cargo, "pwd", "USER");
+
     @Inject
     CargoDao cargoDao;
     @Inject
@@ -75,8 +80,12 @@ public class HoraServiceTest {
                         HoraDao.class.getPackage(),
                         Logged.class.getPackage())
                 .addClass(JAXRSConfiguration.class)
-                .addClass(ObjectMapperContextResolver.class)
+                .addClass(JWTTokenNeeded.class)
+                .addClass(RoleNeeded.class)
+                .addClass(JWTTokenNeededFilterMock.class)
+                .addClass(RoleNeededFilterMock.class)
                 .addClass(HoraService.class)
+                .addClass(UserServiceMock.class)
                 .addAsResource("META-INF/persistence.xml")
                 .addAsResource("endpoints.properties")
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
@@ -89,8 +98,9 @@ public class HoraServiceTest {
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         this.proyecto.setId(1L);
         this.tipoTarea.setId(1L);
-        this.colaborador.setId(1L);
+        this.colaborador_admin.setId(1L);
         this.cargo.setId(1L);
+        this.colaborador_user.setId(2L);
     }
 
     @Test
@@ -100,21 +110,25 @@ public class HoraServiceTest {
         logger.info(tipoTareaDao.save(this.tipoTarea).toString());
         Cargo cargo = cargoDao.save(this.cargo);
         logger.info(cargo.toString());
-        this.colaborador.setCargo(cargo);
-        logger.info(colaboradorDao.save(this.colaborador).toString());
+        this.colaborador_admin.setCargo(cargo);
+        this.colaborador_user.setCargo(cargo);
+        logger.info(colaboradorDao.save(this.colaborador_admin).toString());
+        logger.info(colaboradorDao.save(this.colaborador_user).toString());
     }
+
 
     @Test
     @InSequence(2)
     @RunAsClient
-    public void createTarea(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
-        Hora hora = new Hora(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, this.proyecto, this.tipoTarea, this.colaborador);
+    public void createHoraAdmin(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
+        Hora hora = new Hora(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, this.proyecto, this.tipoTarea, this.colaborador_admin);
 
         System.out.println(objectMapper.writeValueAsString(hora));
 
         final Response response = webTarget
                 .path("/horas")
                 .request(MediaType.APPLICATION_JSON)
+                .header("AUTHORIZATION", "ADMIN:1")
                 .post(Entity.json(objectMapper.writeValueAsString(hora)));
 
         assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
@@ -123,4 +137,109 @@ public class HoraServiceTest {
         assertEquals(1, horaCreada.getId().longValue());
         assertEquals(LocalTime.MAX.truncatedTo(ChronoUnit.MINUTES), horaCreada.getSubtotal());
     }
+
+    @Test
+    @InSequence(3)
+    @RunAsClient
+    public void createHoraUserBien(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
+        Hora hora = new Hora(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, this.proyecto, this.tipoTarea, this.colaborador_user);
+
+        System.out.println(objectMapper.writeValueAsString(hora));
+
+        final Response response = webTarget
+                .path("/horas")
+                .request(MediaType.APPLICATION_JSON)
+                .header("AUTHORIZATION", "USER:2")
+                .post(Entity.json(objectMapper.writeValueAsString(hora)));
+
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+        String horaCreadaString = response.readEntity(String.class);
+        Hora horaCreada = objectMapper.readValue(horaCreadaString, Hora.class);
+        assertEquals(2, horaCreada.getId().longValue());
+        assertEquals(LocalTime.MAX.truncatedTo(ChronoUnit.MINUTES), horaCreada.getSubtotal());
+    }
+
+    @Test
+    @InSequence(4)
+    @RunAsClient
+    public void createHoraUserMal(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
+        Hora hora = new Hora(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, this.proyecto, this.tipoTarea, this.colaborador_user);
+
+        System.out.println(objectMapper.writeValueAsString(hora));
+
+        final Response response = webTarget
+                .path("/horas")
+                .request(MediaType.APPLICATION_JSON)
+                .header("AUTHORIZATION", "USER:5")
+                .post(Entity.json(objectMapper.writeValueAsString(hora)));
+
+        assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    @InSequence(5)
+    @RunAsClient
+    public void getHorasAdminBien(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
+
+
+        final Response response = webTarget
+                .path("/horas")
+                .request(MediaType.APPLICATION_JSON)
+                .header("AUTHORIZATION", "ADMIN:1")
+                .get();
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        List<Hora> horaList = response.readEntity(new GenericType<List<Hora>>() {
+        });
+        assertEquals(2, horaList.size());
+    }
+
+    @Test
+    @InSequence(6)
+    @RunAsClient
+    public void getHorasUserMal(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
+
+
+        final Response response = webTarget
+                .path("/horas")
+                .request(MediaType.APPLICATION_JSON)
+                .header("AUTHORIZATION", "USER:1")
+                .get();
+
+        assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    @InSequence(7)
+    @RunAsClient
+    public void getHorasUserMal2(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
+
+
+        final Response response = webTarget
+                .path("/horas/user/2/01-01-2011/01-01-2018")
+                .request(MediaType.APPLICATION_JSON)
+                .header("AUTHORIZATION", "USER:1")
+                .get();
+
+        assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    @InSequence(7)
+    @RunAsClient
+    public void getHorasUserBien(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
+
+
+        final Response response = webTarget
+                .path("/horas/user/2/01-01-2011/01-01-2018")
+                .request(MediaType.APPLICATION_JSON)
+                .header("AUTHORIZATION", "USER:2")
+                .get();
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        List<Hora> horaList = response.readEntity(new GenericType<List<Hora>>() {
+        });
+        assertEquals(1, horaList.size());
+    }
+
 }

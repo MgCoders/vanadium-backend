@@ -11,6 +11,7 @@ import coop.magnesium.sulfur.db.entities.*;
 import coop.magnesium.sulfur.utils.Logged;
 import coop.magnesium.sulfur.utils.ex.MagnesiumBdAlredyExistsException;
 import coop.magnesium.sulfur.utils.ex.MagnesiumNotFoundException;
+import coop.magnesium.sulfur.utils.ex.MagnesiumSecurityException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -21,7 +22,11 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -37,6 +42,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 @Api(description = "Horas service", tags = "horas")
 public class HoraService {
 
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
     @Inject
     private Logger logger;
     @EJB
@@ -48,7 +54,6 @@ public class HoraService {
     @EJB
     private TipoTareaDao tipoTareaDao;
 
-
     @POST
     @Logged
     @JWTTokenNeeded
@@ -57,9 +62,18 @@ public class HoraService {
     @ApiResponses(value = {
             @ApiResponse(code = 409, message = "Código o Id ya existe"),
             @ApiResponse(code = 400, message = "Objeto inválido"),
-            @ApiResponse(code = 500, message = "Error interno")})
-    public Response create(@Valid Hora hora) {
+            @ApiResponse(code = 500, message = "Error interno"),
+            @ApiResponse(code = 401, message = "No Autorizado")})
+    public Response create(@Valid Hora hora, @Context SecurityContext securityContext) {
         try {
+            Colaborador colaborador = colaboradorDao.findById(hora.getColaborador().getId());
+            if (colaborador == null) throw new MagnesiumNotFoundException("Colaborador no encontrado");
+            hora.setColaborador(colaborador);
+
+            if (!((SulfurUser) securityContext.getUserPrincipal()).getColaboradorId().equals(colaborador.getId())) {
+                throw new MagnesiumSecurityException("Colaborador no coincide");
+            }
+
             Hora horaExists = hora.getId() != null ? horaDao.findById(hora.getId()) : null;
             if (horaExists != null) throw new MagnesiumBdAlredyExistsException("Hora ya existe");
 
@@ -71,9 +85,6 @@ public class HoraService {
             if (tipoTarea == null) throw new MagnesiumNotFoundException("Tipo tarea no encontrado");
             hora.setTipoTarea(tipoTarea);
 
-            Colaborador colaborador = colaboradorDao.findById(hora.getColaborador().getId());
-            if (colaborador == null) throw new MagnesiumNotFoundException("Colaborador no encontrado");
-            hora.setColaborador(colaborador);
 
             hora = horaDao.save(hora);
             return Response.status(Response.Status.CREATED).entity(hora).build();
@@ -83,6 +94,9 @@ public class HoraService {
         } catch (MagnesiumNotFoundException e) {
             logger.warning(e.getMessage());
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        } catch (MagnesiumSecurityException e) {
+            logger.warning(e.getMessage());
+            return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
         } catch (Exception e) {
             logger.severe(e.getMessage());
             return Response.serverError().entity(e.getMessage()).build();
@@ -92,11 +106,45 @@ public class HoraService {
 
     @GET
     @JWTTokenNeeded
-    @RoleNeeded({Role.USER, Role.ADMIN})
+    @RoleNeeded({Role.ADMIN})
     @ApiOperation(value = "Get horas", response = Hora.class, responseContainer = "List")
     public Response findAll() {
         List<Hora> horaList = horaDao.findAll();
         return Response.ok(horaList).build();
+    }
+
+    @GET
+    @Path("user/{id}/{fecha_ini}/{fecha_fin}")
+    @JWTTokenNeeded
+    @RoleNeeded({Role.USER, Role.ADMIN})
+    @ApiOperation(value = "Get horas por usuario y fechas", response = Hora.class, responseContainer = "List")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Objeto inválido"),
+            @ApiResponse(code = 401, message = "No Autorizado")})
+    public Response findAllByColaborador(@PathParam("id") Long id,
+                                         @Context SecurityContext securityContext,
+                                         @PathParam("fecha_ini") String fechaIniString,
+                                         @PathParam("fecha_fin") String fechaFinString) {
+        try {
+            Colaborador colaborador = colaboradorDao.findById(id);
+            if (colaborador == null) throw new MagnesiumNotFoundException("Colaborador no encontrado");
+
+            if (!((SulfurUser) securityContext.getUserPrincipal()).getColaboradorId().equals(colaborador.getId())) {
+                throw new MagnesiumSecurityException("Colaborador no coincide");
+            }
+
+            LocalDate fechaIni = LocalDate.parse(fechaIniString, formatter);
+            LocalDate fechaFin = LocalDate.parse(fechaFinString, formatter);
+
+            List<Hora> horaList = horaDao.findAllByColaborador(colaborador, fechaIni, fechaFin);
+            return Response.ok(horaList).build();
+        } catch (MagnesiumSecurityException e) {
+            logger.warning(e.getMessage());
+            return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
+        } catch (MagnesiumNotFoundException e) {
+            logger.warning(e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        }
     }
 
     @GET
@@ -119,8 +167,17 @@ public class HoraService {
     @ApiOperation(value = "Edit hora", response = Hora.class)
     @ApiResponses(value = {
             @ApiResponse(code = 304, message = "Error: objeto no modificado")})
-    public Response edit(@PathParam("id") Long id, @Valid Hora hora) {
+    public Response edit(@PathParam("id") Long id, @Valid Hora hora, @Context SecurityContext securityContext) {
         try {
+
+            Colaborador colaborador = colaboradorDao.findById(hora.getColaborador().getId());
+            if (colaborador == null) throw new MagnesiumNotFoundException("Colaborador no encontrado");
+            hora.setColaborador(colaborador);
+
+            if (!((SulfurUser) securityContext.getUserPrincipal()).getColaboradorId().equals(colaborador.getId())) {
+                throw new MagnesiumSecurityException("Colaborador no coincide");
+            }
+
             if (horaDao.findById(id) == null) throw new MagnesiumNotFoundException("Hora no encontrada");
             hora.setId(id);
 
@@ -131,11 +188,6 @@ public class HoraService {
             TipoTarea tipoTarea = tipoTareaDao.findById(hora.getTipoTarea().getId());
             if (tipoTarea == null) throw new MagnesiumNotFoundException("Tipo tarea no encontrado");
             hora.setTipoTarea(tipoTarea);
-
-            Colaborador colaborador = colaboradorDao.findById(hora.getColaborador().getId());
-            if (colaborador == null) throw new MagnesiumNotFoundException("Colaborador no encontrado");
-            hora.setColaborador(colaborador);
-
 
             hora = horaDao.save(hora);
             return Response.ok(hora).build();

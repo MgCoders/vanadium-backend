@@ -1,11 +1,10 @@
-package coop.magnesium.sulfur.api.utils;
+package coop.magnesium.sulfur.api;
 
+import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
+import coop.magnesium.sulfur.api.utils.RoleNeeded;
 import coop.magnesium.sulfur.db.entities.Role;
 import coop.magnesium.sulfur.db.entities.SulfurUser;
 import coop.magnesium.sulfur.utils.KeyGenerator;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
 
 import javax.annotation.Priority;
 import javax.inject.Inject;
@@ -21,7 +20,6 @@ import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
-import java.security.Key;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,7 +32,7 @@ import java.util.logging.Logger;
 @Provider
 @JWTTokenNeeded
 @Priority(Priorities.AUTHORIZATION)
-public class RoleNeededFilter implements ContainerRequestFilter {
+public class RoleNeededFilterMock implements ContainerRequestFilter {
 
     @Inject
     private KeyGenerator keyGenerator;
@@ -47,7 +45,6 @@ public class RoleNeededFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {
-
         // Get the resource class which matches with the requested URL
         // Extract the roles declared by it
         Class<?> resourceClass = resourceInfo.getResourceClass();
@@ -66,18 +63,14 @@ public class RoleNeededFilter implements ContainerRequestFilter {
 
         //Saco del token
         String authorizationHeader = containerRequestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
-        String token = authorizationHeader.substring("Bearer".length()).trim();
+        String role = authorizationHeader.split(":")[0];
+        String id = authorizationHeader.split(":")[1];
 
 
         try {
-            //Verifico roles que tiene el usuario
-            Key key = keyGenerator.generateKey();
-            Jws<Claims> claimsJws = Jwts.parser()
-                    .setSigningKey(key)
-                    .parseClaimsJws(token);
 
-            Role rolUsuario = Role.valueOf((String) claimsJws.getBody().get("role"));
-            Long idColaborador = Long.valueOf((String) claimsJws.getBody().get("id"));
+            Role rolUsuario = Role.valueOf(role);
+            Long idColaborador = Long.valueOf(id);
             logger.info("##### ROL: " + rolUsuario.name() + " #####");
 
             if (!rolesPermitidos.contains(rolUsuario)) {

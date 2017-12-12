@@ -9,8 +9,6 @@ import coop.magnesium.sulfur.utils.PasswordUtils;
 import coop.magnesium.sulfur.utils.ex.MagnesiumBdMultipleResultsException;
 import coop.magnesium.sulfur.utils.ex.MagnesiumBdNotFoundException;
 import coop.magnesium.sulfur.utils.ex.MagnesiumSecurityException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -21,7 +19,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import java.security.Key;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -41,7 +38,7 @@ import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
 @Consumes(APPLICATION_JSON)
 @Transactional
 @Api(description = "Aplication auth service", tags = "auth")
-public class UserService {
+public class UserServiceMock {
 
     @Inject
     private KeyGenerator keyGenerator;
@@ -89,16 +86,7 @@ public class UserService {
     }
 
     private String issueToken(String login, Map<String, Object> claims) {
-        Key key = keyGenerator.generateKey();
-        String jwtToken = Jwts.builder()
-                .setSubject(login)
-                .setClaims(claims)
-                .setIssuer(uriInfo.getAbsolutePath().toString())
-                .setIssuedAt(new Date())
-                .setExpiration(toDate(LocalDateTime.now().plusMinutes(15L)))
-                .signWith(SignatureAlgorithm.HS512, key)
-                .compact();
-        return jwtToken;
+        return claims.get("role") + ":" + claims.get("id");
     }
 
     private Date toDate(LocalDateTime localDateTime) {

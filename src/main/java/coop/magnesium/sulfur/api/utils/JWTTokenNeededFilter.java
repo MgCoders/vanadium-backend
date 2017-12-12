@@ -57,5 +57,8 @@ public class JWTTokenNeededFilter implements ContainerRequestFilter {
             containerRequestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
         }
 
+
     }
+
+
 }
