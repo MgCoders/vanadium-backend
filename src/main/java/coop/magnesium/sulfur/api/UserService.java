@@ -3,11 +3,10 @@ package coop.magnesium.sulfur.api;
 
 import coop.magnesium.sulfur.db.dao.ColaboradorDao;
 import coop.magnesium.sulfur.db.entities.Colaborador;
+import coop.magnesium.sulfur.system.MailEvent;
+import coop.magnesium.sulfur.system.MailService;
 import coop.magnesium.sulfur.system.StartupBean;
-import coop.magnesium.sulfur.utils.DataRecuperacionPassword;
-import coop.magnesium.sulfur.utils.KeyGenerator;
-import coop.magnesium.sulfur.utils.Logged;
-import coop.magnesium.sulfur.utils.PasswordUtils;
+import coop.magnesium.sulfur.utils.*;
 import coop.magnesium.sulfur.utils.ex.MagnesiumBdMultipleResultsException;
 import coop.magnesium.sulfur.utils.ex.MagnesiumBdNotFoundException;
 import coop.magnesium.sulfur.utils.ex.MagnesiumSecurityException;
@@ -18,6 +17,7 @@ import io.swagger.annotations.ApiOperation;
 
 import javax.ejb.EJB;
 import javax.ejb.ObjectNotFoundException;
+import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.*;
@@ -27,10 +27,7 @@ import javax.ws.rs.core.UriInfo;
 import java.security.Key;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED;
@@ -47,6 +44,11 @@ import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
 @Api(description = "Aplication auth service", tags = "auth")
 public class UserService {
 
+    @Inject
+    Event<MailEvent> mailEvent;
+    @Inject
+    @PropertiesFromFile
+    Properties endpointsProperties;
     @Inject
     private KeyGenerator keyGenerator;
     @Context
@@ -101,7 +103,7 @@ public class UserService {
             if (colaboradorDao.findByEmail(email) == null) throw new ObjectNotFoundException("no existe colaborador");
             DataRecuperacionPassword dataRecuperacionPassword = new DataRecuperacionPassword(email, UUID.randomUUID().toString(), LocalDateTime.now().plusHours(1));
             startupBean.putRecuperacionPassword(dataRecuperacionPassword);
-            //TODO: send email
+            mailEvent.fire(new MailEvent(Arrays.asList(email), MailService.generarEmailRecuperacionClave(dataRecuperacionPassword.getToken(), endpointsProperties.getProperty("frontend.host"), endpointsProperties.getProperty("frontend.path")), "MARQ: Recuperación de Contraseña"));
             logger.info(dataRecuperacionPassword.getToken());
             return Response.ok().build();
         } catch (ObjectNotFoundException e) {

@@ -34,6 +34,7 @@ public class StartupBean {
     Logger logger;
     @Resource
     TimerService timerService;
+
     private ConcurrentHashMap recuperacionPassword = null;
 
     @PostConstruct
@@ -80,4 +81,6 @@ public class StartupBean {
             return null;
         }
     }
+
+
 }
