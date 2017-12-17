@@ -19,6 +19,8 @@ import javax.validation.constraints.NotNull;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by rsperoni on 17/11/17.
@@ -50,34 +52,58 @@ public class Hora {
     @JsonSerialize(using = LocalTimeSerializer.class)
     private LocalTime horaOut;
     private LocalTime subtotal;
-
-    @NotNull
-    @ManyToOne
-    private Proyecto proyecto;
-    @NotNull
-    @ManyToOne
-    private TipoTarea tipoTarea;
     @NotNull
     @ManyToOne
     private Colaborador colaborador;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "horadetalle",
+            joinColumns = @JoinColumn(name = "hora_id")
+    )
+    private List<HoraDetalle> horaDetalleList = new ArrayList<>();
+    private boolean completa = false;
+    private LocalTime subtotalDetalles;
 
     public Hora() {
     }
 
-    public Hora(LocalDate dia, LocalTime horaIn, LocalTime horaOut, Proyecto proyecto, TipoTarea tipoTarea, Colaborador colaborador) {
+    public Hora(LocalDate dia, LocalTime horaIn, LocalTime horaOut, Colaborador colaborador) {
         this.dia = dia;
         this.horaIn = horaIn;
         this.horaOut = horaOut;
-        this.proyecto = proyecto;
-        this.tipoTarea = tipoTarea;
         this.colaborador = colaborador;
+        this.horaDetalleList = new ArrayList<>();
+        this.completa = false;
     }
 
     @PrePersist
     @PreUpdate
     public void calcularSubtotal() {
+        //Calculo el subtotal
         Duration duration = Duration.between(horaIn, horaOut);
         this.subtotal = LocalTime.ofNanoOfDay(duration.toNanos());
+        this.subtotalDetalles = LocalTime.MIN;
+        horaDetalleList.stream().map(HoraDetalle::getDuracion).reduce((h1, h2) -> {
+            if (h1 != null && h2 != null)
+                return h1.plusHours(h2.getHour()).plusMinutes(h2.getMinute());
+            else return h1;
+        }).ifPresent(localTime -> this.subtotalDetalles = localTime);
+        //Veo si está completa
+        this.completa = (this.subtotalDetalles != null) && (!subtotal.isBefore(subtotalDetalles) && !subtotal.isAfter(subtotalDetalles));
+    }
+
+    @JsonProperty
+    public boolean isCompleta() {
+        return completa;
+    }
+
+    @JsonIgnore
+    public void setCompleta(boolean completa) {
+        this.completa = completa;
+    }
+
+    public List<HoraDetalle> getHoraDetalleList() {
+        return horaDetalleList;
     }
 
     public Colaborador getColaborador() {
@@ -134,20 +160,18 @@ public class Hora {
         this.subtotal = subtotal;
     }
 
-    public Proyecto getProyecto() {
-        return proyecto;
+    @JsonProperty
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+    @ApiModelProperty(dataType = "dateTime", example = "08:00")
+    @JsonDeserialize(using = LocalTimeDeserializer.class)
+    @JsonSerialize(using = LocalTimeSerializer.class)
+    public LocalTime getSubtotalDetalles() {
+        return subtotalDetalles;
     }
 
-    public void setProyecto(Proyecto proyecto) {
-        this.proyecto = proyecto;
-    }
-
-    public TipoTarea getTipoTarea() {
-        return tipoTarea;
-    }
-
-    public void setTipoTarea(TipoTarea tipoTarea) {
-        this.tipoTarea = tipoTarea;
+    @JsonIgnore
+    public void setSubtotalDetalles(LocalTime subtotalDetalles) {
+        this.subtotalDetalles = subtotalDetalles;
     }
 
     @Override
@@ -158,9 +182,10 @@ public class Hora {
                 ", horaIn=" + horaIn +
                 ", horaOut=" + horaOut +
                 ", subtotal=" + subtotal +
-                ", proyecto=" + proyecto.getCodigo() +
-                ", tipoTarea=" + tipoTarea.getCodigo() +
-                ", colaborador=" + colaborador.getNombre() +
+                ", colaborador=" + colaborador +
+                ", horaDetalleList=" + horaDetalleList +
+                ", completa=" + completa +
+                ", subtotalDetalles=" + subtotalDetalles +
                 '}';
     }
 }
