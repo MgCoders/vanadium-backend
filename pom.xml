@@ -146,6 +146,8 @@
                 <jboss.port>8080</jboss.port>
                 <rest.base.path>api</rest.base.path>
                 <rest.base.host>localhost:8080</rest.base.host>
+                <frontend.host>localhost:4200</frontend.host>
+                <frontend.path>/#/extra/new-password?token=</frontend.path>
             </properties>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -158,6 +160,8 @@
                 <jboss.port>80</jboss.port>
                 <rest.base.path>api</rest.base.path>
                 <rest.base.host>sulfur.mgcoders.com</rest.base.host>
+                <frontend.host>https://marq.mgcoders.com</frontend.host>
+                <frontend.path>/#/extra/new-password?token=</frontend.path>
             </properties>
         </profile>
         <!-- Arquillian WildFly managed profile -->

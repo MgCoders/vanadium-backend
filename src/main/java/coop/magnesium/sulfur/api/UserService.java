@@ -3,9 +3,10 @@ package coop.magnesium.sulfur.api;
 
 import coop.magnesium.sulfur.db.dao.ColaboradorDao;
 import coop.magnesium.sulfur.db.entities.Colaborador;
-import coop.magnesium.sulfur.utils.KeyGenerator;
-import coop.magnesium.sulfur.utils.Logged;
-import coop.magnesium.sulfur.utils.PasswordUtils;
+import coop.magnesium.sulfur.system.MailEvent;
+import coop.magnesium.sulfur.system.MailService;
+import coop.magnesium.sulfur.system.StartupBean;
+import coop.magnesium.sulfur.utils.*;
 import coop.magnesium.sulfur.utils.ex.MagnesiumBdMultipleResultsException;
 import coop.magnesium.sulfur.utils.ex.MagnesiumBdNotFoundException;
 import coop.magnesium.sulfur.utils.ex.MagnesiumSecurityException;
@@ -15,6 +16,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 import javax.ejb.EJB;
+import javax.ejb.ObjectNotFoundException;
+import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.*;
@@ -24,9 +27,7 @@ import javax.ws.rs.core.UriInfo;
 import java.security.Key;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED;
@@ -44,6 +45,11 @@ import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
 public class UserService {
 
     @Inject
+    Event<MailEvent> mailEvent;
+    @Inject
+    @PropertiesFromFile
+    Properties endpointsProperties;
+    @Inject
     private KeyGenerator keyGenerator;
     @Context
     private UriInfo uriInfo;
@@ -51,6 +57,8 @@ public class UserService {
     private Logger logger;
     @EJB
     private ColaboradorDao colaboradorDao;
+    @EJB
+    private StartupBean startupBean;
 
     @POST
     @Path("/login")
@@ -72,6 +80,80 @@ public class UserService {
             sulfurUser.setToken(token);
             return Response.ok(sulfurUser).build();
         } catch (MagnesiumSecurityException | MagnesiumBdMultipleResultsException | MagnesiumBdNotFoundException e) {
+            logger.warning(e.getMessage());
+            return Response.status(UNAUTHORIZED).build();
+        } catch (Exception e) {
+            logger.severe(e.getMessage());
+            return Response.serverError().build();
+        }
+    }
+
+    /**
+     * Paso uno de la recuperacion, genero el token y guardo en cache con vencimiento.
+     *
+     * @param email
+     * @return
+     */
+    @POST
+    @Path("/recuperar/{email}")
+    @ApiOperation(value = "Recuperar password", response = Response.class)
+    @Logged
+    public Response recuperarPassword(@PathParam("email") String email) {
+        try {
+            if (colaboradorDao.findByEmail(email) == null) throw new ObjectNotFoundException("no existe colaborador");
+            DataRecuperacionPassword dataRecuperacionPassword = new DataRecuperacionPassword(email, UUID.randomUUID().toString(), LocalDateTime.now().plusHours(1));
+            startupBean.putRecuperacionPassword(dataRecuperacionPassword);
+            mailEvent.fire(new MailEvent(Arrays.asList(email), MailService.generarEmailRecuperacionClave(dataRecuperacionPassword.getToken(), endpointsProperties.getProperty("frontend.host"), endpointsProperties.getProperty("frontend.path")), "MARQ: Recuperación de Contraseña"));
+            logger.info(dataRecuperacionPassword.getToken());
+            return Response.ok().build();
+        } catch (ObjectNotFoundException e) {
+            logger.warning(e.getMessage());
+            return Response.status(UNAUTHORIZED).build();
+        } catch (Exception e) {
+            logger.severe(e.getMessage());
+            return Response.serverError().build();
+        }
+    }
+
+    /**
+     * Paso dos, me dan el token y doy el mail.
+     *
+     * @param token
+     * @return
+     */
+    @GET
+    @Path("/recuperar/{token}")
+    @ApiOperation(value = "Recuperar email", response = Response.class)
+    @Logged
+    public Response recuperarEmail(@PathParam("token") String token) {
+        try {
+            DataRecuperacionPassword dataRecuperacionPassword = startupBean.getRecuperacionInfo(token);
+            if (dataRecuperacionPassword == null) throw new ObjectNotFoundException("no existe recuperación");
+            return Response.ok(dataRecuperacionPassword).build();
+        } catch (ObjectNotFoundException e) {
+            logger.warning(e.getMessage());
+            return Response.status(UNAUTHORIZED).build();
+        } catch (Exception e) {
+            logger.severe(e.getMessage());
+            return Response.serverError().build();
+        }
+    }
+
+    @PUT
+    @Path("/recuperar")
+    @Consumes(APPLICATION_FORM_URLENCODED)
+    @ApiOperation(value = "Cambiar password", response = Colaborador.class)
+    @Logged
+    public Response cambiarPassword(@FormParam("token") String token,
+                                    @FormParam("password") String password) {
+        try {
+            DataRecuperacionPassword dataRecuperacionPassword = startupBean.getRecuperacionInfo(token);
+            if (dataRecuperacionPassword == null) throw new MagnesiumBdNotFoundException("no existe recuperación");
+            Colaborador colaborador = colaboradorDao.findByEmail(dataRecuperacionPassword.getEmail());
+            if (colaborador == null) throw new MagnesiumBdNotFoundException("no existe colaborador");
+            colaborador.setPassword(PasswordUtils.digestPassword(password));
+            return Response.ok().build();
+        } catch (MagnesiumBdNotFoundException e) {
             logger.warning(e.getMessage());
             return Response.status(UNAUTHORIZED).build();
         } catch (Exception e) {
