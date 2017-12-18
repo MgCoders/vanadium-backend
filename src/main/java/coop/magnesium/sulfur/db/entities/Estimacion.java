@@ -1,34 +1,56 @@
 package coop.magnesium.sulfur.db.entities;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by rsperoni on 12/12/17.
  */
 @Entity
 @JsonAutoDetect
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"proyecto_id", "tipoTarea_id", "cargo_id"}))
 public class Estimacion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotNull
     @ManyToOne
     private Proyecto proyecto;
-    @ManyToOne
-    private TipoTarea tipoTarea;
-    @ManyToOne
-    private Cargo cargo;
 
-    public Estimacion(Proyecto proyecto, TipoTarea tipoTarea, Cargo cargo) {
-        this.proyecto = proyecto;
-        this.tipoTarea = tipoTarea;
-        this.cargo = cargo;
-    }
+    private String descripcion;
+
+    @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @ApiModelProperty(dataType = "date", example = "23/01/2017")
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonSerialize(using = LocalDateSerializer.class)
+    private LocalDate fecha;
+
+    @CollectionTable(
+            name = "estimaciondetalle",
+            joinColumns = @JoinColumn(name = "estimacion_id")
+    )
+    private List<EstimacionDetalle> estimacionDetalleList = new ArrayList<>();
+
 
     public Estimacion() {
+    }
+
+    public Estimacion(Proyecto proyecto, String descripcion, LocalDate fecha) {
+        this.proyecto = proyecto;
+        this.descripcion = descripcion;
+        this.fecha = fecha;
     }
 
     public Long getId() {
@@ -39,6 +61,10 @@ public class Estimacion {
         this.id = id;
     }
 
+    public List<EstimacionDetalle> getEstimacionDetalleList() {
+        return estimacionDetalleList;
+    }
+
     public Proyecto getProyecto() {
         return proyecto;
     }
@@ -47,20 +73,20 @@ public class Estimacion {
         this.proyecto = proyecto;
     }
 
-    public TipoTarea getTipoTarea() {
-        return tipoTarea;
+    public String getDescripcion() {
+        return descripcion;
     }
 
-    public void setTipoTarea(TipoTarea tipoTarea) {
-        this.tipoTarea = tipoTarea;
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
-    public Cargo getCargo() {
-        return cargo;
+    public LocalDate getFecha() {
+        return fecha;
     }
 
-    public void setCargo(Cargo cargo) {
-        this.cargo = cargo;
+    public void setFecha(LocalDate fecha) {
+        this.fecha = fecha;
     }
 
     @Override
@@ -68,8 +94,9 @@ public class Estimacion {
         return "Estimacion{" +
                 "id=" + id +
                 ", proyecto=" + proyecto +
-                ", tipoTarea=" + tipoTarea +
-                ", cargo=" + cargo +
+                ", descripcion='" + descripcion + '\'' +
+                ", fecha=" + fecha +
+                ", estimacionDetalleList=" + estimacionDetalleList +
                 '}';
     }
 }

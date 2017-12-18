@@ -21,6 +21,7 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -131,7 +132,7 @@ public class CargoServiceTest {
         Cargo returned = response.readEntity(Cargo.class);
         assertEquals(cargo.getCodigo(), returned.getCodigo());
         assertEquals(cargo.getNombre(), returned.getNombre());
-        assertEquals(cargo.getPrecioHora(), returned.getPrecioHora());
+        assertEquals(cargo.getPrecioHora(LocalDate.now()), returned.getPrecioHora(LocalDate.now()));
     }
 
     @Test

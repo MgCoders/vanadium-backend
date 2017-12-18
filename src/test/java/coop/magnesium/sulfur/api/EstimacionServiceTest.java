@@ -28,6 +28,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
@@ -87,7 +88,7 @@ public class EstimacionServiceTest {
         final Response response = webTarget
                 .path("/estimaciones")
                 .request(MediaType.APPLICATION_JSON)
-                .post(Entity.json(new Estimacion(this.proyecto, this.tipoTarea, this.cargo)));
+                .post(Entity.json(new Estimacion(this.proyecto, null, LocalDate.now())));
         assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
         assertEquals(1, response.readEntity(Estimacion.class).getId().longValue());
     }
@@ -99,7 +100,7 @@ public class EstimacionServiceTest {
         final Response response = webTarget
                 .path("/estimaciones")
                 .request(MediaType.APPLICATION_JSON)
-                .post(Entity.json(new Estimacion(this.proyecto, this.tipoTarea, this.cargo)));
+                .post(Entity.json(new Estimacion(this.proyecto, null, LocalDate.now())));
         assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
     }
 

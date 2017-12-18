@@ -5,6 +5,11 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by rsperoni on 16/11/17.
@@ -21,8 +26,12 @@ public class Cargo {
     @NotNull
     @Column(unique = true)
     private String codigo;
-    @NotNull
-    private BigDecimal precioHora;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "precioHoraHistoria",
+            joinColumns = @JoinColumn(name = "cargo_id")
+    )
+    private List<PrecioHora> precioHoraHistoria = new ArrayList<>();
 
     public Cargo() {
     }
@@ -30,7 +39,7 @@ public class Cargo {
     public Cargo(String codigo, String nombre, BigDecimal precioHora) {
         this.codigo = codigo;
         this.nombre = nombre;
-        this.precioHora = precioHora;
+        this.precioHoraHistoria.add(new PrecioHora(precioHora, LocalDate.now()));
     }
 
     public String getCodigo() {
@@ -57,12 +66,17 @@ public class Cargo {
         this.nombre = nombre;
     }
 
-    public BigDecimal getPrecioHora() {
-        return precioHora;
+    public List<PrecioHora> getPrecioHoraHistoria() {
+        return precioHoraHistoria;
     }
 
-    public void setPrecioHora(BigDecimal precioHora) {
-        this.precioHora = precioHora;
+    /**
+     * Ultimo precioHora.
+     *
+     * @return
+     */
+    public Optional<PrecioHora> getPrecioHora(LocalDate diaReferencia) {
+        return precioHoraHistoria.stream().sorted(Comparator.comparing(PrecioHora::getVigenciaDesde)).findFirst();
     }
 
     @Override
@@ -70,7 +84,8 @@ public class Cargo {
         return "Cargo{" +
                 "id=" + id +
                 ", nombre='" + nombre + '\'' +
-                ", precioHora=" + precioHora +
+                ", codigo='" + codigo + '\'' +
+                ", precioHoraHistoria=" + precioHoraHistoria +
                 '}';
     }
 }
