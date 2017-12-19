@@ -68,4 +68,14 @@ public class EstimacionDetalle {
     public void setPrecioTotal(BigDecimal precioTotal) {
         this.precioTotal = precioTotal;
     }
+
+    @Override
+    public String toString() {
+        return "EstimacionDetalle{" +
+                "tipoTarea=" + tipoTarea +
+                ", cargo=" + cargo +
+                ", cantidadHoras=" + cantidadHoras +
+                ", precioTotal=" + precioTotal +
+                '}';
+    }
 }

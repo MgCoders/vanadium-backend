@@ -19,8 +19,8 @@ import javax.validation.constraints.NotNull;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by rsperoni on 17/11/17.
@@ -60,7 +60,7 @@ public class Hora {
             name = "horadetalle",
             joinColumns = @JoinColumn(name = "hora_id")
     )
-    private List<HoraDetalle> horaDetalleList = new ArrayList<>();
+    private Set<HoraDetalle> horaDetalleList = new HashSet<>();
     private boolean completa = false;
     private LocalTime subtotalDetalles;
 
@@ -72,7 +72,6 @@ public class Hora {
         this.horaIn = horaIn;
         this.horaOut = horaOut;
         this.colaborador = colaborador;
-        this.horaDetalleList = new ArrayList<>();
         this.completa = false;
     }
 
@@ -102,7 +101,7 @@ public class Hora {
         this.completa = completa;
     }
 
-    public List<HoraDetalle> getHoraDetalleList() {
+    public Set<HoraDetalle> getHoraDetalleList() {
         return horaDetalleList;
     }
 

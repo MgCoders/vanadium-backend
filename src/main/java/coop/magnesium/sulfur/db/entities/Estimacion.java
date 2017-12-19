@@ -37,6 +37,7 @@ public class Estimacion {
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate fecha;
 
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name = "estimaciondetalle",
             joinColumns = @JoinColumn(name = "estimacion_id")

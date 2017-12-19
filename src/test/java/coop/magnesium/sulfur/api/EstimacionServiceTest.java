@@ -4,10 +4,7 @@ import coop.magnesium.sulfur.db.dao.CargoDao;
 import coop.magnesium.sulfur.db.dao.EstimacionDao;
 import coop.magnesium.sulfur.db.dao.ProyectoDao;
 import coop.magnesium.sulfur.db.dao.TipoTareaDao;
-import coop.magnesium.sulfur.db.entities.Cargo;
-import coop.magnesium.sulfur.db.entities.Estimacion;
-import coop.magnesium.sulfur.db.entities.Proyecto;
-import coop.magnesium.sulfur.db.entities.TipoTarea;
+import coop.magnesium.sulfur.db.entities.*;
 import coop.magnesium.sulfur.utils.Logged;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
@@ -18,6 +15,7 @@ import org.jboss.shrinkwrap.api.Filters;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,6 +25,7 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.File;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.logging.Logger;
@@ -52,8 +51,11 @@ public class EstimacionServiceTest {
     @Inject
     Logger logger;
 
+
     @Deployment(testable = true)
     public static WebArchive createDeployment() {
+        File[] libs = Maven.resolver()
+                .loadPomFromFile("pom.xml").resolve("com.fasterxml.jackson.datatype:jackson-datatype-jsr310").withTransitivity().asFile();
         return ShrinkWrap.create(WebArchive.class)
                 .addPackages(true, Filters.exclude(".*Test.*"),
                         Estimacion.class.getPackage(),
@@ -63,7 +65,8 @@ public class EstimacionServiceTest {
                 .addClass(EstimacionService.class)
                 .addAsResource("META-INF/persistence.xml")
                 .addAsResource("endpoints.properties")
-                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
+                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+                .addAsLibraries(libs);
     }
 
     @Before
@@ -90,19 +93,27 @@ public class EstimacionServiceTest {
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json(new Estimacion(this.proyecto, null, LocalDate.now())));
         assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
-        assertEquals(1, response.readEntity(Estimacion.class).getId().longValue());
+        Estimacion estimacion = response.readEntity(Estimacion.class);
+        assertEquals(1, estimacion.getId().longValue());
     }
 
     @Test
     @InSequence(3)
     @RunAsClient
-    public void createEstmacionMal(@ArquillianResteasyResource final WebTarget webTarget) {
+    public void createEstmacion2(@ArquillianResteasyResource final WebTarget webTarget) {
+        Estimacion estimacion = new Estimacion(this.proyecto, null, LocalDate.now());
+        estimacion.getEstimacionDetalleList().add(new EstimacionDetalle(this.tipoTarea, this.cargo, 3, new BigDecimal(150.5)));
+        estimacion.getEstimacionDetalleList().add(new EstimacionDetalle(this.tipoTarea, this.cargo, 6, new BigDecimal(170)));
         final Response response = webTarget
                 .path("/estimaciones")
                 .request(MediaType.APPLICATION_JSON)
-                .post(Entity.json(new Estimacion(this.proyecto, null, LocalDate.now())));
-        assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
+                .post(Entity.json(estimacion));
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+        Estimacion estimacionCreated = response.readEntity(Estimacion.class);
+        assertEquals(2, estimacionCreated.getId().longValue());
     }
+
+    //Todo: servicios y tests de consultas sobre las estimaciones.
 
 
 }
