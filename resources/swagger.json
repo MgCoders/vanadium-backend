@@ -12,28 +12,28 @@
   "basePath": "/api",
   "tags": [
     {
+      "name": "estimacion"
+    },
+    {
+      "name": "colaboradores"
+    },
+    {
       "name": "status"
     },
     {
       "name": "horas"
     },
     {
-      "name": "estimacion"
-    },
-    {
       "name": "proyectos"
-    },
-    {
-      "name": "auth"
-    },
-    {
-      "name": "colaboradores"
     },
     {
       "name": "tareas"
     },
     {
       "name": "cargos"
+    },
+    {
+      "name": "auth"
     }
   ],
   "schemes": [
@@ -138,6 +138,51 @@
           },
           "404": {
             "description": "Id no encontrado"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "cargos"
+        ],
+        "summary": "Actualizar precioHora Cargo",
+        "description": "",
+        "operationId": "actualizarPrecioHora",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/PrecioHora"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/Cargo"
+            }
+          },
+          "304": {
+            "description": "No modificado"
+          },
+          "409": {
+            "description": "Código o Id ya existe"
           }
         }
       },
@@ -1165,8 +1210,7 @@
       "type": "object",
       "required": [
         "codigo",
-        "nombre",
-        "precioHora"
+        "nombre"
       ],
       "properties": {
         "id": {
@@ -1179,9 +1223,12 @@
         "codigo": {
           "type": "string"
         },
-        "precioHora": {
-          "type": "number",
-          "format": "double"
+        "precioHoraHistoria": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/PrecioHora"
+          }
         }
       }
     },
@@ -1243,9 +1290,21 @@
         },
         "horaDetalleList": {
           "type": "array",
+          "uniqueItems": true,
           "items": {
             "$ref": "#/definitions/HoraDetalle"
           }
+        },
+        "completa": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "subtotalDetalles": {
+          "type": "string",
+          "format": "date-time",
+          "example": "08:00",
+          "readOnly": true
         }
       }
     },
@@ -1266,6 +1325,31 @@
           "type": "string",
           "format": "date-time",
           "example": "17:34"
+        }
+      }
+    },
+    "EstimacionDetalle": {
+      "type": "object",
+      "required": [
+        "cantidadHoras",
+        "cargo",
+        "precioTotal",
+        "tipoTarea"
+      ],
+      "properties": {
+        "tipoTarea": {
+          "$ref": "#/definitions/TipoTarea"
+        },
+        "cargo": {
+          "$ref": "#/definitions/Cargo"
+        },
+        "cantidadHoras": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "precioTotal": {
+          "type": "number",
+          "format": "double"
         }
       }
     },
@@ -1291,6 +1375,10 @@
     },
     "Estimacion": {
       "type": "object",
+      "required": [
+        "fecha",
+        "proyecto"
+      ],
       "properties": {
         "id": {
           "type": "integer",
@@ -1299,11 +1387,37 @@
         "proyecto": {
           "$ref": "#/definitions/Proyecto"
         },
-        "tipoTarea": {
-          "$ref": "#/definitions/TipoTarea"
+        "descripcion": {
+          "type": "string"
         },
-        "cargo": {
-          "$ref": "#/definitions/Cargo"
+        "fecha": {
+          "type": "string",
+          "format": "date",
+          "example": "23/01/2017"
+        },
+        "estimacionDetalleList": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EstimacionDetalle"
+          }
+        }
+      }
+    },
+    "PrecioHora": {
+      "type": "object",
+      "required": [
+        "precioHora",
+        "vigenciaDesde"
+      ],
+      "properties": {
+        "precioHora": {
+          "type": "number",
+          "format": "double"
+        },
+        "vigenciaDesde": {
+          "type": "string",
+          "format": "date",
+          "example": "23/01/2017"
         }
       }
     },
@@ -1329,7 +1443,6 @@
     "Colaborador": {
       "type": "object",
       "required": [
-        "cargo",
         "email",
         "nombre",
         "role"

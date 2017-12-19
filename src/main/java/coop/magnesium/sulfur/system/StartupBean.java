@@ -5,6 +5,7 @@ import coop.magnesium.sulfur.db.dao.ColaboradorDao;
 import coop.magnesium.sulfur.db.entities.Colaborador;
 import coop.magnesium.sulfur.utils.DataRecuperacionPassword;
 import coop.magnesium.sulfur.utils.PasswordUtils;
+import coop.magnesium.sulfur.utils.ex.MagnesiumBdMultipleResultsException;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -38,7 +39,13 @@ public class StartupBean {
     @PostConstruct
     public void init() {
         this.recuperacionPassword = new ConcurrentHashMap();
-        colaboradorDao.save(new Colaborador("root@magnesium.coop", "root", null, PasswordUtils.digestPassword(System.getenv("ROOT_PASSWORD")), "ADMIN"));
+        try {
+            if (colaboradorDao.findByEmail("root@magnesium.coop") == null) {
+                colaboradorDao.save(new Colaborador("root@magnesium.coop", "root", null, PasswordUtils.digestPassword(System.getenv("ROOT_PASSWORD")), "ADMIN"));
+            }
+        } catch (MagnesiumBdMultipleResultsException e) {
+            logger.warning(e.getMessage());
+        }
     }
 
     @Timeout

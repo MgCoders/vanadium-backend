@@ -1,6 +1,7 @@
 package coop.magnesium.sulfur.db.entities;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import io.swagger.annotations.ApiModel;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -16,6 +17,7 @@ import java.util.Set;
  */
 @Entity
 @JsonAutoDetect
+@ApiModel
 public class Cargo {
 
     @Id
