@@ -121,7 +121,8 @@ public class HoraServiceTest {
     @InSequence(2)
     @RunAsClient
     public void createHoraAdmin(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
-        Hora hora = new Hora(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, this.proyecto, this.tipoTarea, this.colaborador_admin);
+        Hora hora = new Hora(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, this.colaborador_admin);
+        hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, LocalTime.MAX));
 
         System.out.println(objectMapper.writeValueAsString(hora));
 
@@ -142,7 +143,8 @@ public class HoraServiceTest {
     @InSequence(3)
     @RunAsClient
     public void createHoraUserBien(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
-        Hora hora = new Hora(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, this.proyecto, this.tipoTarea, this.colaborador_user);
+        Hora hora = new Hora(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, this.colaborador_user);
+        hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, LocalTime.MAX));
 
         System.out.println(objectMapper.writeValueAsString(hora));
 
@@ -163,7 +165,8 @@ public class HoraServiceTest {
     @InSequence(4)
     @RunAsClient
     public void createHoraUserMal(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
-        Hora hora = new Hora(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, this.proyecto, this.tipoTarea, this.colaborador_user);
+        Hora hora = new Hora(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, this.colaborador_user);
+        hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, LocalTime.MAX));
 
         System.out.println(objectMapper.writeValueAsString(hora));
 
@@ -178,6 +181,25 @@ public class HoraServiceTest {
 
     @Test
     @InSequence(5)
+    @RunAsClient
+    public void createHoraUserMal2(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
+        Hora hora = new Hora(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, this.colaborador_user);
+        hora.getHoraDetalleList().add(new HoraDetalle(new Proyecto("EE", "No existe"), this.tipoTarea, LocalTime.MAX));
+
+        System.out.println(objectMapper.writeValueAsString(hora));
+
+        final Response response = webTarget
+                .path("/horas")
+                .request(MediaType.APPLICATION_JSON)
+                .header("AUTHORIZATION", "USER:2")
+                .post(Entity.json(objectMapper.writeValueAsString(hora)));
+
+        assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
+    }
+
+
+    @Test
+    @InSequence(6)
     @RunAsClient
     public void getHorasAdminBien(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
 
@@ -195,7 +217,7 @@ public class HoraServiceTest {
     }
 
     @Test
-    @InSequence(6)
+    @InSequence(7)
     @RunAsClient
     public void getHorasUserMal(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
 
@@ -210,7 +232,7 @@ public class HoraServiceTest {
     }
 
     @Test
-    @InSequence(7)
+    @InSequence(8)
     @RunAsClient
     public void getHorasUserMal2(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
 
@@ -225,7 +247,7 @@ public class HoraServiceTest {
     }
 
     @Test
-    @InSequence(7)
+    @InSequence(9)
     @RunAsClient
     public void getHorasUserBien(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
 
@@ -240,6 +262,58 @@ public class HoraServiceTest {
         List<Hora> horaList = response.readEntity(new GenericType<List<Hora>>() {
         });
         assertEquals(1, horaList.size());
+    }
+
+    @Test
+    @InSequence(10)
+    @RunAsClient
+    public void editHoraUser(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
+        Hora hora = new Hora(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, this.colaborador_user);
+        hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, LocalTime.MAX.minusHours(3)));
+        hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, LocalTime.of(3, 0)));
+
+
+        System.out.println(objectMapper.writeValueAsString(hora));
+
+        final Response response = webTarget
+                .path("/horas/1")
+                .request(MediaType.APPLICATION_JSON)
+                .header("AUTHORIZATION", "USER:2")
+                .put(Entity.json(objectMapper.writeValueAsString(hora)));
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        String horaCreadaString = response.readEntity(String.class);
+        System.out.println(horaCreadaString);
+        Hora horaCreada = objectMapper.readValue(horaCreadaString, Hora.class);
+        assertEquals(1, horaCreada.getId().longValue());
+        assertEquals(2, horaCreada.getHoraDetalleList().size());
+        assertEquals(true, horaCreada.isCompleta());
+    }
+
+    @Test
+    @InSequence(10)
+    @RunAsClient
+    public void editHoraUserIncompleta(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
+        Hora hora = new Hora(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, this.colaborador_user);
+        hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, LocalTime.MAX.minusHours(3)));
+        hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, LocalTime.of(2, 0)));
+
+
+        System.out.println(objectMapper.writeValueAsString(hora));
+
+        final Response response = webTarget
+                .path("/horas/1")
+                .request(MediaType.APPLICATION_JSON)
+                .header("AUTHORIZATION", "USER:2")
+                .put(Entity.json(objectMapper.writeValueAsString(hora)));
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        String horaCreadaString = response.readEntity(String.class);
+        System.out.println(horaCreadaString);
+        Hora horaCreada = objectMapper.readValue(horaCreadaString, Hora.class);
+        assertEquals(1, horaCreada.getId().longValue());
+        assertEquals(2, horaCreada.getHoraDetalleList().size());
+        assertEquals(false, horaCreada.isCompleta());
     }
 
 }

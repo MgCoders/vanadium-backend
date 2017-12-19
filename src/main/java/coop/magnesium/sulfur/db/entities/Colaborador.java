@@ -23,7 +23,6 @@ public class Colaborador {
     private String email;
     @NotNull
     private String nombre;
-    @NotNull
     @Valid
     @ManyToOne
     private Cargo cargo;

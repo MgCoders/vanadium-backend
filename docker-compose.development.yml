@@ -13,6 +13,7 @@ services:
         LOGSTASH_HOST: logstash
         ZOHO_MAIL_FROM: ${ZOHO_MAIL_FROM}
         ZOHO_MAIL_PASS: ${ZOHO_MAIL_PASS}
+        ROOT_PASSWORD: ${ROOT_PASSWORD}
       ports:
         - 127.0.0.1:8080:8080
         - 127.0.0.1:9990:9990

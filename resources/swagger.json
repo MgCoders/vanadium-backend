@@ -12,28 +12,28 @@
   "basePath": "/api",
   "tags": [
     {
-      "name": "tareas"
-    },
-    {
-      "name": "horas"
-    },
-    {
-      "name": "auth"
-    },
-    {
-      "name": "proyectos"
-    },
-    {
-      "name": "cargos"
-    },
-    {
-      "name": "status"
+      "name": "estimacion"
     },
     {
       "name": "colaboradores"
     },
     {
-      "name": "estimacion"
+      "name": "status"
+    },
+    {
+      "name": "horas"
+    },
+    {
+      "name": "proyectos"
+    },
+    {
+      "name": "tareas"
+    },
+    {
+      "name": "cargos"
+    },
+    {
+      "name": "auth"
     }
   ],
   "schemes": [
@@ -138,6 +138,51 @@
           },
           "404": {
             "description": "Id no encontrado"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "cargos"
+        ],
+        "summary": "Actualizar precioHora Cargo",
+        "description": "",
+        "operationId": "actualizarPrecioHora",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/PrecioHora"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/Cargo"
+            }
+          },
+          "304": {
+            "description": "No modificado"
+          },
+          "409": {
+            "description": "Código o Id ya existe"
           }
         }
       },
@@ -1062,6 +1107,102 @@
           }
         }
       }
+    },
+    "/users/recuperar": {
+      "put": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Cambiar password",
+        "description": "",
+        "operationId": "cambiarPassword",
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "token",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "password",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/Colaborador"
+            }
+          }
+        }
+      }
+    },
+    "/users/recuperar/{email}": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Recuperar password",
+        "description": "",
+        "operationId": "recuperarPassword",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/users/recuperar/{token}": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Recuperar email",
+        "description": "",
+        "operationId": "recuperarEmail",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -1069,8 +1210,7 @@
       "type": "object",
       "required": [
         "codigo",
-        "nombre",
-        "precioHora"
+        "nombre"
       ],
       "properties": {
         "id": {
@@ -1083,9 +1223,12 @@
         "codigo": {
           "type": "string"
         },
-        "precioHora": {
-          "type": "number",
-          "format": "double"
+        "precioHoraHistoria": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/PrecioHora"
+          }
         }
       }
     },
@@ -1114,9 +1257,7 @@
         "colaborador",
         "dia",
         "horaIn",
-        "horaOut",
-        "proyecto",
-        "tipoTarea"
+        "horaOut"
       ],
       "properties": {
         "id": {
@@ -1144,14 +1285,71 @@
           "example": "08:00",
           "readOnly": true
         },
+        "colaborador": {
+          "$ref": "#/definitions/Colaborador"
+        },
+        "horaDetalleList": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/HoraDetalle"
+          }
+        },
+        "completa": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "subtotalDetalles": {
+          "type": "string",
+          "format": "date-time",
+          "example": "08:00",
+          "readOnly": true
+        }
+      }
+    },
+    "HoraDetalle": {
+      "type": "object",
+      "required": [
+        "proyecto",
+        "tipoTarea"
+      ],
+      "properties": {
         "proyecto": {
           "$ref": "#/definitions/Proyecto"
         },
         "tipoTarea": {
           "$ref": "#/definitions/TipoTarea"
         },
-        "colaborador": {
-          "$ref": "#/definitions/Colaborador"
+        "duracion": {
+          "type": "string",
+          "format": "date-time",
+          "example": "17:34"
+        }
+      }
+    },
+    "EstimacionDetalle": {
+      "type": "object",
+      "required": [
+        "cantidadHoras",
+        "cargo",
+        "precioTotal",
+        "tipoTarea"
+      ],
+      "properties": {
+        "tipoTarea": {
+          "$ref": "#/definitions/TipoTarea"
+        },
+        "cargo": {
+          "$ref": "#/definitions/Cargo"
+        },
+        "cantidadHoras": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "precioTotal": {
+          "type": "number",
+          "format": "double"
         }
       }
     },
@@ -1177,6 +1375,10 @@
     },
     "Estimacion": {
       "type": "object",
+      "required": [
+        "fecha",
+        "proyecto"
+      ],
       "properties": {
         "id": {
           "type": "integer",
@@ -1185,11 +1387,37 @@
         "proyecto": {
           "$ref": "#/definitions/Proyecto"
         },
-        "tipoTarea": {
-          "$ref": "#/definitions/TipoTarea"
+        "descripcion": {
+          "type": "string"
         },
-        "cargo": {
-          "$ref": "#/definitions/Cargo"
+        "fecha": {
+          "type": "string",
+          "format": "date",
+          "example": "23/01/2017"
+        },
+        "estimacionDetalleList": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EstimacionDetalle"
+          }
+        }
+      }
+    },
+    "PrecioHora": {
+      "type": "object",
+      "required": [
+        "precioHora",
+        "vigenciaDesde"
+      ],
+      "properties": {
+        "precioHora": {
+          "type": "number",
+          "format": "double"
+        },
+        "vigenciaDesde": {
+          "type": "string",
+          "format": "date",
+          "example": "23/01/2017"
         }
       }
     },
@@ -1215,7 +1443,6 @@
     "Colaborador": {
       "type": "object",
       "required": [
-        "cargo",
         "email",
         "nombre",
         "role"

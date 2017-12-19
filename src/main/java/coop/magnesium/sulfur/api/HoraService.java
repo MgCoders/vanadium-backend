@@ -7,7 +7,10 @@ import coop.magnesium.sulfur.db.dao.ColaboradorDao;
 import coop.magnesium.sulfur.db.dao.HoraDao;
 import coop.magnesium.sulfur.db.dao.ProyectoDao;
 import coop.magnesium.sulfur.db.dao.TipoTareaDao;
-import coop.magnesium.sulfur.db.entities.*;
+import coop.magnesium.sulfur.db.entities.Colaborador;
+import coop.magnesium.sulfur.db.entities.Hora;
+import coop.magnesium.sulfur.db.entities.Role;
+import coop.magnesium.sulfur.db.entities.SulfurUser;
 import coop.magnesium.sulfur.utils.Logged;
 import coop.magnesium.sulfur.utils.ex.MagnesiumBdAlredyExistsException;
 import coop.magnesium.sulfur.utils.ex.MagnesiumNotFoundException;
@@ -76,14 +79,6 @@ public class HoraService {
 
             Hora horaExists = hora.getId() != null ? horaDao.findById(hora.getId()) : null;
             if (horaExists != null) throw new MagnesiumBdAlredyExistsException("Hora ya existe");
-
-            Proyecto proyecto = proyectoDao.findById(hora.getProyecto().getId());
-            if (proyecto == null) throw new MagnesiumNotFoundException("Proyecto no encontrado");
-            hora.setProyecto(proyecto);
-
-            TipoTarea tipoTarea = tipoTareaDao.findById(hora.getTipoTarea().getId());
-            if (tipoTarea == null) throw new MagnesiumNotFoundException("Tipo tarea no encontrado");
-            hora.setTipoTarea(tipoTarea);
 
 
             hora = horaDao.save(hora);
@@ -181,13 +176,6 @@ public class HoraService {
             if (horaDao.findById(id) == null) throw new MagnesiumNotFoundException("Hora no encontrada");
             hora.setId(id);
 
-            Proyecto proyecto = proyectoDao.findById(hora.getProyecto().getId());
-            if (proyecto == null) throw new MagnesiumNotFoundException("Proyecto no encontrado");
-            hora.setProyecto(proyecto);
-
-            TipoTarea tipoTarea = tipoTareaDao.findById(hora.getTipoTarea().getId());
-            if (tipoTarea == null) throw new MagnesiumNotFoundException("Tipo tarea no encontrado");
-            hora.setTipoTarea(tipoTarea);
 
             hora = horaDao.save(hora);
             return Response.ok(hora).build();

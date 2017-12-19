@@ -2,16 +2,15 @@ package coop.magnesium.sulfur.system;
 
 import coop.magnesium.sulfur.db.dao.CargoDao;
 import coop.magnesium.sulfur.db.dao.ColaboradorDao;
-import coop.magnesium.sulfur.db.entities.Cargo;
 import coop.magnesium.sulfur.db.entities.Colaborador;
 import coop.magnesium.sulfur.utils.DataRecuperacionPassword;
 import coop.magnesium.sulfur.utils.PasswordUtils;
+import coop.magnesium.sulfur.utils.ex.MagnesiumBdMultipleResultsException;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.*;
 import javax.inject.Inject;
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -40,22 +39,13 @@ public class StartupBean {
     @PostConstruct
     public void init() {
         this.recuperacionPassword = new ConcurrentHashMap();
-        Cargo cargo = new Cargo("JUNIOR", "JUNIOR", new BigDecimal(32.2));
-        cargo = cargoDao.save(cargo);
-        colaboradorDao.save(new Colaborador("root@magnesium.coop", "root", cargo, PasswordUtils.digestPassword("root"), "ADMIN"));
-
-        /*try {
+        try {
             if (colaboradorDao.findByEmail("root@magnesium.coop") == null) {
-                Colaborador root = new Colaborador();
-                root.setNombre("Root");
-                root.setRole("ADMIN");
-                root.setCargo(null);
-                root.setPassword(PasswordUtils.digestPassword("root"));
-                colaboradorDao.save(root);
+                colaboradorDao.save(new Colaborador("root@magnesium.coop", "root", null, PasswordUtils.digestPassword(System.getenv("ROOT_PASSWORD")), "ADMIN"));
             }
         } catch (MagnesiumBdMultipleResultsException e) {
-            logger.severe(e.getMessage());
-        }*/
+            logger.warning(e.getMessage());
+        }
     }
 
     @Timeout

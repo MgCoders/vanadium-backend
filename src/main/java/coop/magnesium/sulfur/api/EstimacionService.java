@@ -7,7 +7,9 @@ import coop.magnesium.sulfur.db.dao.CargoDao;
 import coop.magnesium.sulfur.db.dao.EstimacionDao;
 import coop.magnesium.sulfur.db.dao.ProyectoDao;
 import coop.magnesium.sulfur.db.dao.TipoTareaDao;
-import coop.magnesium.sulfur.db.entities.*;
+import coop.magnesium.sulfur.db.entities.Estimacion;
+import coop.magnesium.sulfur.db.entities.Proyecto;
+import coop.magnesium.sulfur.db.entities.Role;
 import coop.magnesium.sulfur.utils.Logged;
 import coop.magnesium.sulfur.utils.ex.MagnesiumBdAlredyExistsException;
 import coop.magnesium.sulfur.utils.ex.MagnesiumNotFoundException;
@@ -63,27 +65,12 @@ public class EstimacionService {
             Estimacion estimacionExists = estimacion.getId() != null ? estimacionDao.findById(estimacion.getId()) : null;
             if (estimacionExists != null) throw new MagnesiumBdAlredyExistsException("Estimacion ya existe");
 
-            Cargo cargo = cargoDao.findById(estimacion.getCargo().getId());
-            if (cargo == null) throw new MagnesiumNotFoundException("Cargo no encontrado");
-            estimacion.setCargo(cargo);
-
-            Proyecto proyecto = proyectoDao.findById(estimacion.getProyecto().getId());
-            if (proyecto == null) throw new MagnesiumNotFoundException("Proyecto no encontrado");
-            estimacion.setProyecto(proyecto);
-
-            TipoTarea tipoTarea = tipoTareaDao.findById(estimacion.getTipoTarea().getId());
-            if (tipoTarea == null) throw new MagnesiumNotFoundException("Tipo tarea no encontrado");
-            estimacion.setTipoTarea(tipoTarea);
-
 
             estimacion = estimacionDao.save(estimacion);
             return Response.status(Response.Status.CREATED).entity(estimacion).build();
         } catch (MagnesiumBdAlredyExistsException exists) {
             logger.warning(exists.getMessage());
             return Response.status(Response.Status.CONFLICT).entity(exists.getMessage()).build();
-        } catch (MagnesiumNotFoundException e) {
-            logger.warning(e.getMessage());
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (Exception e) {
             logger.severe(e.getMessage());
             return Response.serverError().entity(e.getMessage()).build();
@@ -147,17 +134,10 @@ public class EstimacionService {
             if (estimacionDao.findById(id) == null) throw new MagnesiumNotFoundException("Estimacion no encontrada");
             estimacion.setId(id);
 
-            Cargo cargo = cargoDao.findById(estimacion.getCargo().getId());
-            if (cargo == null) throw new MagnesiumNotFoundException("Cargo no encontrado");
-            estimacion.setCargo(cargo);
-
             Proyecto proyecto = proyectoDao.findById(estimacion.getProyecto().getId());
             if (proyecto == null) throw new MagnesiumNotFoundException("Proyecto no encontrado");
             estimacion.setProyecto(proyecto);
 
-            TipoTarea tipoTarea = tipoTareaDao.findById(estimacion.getTipoTarea().getId());
-            if (tipoTarea == null) throw new MagnesiumNotFoundException("Tipo tarea no encontrado");
-            estimacion.setTipoTarea(tipoTarea);
 
             estimacion = estimacionDao.save(estimacion);
             return Response.ok(estimacion).build();

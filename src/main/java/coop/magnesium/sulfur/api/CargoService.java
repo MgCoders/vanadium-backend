@@ -5,6 +5,7 @@ import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
 import coop.magnesium.sulfur.api.utils.RoleNeeded;
 import coop.magnesium.sulfur.db.dao.CargoDao;
 import coop.magnesium.sulfur.db.entities.Cargo;
+import coop.magnesium.sulfur.db.entities.PrecioHora;
 import coop.magnesium.sulfur.db.entities.Role;
 import coop.magnesium.sulfur.utils.Logged;
 import coop.magnesium.sulfur.utils.ex.MagnesiumBdAlredyExistsException;
@@ -62,6 +63,25 @@ public class CargoService {
         } catch (Exception e) {
             logger.severe(e.getMessage());
             return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+
+    @POST
+    @Path("{id}")
+    @Logged
+    @ApiOperation(value = "Actualizar precioHora Cargo", response = Cargo.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 409, message = "Código o Id ya existe"),
+            @ApiResponse(code = 304, message = "No modificado")})
+    public Response actualizarPrecioHora(@PathParam("id") Long id, @Valid PrecioHora precioHora) {
+        try {
+            Cargo cargo = cargoDao.findById(id);
+            if (cargo == null) throw new MagnesiumNotFoundException("Cargo no encontrado");
+
+            cargo.getPrecioHoraHistoria().add(precioHora);
+            return Response.ok(cargo).build();
+        } catch (Exception e) {
+            return Response.notModified().entity(e.getMessage()).build();
         }
     }
 

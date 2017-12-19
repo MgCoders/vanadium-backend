@@ -1,16 +1,23 @@
 package coop.magnesium.sulfur.db.entities;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import io.swagger.annotations.ApiModel;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Created by rsperoni on 16/11/17.
  */
 @Entity
 @JsonAutoDetect
+@ApiModel
 public class Cargo {
 
     @Id
@@ -21,8 +28,12 @@ public class Cargo {
     @NotNull
     @Column(unique = true)
     private String codigo;
-    @NotNull
-    private BigDecimal precioHora;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "precioHoraHistoria",
+            joinColumns = @JoinColumn(name = "cargo_id")
+    )
+    private Set<PrecioHora> precioHoraHistoria = new HashSet<>();
 
     public Cargo() {
     }
@@ -30,7 +41,7 @@ public class Cargo {
     public Cargo(String codigo, String nombre, BigDecimal precioHora) {
         this.codigo = codigo;
         this.nombre = nombre;
-        this.precioHora = precioHora;
+        this.precioHoraHistoria.add(new PrecioHora(precioHora, LocalDate.now()));
     }
 
     public String getCodigo() {
@@ -57,12 +68,17 @@ public class Cargo {
         this.nombre = nombre;
     }
 
-    public BigDecimal getPrecioHora() {
-        return precioHora;
+    public Set<PrecioHora> getPrecioHoraHistoria() {
+        return precioHoraHistoria;
     }
 
-    public void setPrecioHora(BigDecimal precioHora) {
-        this.precioHora = precioHora;
+    /**
+     * Ultimo precioHora.
+     *
+     * @return
+     */
+    public Optional<PrecioHora> getPrecioHora(LocalDate diaReferencia) {
+        return precioHoraHistoria.stream().sorted(Comparator.comparing(PrecioHora::getVigenciaDesde).reversed()).filter(precioHora -> precioHora.getVigenciaDesde().isBefore(diaReferencia)).findFirst();
     }
 
     @Override
@@ -70,7 +86,8 @@ public class Cargo {
         return "Cargo{" +
                 "id=" + id +
                 ", nombre='" + nombre + '\'' +
-                ", precioHora=" + precioHora +
+                ", codigo='" + codigo + '\'' +
+                ", precioHoraHistoria=" + precioHoraHistoria +
                 '}';
     }
 }
