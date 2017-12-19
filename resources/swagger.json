@@ -12,28 +12,28 @@
   "basePath": "/api",
   "tags": [
     {
-      "name": "tareas"
+      "name": "status"
     },
     {
       "name": "horas"
     },
     {
-      "name": "auth"
+      "name": "estimacion"
     },
     {
       "name": "proyectos"
     },
     {
-      "name": "cargos"
-    },
-    {
-      "name": "status"
+      "name": "auth"
     },
     {
       "name": "colaboradores"
     },
     {
-      "name": "estimacion"
+      "name": "tareas"
+    },
+    {
+      "name": "cargos"
     }
   ],
   "schemes": [
@@ -1062,6 +1062,102 @@
           }
         }
       }
+    },
+    "/users/recuperar": {
+      "put": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Cambiar password",
+        "description": "",
+        "operationId": "cambiarPassword",
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "token",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "password",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/Colaborador"
+            }
+          }
+        }
+      }
+    },
+    "/users/recuperar/{email}": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Recuperar password",
+        "description": "",
+        "operationId": "recuperarPassword",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/users/recuperar/{token}": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Recuperar email",
+        "description": "",
+        "operationId": "recuperarEmail",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -1114,9 +1210,7 @@
         "colaborador",
         "dia",
         "horaIn",
-        "horaOut",
-        "proyecto",
-        "tipoTarea"
+        "horaOut"
       ],
       "properties": {
         "id": {
@@ -1144,14 +1238,34 @@
           "example": "08:00",
           "readOnly": true
         },
+        "colaborador": {
+          "$ref": "#/definitions/Colaborador"
+        },
+        "horaDetalleList": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/HoraDetalle"
+          }
+        }
+      }
+    },
+    "HoraDetalle": {
+      "type": "object",
+      "required": [
+        "proyecto",
+        "tipoTarea"
+      ],
+      "properties": {
         "proyecto": {
           "$ref": "#/definitions/Proyecto"
         },
         "tipoTarea": {
           "$ref": "#/definitions/TipoTarea"
         },
-        "colaborador": {
-          "$ref": "#/definitions/Colaborador"
+        "duracion": {
+          "type": "string",
+          "format": "date-time",
+          "example": "17:34"
         }
       }
     },
