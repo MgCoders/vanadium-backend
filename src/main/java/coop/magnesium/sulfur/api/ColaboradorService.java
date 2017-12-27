@@ -59,8 +59,8 @@ public class ColaboradorService {
             logger.warning("Email ya existe");
             return Response.status(Response.Status.CONFLICT).entity("Email ya existe").build();
         } catch (MagnesiumNotFoundException e) {
-            logger.warning("Rol no existe");
-            return Response.status(Response.Status.BAD_REQUEST).entity("Rol no existe").build();
+            logger.warning(e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (Exception e) {
             logger.severe(e.getMessage());
             return Response.serverError().entity(e.getMessage()).build();
