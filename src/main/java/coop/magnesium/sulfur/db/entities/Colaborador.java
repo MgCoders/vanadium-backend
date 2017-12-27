@@ -107,10 +107,10 @@ public class Colaborador {
     @Override
     public String toString() {
         return "Colaborador{" +
-                "email='" + email + '\'' +
+                "id=" + id +
+                ", email='" + email + '\'' +
                 ", nombre='" + nombre + '\'' +
-                ", cargo=" + cargo.getNombre() +
-                ", password='" + password + '\'' +
+                ", cargo=" + cargo +
                 ", role='" + role + '\'' +
                 '}';
     }
