@@ -50,9 +50,11 @@ public class ColaboradorService {
             Colaborador colaboradorExists = colaboradorDao.findByEmail(colaborador.getEmail());
             if (colaboradorExists != null) throw new MagnesiumBdAlredyExistsException("Email ya existe");
             colaborador.setPassword(PasswordUtils.digestPassword(colaborador.getPassword()));
-            Cargo cargo = cargoDao.findById(colaborador.getCargo().getId());
-            if (cargo == null) throw new MagnesiumNotFoundException("Cargo no encontrado");
-            colaborador.setCargo(cargo);
+            if (colaborador.getCargo() != null) {
+                Cargo cargo = cargoDao.findById(colaborador.getCargo().getId());
+                if (cargo == null) throw new MagnesiumNotFoundException("Cargo no existe");
+                colaborador.setCargo(cargo);
+            }
             colaborador = colaboradorDao.save(colaborador);
             return Response.status(Response.Status.CREATED).entity(colaborador).build();
         } catch (MagnesiumBdMultipleResultsException | MagnesiumBdAlredyExistsException exists) {
@@ -60,7 +62,7 @@ public class ColaboradorService {
             return Response.status(Response.Status.CONFLICT).entity("Email ya existe").build();
         } catch (MagnesiumNotFoundException e) {
             logger.warning(e.getMessage());
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("Rol no existe").build();
         } catch (Exception e) {
             logger.severe(e.getMessage());
             return Response.serverError().entity(e.getMessage()).build();
