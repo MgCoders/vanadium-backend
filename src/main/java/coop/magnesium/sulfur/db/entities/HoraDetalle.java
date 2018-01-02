@@ -1,18 +1,17 @@
 package coop.magnesium.sulfur.db.entities;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.DurationDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.DurationSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.Embeddable;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
-import java.time.LocalTime;
+import java.time.Duration;
 
 /**
  * Created by rsperoni on 17/12/17.
@@ -28,16 +27,15 @@ public class HoraDetalle {
     @NotNull
     @ManyToOne
     private TipoTarea tipoTarea;
-    @ApiModelProperty(dataType = "dateTime", example = "17:34")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-    @JsonDeserialize(using = LocalTimeDeserializer.class)
-    @JsonSerialize(using = LocalTimeSerializer.class)
-    private LocalTime duracion;
+    @ApiModelProperty(dataType = "dateTime", example = "PT23H59M")
+    @JsonDeserialize(using = DurationDeserializer.class)
+    @JsonSerialize(using = DurationSerializer.class)
+    private Duration duracion;
 
     public HoraDetalle() {
     }
 
-    public HoraDetalle(Proyecto proyecto, TipoTarea tipoTarea, LocalTime duracion) {
+    public HoraDetalle(Proyecto proyecto, TipoTarea tipoTarea, Duration duracion) {
         this.proyecto = proyecto;
         this.tipoTarea = tipoTarea;
         this.duracion = duracion;
@@ -59,11 +57,11 @@ public class HoraDetalle {
         this.tipoTarea = tipoTarea;
     }
 
-    public LocalTime getDuracion() {
+    public Duration getDuracion() {
         return duracion;
     }
 
-    public void setDuracion(LocalTime duracion) {
+    public void setDuracion(Duration duracion) {
         this.duracion = duracion;
     }
 

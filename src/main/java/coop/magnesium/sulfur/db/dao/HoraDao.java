@@ -1,7 +1,10 @@
 package coop.magnesium.sulfur.db.dao;
 
+import coop.magnesium.sulfur.api.dto.HorasDeProyectoPorCargo;
+import coop.magnesium.sulfur.db.entities.Cargo;
 import coop.magnesium.sulfur.db.entities.Colaborador;
 import coop.magnesium.sulfur.db.entities.Hora;
+import coop.magnesium.sulfur.db.entities.Proyecto;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -55,6 +58,14 @@ public class HoraDao extends AbstractDao<Hora, Long> {
         query.setParameter("ini", ini);
         query.setParameter("fin",fin);
         return (List<Hora>) query.getResultList();
+    }
+
+    public List<HorasDeProyectoPorCargo> findHoras(Proyecto proyecto, Cargo cargo) {
+        Query query = em.createQuery("" +
+                "select new coop.magnesium.sulfur.api.dto.HorasDeProyectoPorCargo(sum(hd.duracion),h.dia,hd.proyecto,hd.tipoTarea,h.colaborador) " +
+                "from Hora h JOIN h.horaDetalleList hd " +
+                "group by h");
+        return query.getResultList();
     }
 
 
