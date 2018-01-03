@@ -82,14 +82,14 @@ public class Hora {
     public void calcularSubtotal() {
         //Calculo el subtotal
         this.subtotal = Duration.between(horaIn, horaOut);
-        this.subtotalDetalles = Duration.ofMillis(0);
+        this.subtotalDetalles = Duration.ZERO;
         horaDetalleList.stream().map(HoraDetalle::getDuracion).reduce((h1, h2) -> {
             if (h1 != null && h2 != null)
                 return h1.plus(h2);
             else return h1;
-        }).ifPresent(localTime -> this.subtotalDetalles = localTime);
+        }).ifPresent(duration -> this.subtotalDetalles = duration);
         //Veo si está completa
-        this.completa = (this.subtotalDetalles != null) && (subtotal.compareTo(subtotalDetalles) == 0);
+        this.completa = this.subtotal.compareTo(this.subtotalDetalles) == 0;
     }
 
     @JsonProperty

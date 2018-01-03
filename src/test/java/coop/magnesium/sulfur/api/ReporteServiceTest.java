@@ -4,15 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import coop.magnesium.sulfur.api.dto.EstimacionProyectoTipoTareaXCargo;
+import coop.magnesium.sulfur.api.dto.HorasProyectoTipoTareaCargoXColaborador;
 import coop.magnesium.sulfur.api.dto.HorasProyectoTipoTareaXCargo;
+import coop.magnesium.sulfur.api.dto.HorasProyectoXCargo;
 import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
 import coop.magnesium.sulfur.api.utils.RoleNeeded;
 import coop.magnesium.sulfur.db.dao.*;
 import coop.magnesium.sulfur.db.entities.*;
 import coop.magnesium.sulfur.utils.Logged;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.RunAsClient;
-import org.jboss.arquillian.extension.rest.client.ArquillianResteasyResource;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.junit.InSequence;
 import org.jboss.shrinkwrap.api.Filters;
@@ -25,12 +25,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import javax.inject.Inject;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -95,6 +90,8 @@ public class ReporteServiceTest {
                 .addClass(HoraService.class)
                 .addClass(EstimacionDetalle.class)
                 .addClass(HorasProyectoTipoTareaXCargo.class)
+                .addClass(HorasProyectoTipoTareaCargoXColaborador.class)
+                .addClass(HorasProyectoXCargo.class)
                 .addClass(EstimacionProyectoTipoTareaXCargo.class)
                 .addClass(UserServiceMock.class)
                 .addAsResource("META-INF/persistence.xml")
@@ -148,7 +145,26 @@ public class ReporteServiceTest {
         hora4.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea1, Duration.ofHours(20).plus(Duration.ofMinutes(30))));
         horaDao.save(hora4);
 
-        List<HorasProyectoTipoTareaXCargo> horasProyectoTipoTareaXCargos = horaDao.findHorasXCargo(proyecto1, tipoTarea1);
+        Hora hora5 = new Hora(LocalDate.of(2017, 12, 25), LocalTime.MIN, LocalTime.MAX, colaborador1);
+        hora5.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea2, Duration.ofHours(8)));
+        horaDao.save(hora5);
+
+        Hora hora6 = new Hora(LocalDate.of(2017, 12, 25), LocalTime.MIN, LocalTime.MAX, colaborador2);
+        hora6.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea2, Duration.ofHours(10)));
+        horaDao.save(hora6);
+
+    }
+
+
+    @Test
+    @InSequence(2)
+    public void horasXCargo() {
+
+        proyecto1.setId(1L);
+        tipoTarea1.setId(1L);
+
+
+        List<HorasProyectoTipoTareaXCargo> horasProyectoTipoTareaXCargos = horaDao.findHorasProyectoTipoTareaXCargo(proyecto1, tipoTarea1);
         horasProyectoTipoTareaXCargos.forEach(horasProyectoTipoTareaXCargo -> {
             logger.info(horasProyectoTipoTareaXCargo.toString());
             if (horasProyectoTipoTareaXCargo.cargo.getCodigo().equals("C1")) {
@@ -161,8 +177,15 @@ public class ReporteServiceTest {
 
         assertEquals(2, horasProyectoTipoTareaXCargos.size());
 
+    }
 
-        List<EstimacionProyectoTipoTareaXCargo> estimacionProyectoTipoTareaXCargos = estimacionDao.findEstimacionXCargo(proyecto1, tipoTarea1);
+    @Test
+    @InSequence(3)
+    public void estimacionesXCargo() {
+        proyecto1.setId(1L);
+        tipoTarea1.setId(1L);
+
+        List<EstimacionProyectoTipoTareaXCargo> estimacionProyectoTipoTareaXCargos = estimacionDao.findEstimacionProyectoTipoTareaXCargo(proyecto1, tipoTarea1);
         estimacionProyectoTipoTareaXCargos.forEach(estimacionProyectoTipoTareaXCargo -> {
             logger.info(estimacionProyectoTipoTareaXCargo.toString());
             if (estimacionProyectoTipoTareaXCargo.cargo.getCodigo().equals("C1")) {
@@ -174,26 +197,53 @@ public class ReporteServiceTest {
         });
 
         assertEquals(2, estimacionProyectoTipoTareaXCargos.size());
-
     }
 
+    @Test
+    @InSequence(4)
+    public void totalHorasXCargo() {
+        proyecto1.setId(1L);
+
+        List<HorasProyectoXCargo> horasProyectoXCargo = horaDao.findHorasProyectoXCargo(proyecto1);
+        horasProyectoXCargo.forEach(horasProyectoXCargo1 -> {
+            logger.info(horasProyectoXCargo1.toString());
+            if (horasProyectoXCargo1.cargo.getCodigo().equals("C1")) {
+                assertEquals(52, horasProyectoXCargo1.cantidadHoras.toHours());
+
+            } else {
+                assertEquals(46, horasProyectoXCargo1.cantidadHoras.toHours());
+            }
+        });
+
+        assertEquals(2, horasProyectoXCargo.size());
+    }
 
     @Test
-    @InSequence(9)
-    @RunAsClient
-    public void getHorasUserBien(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
+    @InSequence(5)
+    public void totalHorasCargo1() {
+        proyecto1.setId(1L);
+        tipoTarea1.setId(1L);
+        cargo1.setId(1L);
 
+        List<HorasProyectoTipoTareaCargoXColaborador> horasProyectoTipoTareaCargoXColaborador = horaDao.findHorasProyectoTipoTareaCargoXColaborador(proyecto1, tipoTarea1, cargo1);
+        logger.info(horasProyectoTipoTareaCargoXColaborador.get(0).toString());
+        assertEquals(44, horasProyectoTipoTareaCargoXColaborador.get(0).cantidadHoras.toHours());
+        assertEquals(cargo1.getCodigo(), horasProyectoTipoTareaCargoXColaborador.get(0).cargo.getCodigo());
+        assertEquals(1, horasProyectoTipoTareaCargoXColaborador.size());
+    }
 
-        final Response response = webTarget
-                .path("/horas/user/2/01-01-2011/01-01-2018")
-                .request(MediaType.APPLICATION_JSON)
-                .header("AUTHORIZATION", "USER:2")
-                .get();
+    @Test
+    @InSequence(6)
+    public void totalHorasCargo2() {
+        proyecto1.setId(1L);
+        tipoTarea1.setId(1L);
+        cargo2.setId(2L);
 
-        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-        List<Hora> horaList = response.readEntity(new GenericType<List<Hora>>() {
-        });
-        assertEquals(1, horaList.size());
+        List<HorasProyectoTipoTareaCargoXColaborador> horasProyectoTipoTareaCargoXColaborador = horaDao.findHorasProyectoTipoTareaCargoXColaborador(proyecto1, tipoTarea1, cargo2);
+        logger.info(horasProyectoTipoTareaCargoXColaborador.get(0).toString());
+        assertEquals(36, horasProyectoTipoTareaCargoXColaborador.get(0).cantidadHoras.toHours());
+        assertEquals(cargo2.getCodigo(), horasProyectoTipoTareaCargoXColaborador.get(0).cargo.getCodigo());
+        assertEquals(1, horasProyectoTipoTareaCargoXColaborador.size());
     }
 
 

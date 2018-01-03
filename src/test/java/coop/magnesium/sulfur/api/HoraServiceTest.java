@@ -3,7 +3,7 @@ package coop.magnesium.sulfur.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import coop.magnesium.sulfur.api.dto.HorasProyectoTipoTareaXCargo;
+import coop.magnesium.sulfur.api.dto.HorasProyectoXCargo;
 import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
 import coop.magnesium.sulfur.api.utils.RoleNeeded;
 import coop.magnesium.sulfur.db.dao.*;
@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 /**
  * Created by rsperoni on 22/11/17.
@@ -79,13 +80,13 @@ public class HoraServiceTest {
                 .addPackages(true, Filters.exclude(".*Test.*"),
                         Hora.class.getPackage(),
                         HoraDao.class.getPackage(),
-                        Logged.class.getPackage())
+                        Logged.class.getPackage(),
+                        HorasProyectoXCargo.class.getPackage())
                 .addClass(JAXRSConfiguration.class)
                 .addClass(JWTTokenNeeded.class)
                 .addClass(RoleNeeded.class)
                 .addClass(JWTTokenNeededFilterMock.class)
                 .addClass(RoleNeededFilterMock.class)
-                .addClass(HorasProyectoTipoTareaXCargo.class)
                 .addClass(HoraService.class)
                 .addClass(UserServiceMock.class)
                 .addAsResource("META-INF/persistence.xml")
@@ -273,6 +274,8 @@ public class HoraServiceTest {
         Hora hora = new Hora(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, this.colaborador_user);
         hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, Duration.ofHours(20)));
         hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, Duration.ofHours(3)));
+        hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, Duration.ofMinutes(59)));
+
 
 
         System.out.println(objectMapper.writeValueAsString(hora));
@@ -288,7 +291,8 @@ public class HoraServiceTest {
         System.out.println(horaCreadaString);
         Hora horaCreada = objectMapper.readValue(horaCreadaString, Hora.class);
         assertEquals(1, horaCreada.getId().longValue());
-        assertEquals(2, horaCreada.getHoraDetalleList().size());
+        assertEquals(23, horaCreada.getSubtotal().toHours());
+        assertEquals(horaCreada.getSubtotalDetalles(), horaCreada.getSubtotal());
         assertEquals(true, horaCreada.isCompleta());
     }
 
@@ -315,6 +319,7 @@ public class HoraServiceTest {
         Hora horaCreada = objectMapper.readValue(horaCreadaString, Hora.class);
         assertEquals(1, horaCreada.getId().longValue());
         assertEquals(2, horaCreada.getHoraDetalleList().size());
+        assertNotEquals(horaCreada.getSubtotalDetalles(), horaCreada.getSubtotal());
         assertEquals(false, horaCreada.isCompleta());
     }
 

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import coop.magnesium.sulfur.db.entities.Cargo;
 import coop.magnesium.sulfur.db.entities.Proyecto;
-import coop.magnesium.sulfur.db.entities.TipoTarea;
 import io.swagger.annotations.ApiModel;
 
 import java.time.Duration;
@@ -16,18 +15,16 @@ import java.time.Duration;
  */
 @JsonAutoDetect
 @ApiModel
-public class HorasProyectoTipoTareaXCargo {
+public class HorasProyectoXCargo {
 
     @JsonIgnore
     public Duration cantidadHoras;
     public Proyecto proyecto;
-    public TipoTarea tipoTarea;
     public Cargo cargo;
 
-    public HorasProyectoTipoTareaXCargo(Long cantidadHoras, Proyecto proyecto, TipoTarea tipoTarea, Cargo cargo) {
+    public HorasProyectoXCargo(Long cantidadHoras, Proyecto proyecto, Cargo cargo) {
         this.cantidadHoras = Duration.ofNanos(cantidadHoras);
         this.proyecto = proyecto;
-        this.tipoTarea = tipoTarea;
         this.cargo = cargo;
     }
 
@@ -40,10 +37,6 @@ public class HorasProyectoTipoTareaXCargo {
         return proyecto;
     }
 
-    public TipoTarea getTipoTarea() {
-        return tipoTarea;
-    }
-
     public Cargo getCargo() {
         return cargo;
     }
@@ -53,7 +46,6 @@ public class HorasProyectoTipoTareaXCargo {
         return "HorasProyectoTipoTareaXCargo{" +
                 "cantidadHoras=" + cantidadHoras +
                 ", proyecto=" + proyecto +
-                ", tipoTarea=" + tipoTarea +
                 ", cargo=" + cargo +
                 '}';
     }

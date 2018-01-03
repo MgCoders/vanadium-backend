@@ -44,7 +44,7 @@ public class EstimacionDao extends AbstractDao<Estimacion, Long> {
         return (List<Estimacion>) query.getResultList();
     }
 
-    public List<EstimacionProyectoTipoTareaXCargo> findEstimacionXCargo(Proyecto proyecto, TipoTarea tipoTarea) {
+    public List<EstimacionProyectoTipoTareaXCargo> findEstimacionProyectoTipoTareaXCargo(Proyecto proyecto, TipoTarea tipoTarea) {
         Query query = em.createQuery("" +
                 "select new coop.magnesium.sulfur.api.dto.EstimacionProyectoTipoTareaXCargo(e.proyecto,ed.tipoTarea,ed.cargo, sum(ed.precioTotal), sum(ed.duracion)) " +
                 "from Estimacion e JOIN e.estimacionDetalleList ed " +
