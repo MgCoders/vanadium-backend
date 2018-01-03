@@ -3,7 +3,7 @@ package coop.magnesium.sulfur.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import coop.magnesium.sulfur.api.dto.HorasDeProyectoPorCargo;
+import coop.magnesium.sulfur.api.dto.HorasProyectoTipoTareaXCargo;
 import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
 import coop.magnesium.sulfur.api.utils.RoleNeeded;
 import coop.magnesium.sulfur.db.dao.*;
@@ -85,7 +85,7 @@ public class HoraServiceTest {
                 .addClass(RoleNeeded.class)
                 .addClass(JWTTokenNeededFilterMock.class)
                 .addClass(RoleNeededFilterMock.class)
-                .addClass(HorasDeProyectoPorCargo.class)
+                .addClass(HorasProyectoTipoTareaXCargo.class)
                 .addClass(HoraService.class)
                 .addClass(UserServiceMock.class)
                 .addAsResource("META-INF/persistence.xml")

@@ -1,7 +1,9 @@
 package coop.magnesium.sulfur.db.dao;
 
+import coop.magnesium.sulfur.api.dto.EstimacionProyectoTipoTareaXCargo;
 import coop.magnesium.sulfur.db.entities.Estimacion;
 import coop.magnesium.sulfur.db.entities.Proyecto;
+import coop.magnesium.sulfur.db.entities.TipoTarea;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -41,4 +43,17 @@ public class EstimacionDao extends AbstractDao<Estimacion, Long> {
         query.setParameter("p", proyecto);
         return (List<Estimacion>) query.getResultList();
     }
+
+    public List<EstimacionProyectoTipoTareaXCargo> findEstimacionXCargo(Proyecto proyecto, TipoTarea tipoTarea) {
+        Query query = em.createQuery("" +
+                "select new coop.magnesium.sulfur.api.dto.EstimacionProyectoTipoTareaXCargo(e.proyecto,ed.tipoTarea,ed.cargo, sum(ed.precioTotal), sum(ed.duracion)) " +
+                "from Estimacion e JOIN e.estimacionDetalleList ed " +
+                "where e.proyecto = :proyecto and ed.tipoTarea = :tipoTarea " +
+                "group by e.proyecto, ed.tipoTarea, ed.cargo");
+        query.setParameter("proyecto", proyecto);
+        query.setParameter("tipoTarea", tipoTarea);
+        return query.getResultList();
+    }
+
+
 }

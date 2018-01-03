@@ -3,7 +3,8 @@ package coop.magnesium.sulfur.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import coop.magnesium.sulfur.api.dto.HorasDeProyectoPorCargo;
+import coop.magnesium.sulfur.api.dto.EstimacionProyectoTipoTareaXCargo;
+import coop.magnesium.sulfur.api.dto.HorasProyectoTipoTareaXCargo;
 import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
 import coop.magnesium.sulfur.api.utils.RoleNeeded;
 import coop.magnesium.sulfur.db.dao.*;
@@ -51,11 +52,14 @@ public class ReporteServiceTest {
      */
     final ObjectMapper objectMapper = new ObjectMapper();
 
-    final Proyecto proyecto = new Proyecto("PP", "PP");
-    final TipoTarea tipoTarea = new TipoTarea("TT", "TT");
-    final Cargo cargo = new Cargo("CC", "CC", new BigDecimal(32.2));
-    final Colaborador colaborador_admin = new Colaborador("em", "nom", cargo, "pwd", "ADMIN");
-    final Colaborador colaborador_user = new Colaborador("em1", "nom", cargo, "pwd", "USER");
+    final Proyecto proyecto1 = new Proyecto("P1", "P1");
+    final Proyecto proyecto2 = new Proyecto("P2", "P2");
+    final TipoTarea tipoTarea1 = new TipoTarea("T1", "T1");
+    final TipoTarea tipoTarea2 = new TipoTarea("T2", "T2");
+    final Cargo cargo1 = new Cargo("C1", "C1", new BigDecimal(32.2));
+    final Cargo cargo2 = new Cargo("C2", "C2", new BigDecimal(33.2));
+    final Colaborador colaborador_admin = new Colaborador("em", "nom", cargo1, "pwd", "ADMIN");
+    final Colaborador colaborador_user = new Colaborador("em1", "nom", cargo2, "pwd", "USER");
 
     @Inject
     CargoDao cargoDao;
@@ -65,6 +69,8 @@ public class ReporteServiceTest {
     ColaboradorDao colaboradorDao;
     @Inject
     TipoTareaDao tipoTareaDao;
+    @Inject
+    EstimacionDao estimacionDao;
     @Inject
     HoraDao horaDao;
     @Inject
@@ -87,7 +93,9 @@ public class ReporteServiceTest {
                 .addClass(JWTTokenNeededFilterMock.class)
                 .addClass(RoleNeededFilterMock.class)
                 .addClass(HoraService.class)
-                .addClass(HorasDeProyectoPorCargo.class)
+                .addClass(EstimacionDetalle.class)
+                .addClass(HorasProyectoTipoTareaXCargo.class)
+                .addClass(EstimacionProyectoTipoTareaXCargo.class)
                 .addClass(UserServiceMock.class)
                 .addAsResource("META-INF/persistence.xml")
                 .addAsResource("endpoints.properties")
@@ -99,32 +107,74 @@ public class ReporteServiceTest {
     public void init() {
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        this.proyecto.setId(1L);
-        this.tipoTarea.setId(1L);
-        this.colaborador_admin.setId(1L);
-        this.cargo.setId(1L);
-        this.colaborador_user.setId(2L);
     }
 
     @Test
     @InSequence(1)
     public void inicializarBd() {
-        logger.info(proyectoDao.save(this.proyecto).toString());
-        logger.info(tipoTareaDao.save(this.tipoTarea).toString());
-        Cargo cargo = cargoDao.save(this.cargo);
-        logger.info(cargo.toString());
-        this.colaborador_admin.setCargo(cargo);
-        this.colaborador_user.setCargo(cargo);
-        logger.info(colaboradorDao.save(this.colaborador_admin).toString());
-        logger.info(colaboradorDao.save(this.colaborador_user).toString());
+        Proyecto proyecto1 = proyectoDao.save(this.proyecto1);
+        Proyecto proyecto2 = proyectoDao.save(this.proyecto2);
+        TipoTarea tipoTarea1 = tipoTareaDao.save(this.tipoTarea1);
+        TipoTarea tipoTarea2 = tipoTareaDao.save(this.tipoTarea2);
+        Cargo cargo1 = cargoDao.save(this.cargo1);
+        Cargo cargo2 = cargoDao.save(this.cargo2);
+        this.colaborador_admin.setCargo(cargo1);
+        this.colaborador_user.setCargo(cargo2);
+        Colaborador colaborador1 = colaboradorDao.save(this.colaborador_admin);
+        Colaborador colaborador2 = colaboradorDao.save(this.colaborador_user);
 
-        Hora hora = new Hora(LocalDate.of(2017, 12, 24), LocalTime.MIN, LocalTime.MAX, this.colaborador_user);
-        hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, Duration.ofHours(23).plus(Duration.ofMinutes(59))));
+        Estimacion estimacion = new Estimacion(proyecto1, null, LocalDate.now());
+        estimacion.getEstimacionDetalleList().add(new EstimacionDetalle(tipoTarea1, cargo1, Duration.ofHours(3), new BigDecimal(150.5)));
+        estimacion.getEstimacionDetalleList().add(new EstimacionDetalle(tipoTarea1, cargo2, Duration.ofHours(6), new BigDecimal(170)));
+        estimacionDao.save(estimacion);
+
+        Estimacion estimacion2 = new Estimacion(proyecto1, null, LocalDate.now());
+        estimacion2.getEstimacionDetalleList().add(new EstimacionDetalle(tipoTarea1, cargo1, Duration.ofHours(3), new BigDecimal(150.5)));
+        estimacionDao.save(estimacion2);
+
+        Hora hora = new Hora(LocalDate.of(2017, 12, 24), LocalTime.MIN, LocalTime.MAX, colaborador1);
+        hora.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea1, Duration.ofHours(23).plus(Duration.ofMinutes(30))));
         horaDao.save(hora);
 
-        List<HorasDeProyectoPorCargo> horasDeProyectoPorCargos = horaDao.findHoras(null, null);
-        horasDeProyectoPorCargos.forEach(horasDeProyectoPorCargo -> logger.info(horasDeProyectoPorCargo.toString()));
-        horasDeProyectoPorCargos.size();
+        Hora hora2 = new Hora(LocalDate.of(2017, 12, 24), LocalTime.MIN, LocalTime.MAX, colaborador2);
+        hora2.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea1, Duration.ofHours(15).plus(Duration.ofMinutes(30))));
+        horaDao.save(hora2);
+
+        Hora hora3 = new Hora(LocalDate.of(2017, 12, 25), LocalTime.MIN, LocalTime.MAX, colaborador2);
+        hora3.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea1, Duration.ofHours(20).plus(Duration.ofMinutes(30))));
+        horaDao.save(hora3);
+
+        Hora hora4 = new Hora(LocalDate.of(2017, 12, 25), LocalTime.MIN, LocalTime.MAX, colaborador1);
+        hora4.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea1, Duration.ofHours(20).plus(Duration.ofMinutes(30))));
+        horaDao.save(hora4);
+
+        List<HorasProyectoTipoTareaXCargo> horasProyectoTipoTareaXCargos = horaDao.findHorasXCargo(proyecto1, tipoTarea1);
+        horasProyectoTipoTareaXCargos.forEach(horasProyectoTipoTareaXCargo -> {
+            logger.info(horasProyectoTipoTareaXCargo.toString());
+            if (horasProyectoTipoTareaXCargo.cargo.getCodigo().equals("C1")) {
+                assertEquals(44, horasProyectoTipoTareaXCargo.cantidadHoras.toHours());
+
+            } else {
+                assertEquals(36, horasProyectoTipoTareaXCargo.cantidadHoras.toHours());
+            }
+        });
+
+        assertEquals(2, horasProyectoTipoTareaXCargos.size());
+
+
+        List<EstimacionProyectoTipoTareaXCargo> estimacionProyectoTipoTareaXCargos = estimacionDao.findEstimacionXCargo(proyecto1, tipoTarea1);
+        estimacionProyectoTipoTareaXCargos.forEach(estimacionProyectoTipoTareaXCargo -> {
+            logger.info(estimacionProyectoTipoTareaXCargo.toString());
+            if (estimacionProyectoTipoTareaXCargo.cargo.getCodigo().equals("C1")) {
+                assertEquals(6, estimacionProyectoTipoTareaXCargo.cantidadHoras.toHours());
+
+            } else {
+                assertEquals(6, estimacionProyectoTipoTareaXCargo.cantidadHoras.toHours());
+            }
+        });
+
+        assertEquals(2, estimacionProyectoTipoTareaXCargos.size());
+
     }
 
 

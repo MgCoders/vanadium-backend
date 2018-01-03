@@ -1,10 +1,10 @@
 package coop.magnesium.sulfur.db.dao;
 
-import coop.magnesium.sulfur.api.dto.HorasDeProyectoPorCargo;
-import coop.magnesium.sulfur.db.entities.Cargo;
+import coop.magnesium.sulfur.api.dto.HorasProyectoTipoTareaXCargo;
 import coop.magnesium.sulfur.db.entities.Colaborador;
 import coop.magnesium.sulfur.db.entities.Hora;
 import coop.magnesium.sulfur.db.entities.Proyecto;
+import coop.magnesium.sulfur.db.entities.TipoTarea;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -60,11 +60,14 @@ public class HoraDao extends AbstractDao<Hora, Long> {
         return (List<Hora>) query.getResultList();
     }
 
-    public List<HorasDeProyectoPorCargo> findHoras(Proyecto proyecto, Cargo cargo) {
+    public List<HorasProyectoTipoTareaXCargo> findHorasXCargo(Proyecto proyecto, TipoTarea tipoTarea) {
         Query query = em.createQuery("" +
-                "select new coop.magnesium.sulfur.api.dto.HorasDeProyectoPorCargo(sum(hd.duracion),h.dia,hd.proyecto,hd.tipoTarea,h.colaborador) " +
+                "select new coop.magnesium.sulfur.api.dto.HorasProyectoTipoTareaXCargo(sum(hd.duracion),hd.proyecto,hd.tipoTarea,h.colaborador.cargo) " +
                 "from Hora h JOIN h.horaDetalleList hd " +
-                "group by h");
+                "where hd.proyecto = :proyecto and hd.tipoTarea = :tipoTarea " +
+                "group by hd.proyecto,hd.tipoTarea,h.colaborador.cargo");
+        query.setParameter("proyecto", proyecto);
+        query.setParameter("tipoTarea", tipoTarea);
         return query.getResultList();
     }
 

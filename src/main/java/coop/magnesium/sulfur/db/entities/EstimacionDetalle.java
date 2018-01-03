@@ -1,12 +1,18 @@
 package coop.magnesium.sulfur.db.entities;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.DurationDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.DurationSerializer;
 import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.Embeddable;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.Duration;
 
 /**
  * Created by rsperoni on 18/12/17.
@@ -23,17 +29,20 @@ public class EstimacionDetalle {
     @ManyToOne
     private Cargo cargo;
     @NotNull
-    private Integer cantidadHoras;
+    @ApiModelProperty(dataType = "dateTime", example = "PT23H59M")
+    @JsonDeserialize(using = DurationDeserializer.class)
+    @JsonSerialize(using = DurationSerializer.class)
+    private Duration duracion;
     @NotNull
     private BigDecimal precioTotal;
 
     public EstimacionDetalle() {
     }
 
-    public EstimacionDetalle(TipoTarea tipoTarea, Cargo cargo, Integer cantidadHoras, BigDecimal precioTotal) {
+    public EstimacionDetalle(TipoTarea tipoTarea, Cargo cargo, Duration duracion, BigDecimal precioTotal) {
         this.tipoTarea = tipoTarea;
         this.cargo = cargo;
-        this.cantidadHoras = cantidadHoras;
+        this.duracion = duracion;
         this.precioTotal = precioTotal;
     }
 
@@ -53,12 +62,12 @@ public class EstimacionDetalle {
         this.cargo = cargo;
     }
 
-    public Integer getCantidadHoras() {
-        return cantidadHoras;
+    public Duration getDuracion() {
+        return duracion;
     }
 
-    public void setCantidadHoras(Integer cantidadHoras) {
-        this.cantidadHoras = cantidadHoras;
+    public void setDuracion(Duration duracion) {
+        this.duracion = duracion;
     }
 
     public BigDecimal getPrecioTotal() {
@@ -74,7 +83,7 @@ public class EstimacionDetalle {
         return "EstimacionDetalle{" +
                 "tipoTarea=" + tipoTarea +
                 ", cargo=" + cargo +
-                ", cantidadHoras=" + cantidadHoras +
+                ", duration=" + duracion +
                 ", precioTotal=" + precioTotal +
                 '}';
     }

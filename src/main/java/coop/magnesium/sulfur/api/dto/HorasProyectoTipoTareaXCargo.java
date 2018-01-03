@@ -1,39 +1,36 @@
 package coop.magnesium.sulfur.api.dto;
 
-import coop.magnesium.sulfur.db.entities.Colaborador;
+import coop.magnesium.sulfur.db.entities.Cargo;
 import coop.magnesium.sulfur.db.entities.Proyecto;
 import coop.magnesium.sulfur.db.entities.TipoTarea;
 
 import java.time.Duration;
-import java.time.LocalDate;
 
 /**
  * Created by rsperoni on 19/12/17.
+ * Para extraer horas por proyecto y tipoTarea agrupadas por Cargo del Colaborador.
  */
-public class HorasDeProyectoPorCargo {
+public class HorasProyectoTipoTareaXCargo {
 
     public Duration cantidadHoras;
-    public LocalDate dia;
     public Proyecto proyecto;
     public TipoTarea tipoTarea;
-    public Colaborador colaborador;
+    public Cargo cargo;
 
-    public HorasDeProyectoPorCargo(Long cantidadHoras, LocalDate dia, Proyecto proyecto, TipoTarea tipoTarea, Colaborador colaborador) {
+    public HorasProyectoTipoTareaXCargo(Long cantidadHoras, Proyecto proyecto, TipoTarea tipoTarea, Cargo cargo) {
         this.cantidadHoras = Duration.ofNanos(cantidadHoras);
-        this.dia = dia;
         this.proyecto = proyecto;
         this.tipoTarea = tipoTarea;
-        this.colaborador = colaborador;
+        this.cargo = cargo;
     }
 
     @Override
     public String toString() {
-        return "HorasDeProyectoPorCargo{" +
+        return "HorasProyectoTipoTareaXCargo{" +
                 "cantidadHoras=" + cantidadHoras +
-                ", dia=" + dia +
                 ", proyecto=" + proyecto +
                 ", tipoTarea=" + tipoTarea +
-                ", colaborador=" + colaborador +
+                ", cargo=" + cargo +
                 '}';
     }
 }
