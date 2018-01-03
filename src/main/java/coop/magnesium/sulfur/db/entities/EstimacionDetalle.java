@@ -1,6 +1,7 @@
 package coop.magnesium.sulfur.db.entities;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.DurationDeserializer;
@@ -29,7 +30,8 @@ public class EstimacionDetalle {
     @ManyToOne
     private Cargo cargo;
     @NotNull
-    @ApiModelProperty(dataType = "dateTime", example = "PT23H59M")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "'PT'HH'H'MM'M'")
+    @ApiModelProperty(example = "PT23H59M", dataType = "dateTime")
     @JsonDeserialize(using = DurationDeserializer.class)
     @JsonSerialize(using = DurationSerializer.class)
     private Duration duracion;

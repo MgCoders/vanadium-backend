@@ -34,7 +34,7 @@ public class Estimacion {
 
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-    @ApiModelProperty(dataType = "date", example = "23/01/2017")
+    @ApiModelProperty(dataType = "date", example = "23-01-2017")
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate fecha;

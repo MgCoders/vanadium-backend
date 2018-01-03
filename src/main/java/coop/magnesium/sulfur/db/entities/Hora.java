@@ -37,7 +37,7 @@ public class Hora {
     private Long id;
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-    @ApiModelProperty(dataType = "date", example = "23/01/2017")
+    @ApiModelProperty(dataType = "date", example = "23-01-2017")
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate dia;
@@ -147,7 +147,8 @@ public class Hora {
     }
 
     @JsonProperty
-    @ApiModelProperty(dataType = "dateTime", example = "PT23H59M")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "'PT'HH'H'MM'M'")
+    @ApiModelProperty(example = "PT23H59M", dataType = "dateTime")
     @JsonDeserialize(using = DurationDeserializer.class)
     @JsonSerialize(using = DurationSerializer.class)
     public Duration getSubtotal() {
@@ -160,7 +161,8 @@ public class Hora {
     }
 
     @JsonProperty
-    @ApiModelProperty(dataType = "dateTime", example = "PT23H59M")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "'PT'HH'H'MM'M'")
+    @ApiModelProperty(example = "PT23H59M", dataType = "dateTime")
     @JsonDeserialize(using = DurationDeserializer.class)
     @JsonSerialize(using = DurationSerializer.class)
     public Duration getSubtotalDetalles() {
