@@ -1,6 +1,7 @@
 package coop.magnesium.sulfur.api;
 
 import coop.magnesium.sulfur.api.dto.HorasProyectoTipoTareaXCargo;
+import coop.magnesium.sulfur.api.dto.HorasProyectoXCargo;
 import coop.magnesium.sulfur.db.dao.CargoDao;
 import coop.magnesium.sulfur.db.dao.EstimacionDao;
 import coop.magnesium.sulfur.db.dao.ProyectoDao;
@@ -62,10 +63,10 @@ public class EstimacionServiceTest {
                 .addPackages(true, Filters.exclude(".*Test.*"),
                         Estimacion.class.getPackage(),
                         EstimacionDao.class.getPackage(),
-                        Logged.class.getPackage())
+                        Logged.class.getPackage(),
+                        HorasProyectoXCargo.class.getPackage())
                 .addClass(JAXRSConfiguration.class)
                 .addClass(EstimacionService.class)
-                .addClass(HorasProyectoTipoTareaXCargo.class)
                 .addAsResource("META-INF/persistence.xml")
                 .addAsResource("endpoints.properties")
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")

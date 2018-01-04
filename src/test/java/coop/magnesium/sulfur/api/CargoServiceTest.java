@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import coop.magnesium.sulfur.api.dto.HorasProyectoXCargo;
 import coop.magnesium.sulfur.db.dao.CargoDao;
 import coop.magnesium.sulfur.db.dao.ProyectoDao;
 import coop.magnesium.sulfur.db.dao.TipoTareaDao;
@@ -72,7 +73,8 @@ public class CargoServiceTest {
                 .addPackages(true, Filters.exclude(".*Test.*"),
                         Cargo.class.getPackage(),
                         CargoDao.class.getPackage(),
-                        Logged.class.getPackage())
+                        Logged.class.getPackage(),
+                        HorasProyectoXCargo.class.getPackage())
                 .addClass(JAXRSConfiguration.class)
                 .addClass(CargoService.class)
                 .addAsResource("META-INF/persistence.xml")
