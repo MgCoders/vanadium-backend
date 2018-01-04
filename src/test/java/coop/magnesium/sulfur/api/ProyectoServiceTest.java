@@ -1,5 +1,6 @@
 package coop.magnesium.sulfur.api;
 
+import coop.magnesium.sulfur.api.dto.HorasProyectoXCargo;
 import coop.magnesium.sulfur.db.dao.ProyectoDao;
 import coop.magnesium.sulfur.db.entities.Cargo;
 import coop.magnesium.sulfur.db.entities.Proyecto;
@@ -36,7 +37,8 @@ public class ProyectoServiceTest {
                 .addPackages(true, Filters.exclude(".*Test.*"),
                         Proyecto.class.getPackage(),
                         ProyectoDao.class.getPackage(),
-                        Logged.class.getPackage())
+                        Logged.class.getPackage(),
+                        HorasProyectoXCargo.class.getPackage())
                 .addClass(JAXRSConfiguration.class)
                 .addClass(ProyectoService.class)
                 .addAsResource("META-INF/persistence.xml")

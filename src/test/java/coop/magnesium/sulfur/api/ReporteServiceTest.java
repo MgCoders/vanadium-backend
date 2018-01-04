@@ -81,7 +81,8 @@ public class ReporteServiceTest {
                 .addPackages(true, Filters.exclude(".*Test.*"),
                         Hora.class.getPackage(),
                         HoraDao.class.getPackage(),
-                        Logged.class.getPackage())
+                        Logged.class.getPackage(),
+                        HorasProyectoXCargo.class.getPackage())
                 .addClass(JAXRSConfiguration.class)
                 .addClass(JWTTokenNeeded.class)
                 .addClass(RoleNeeded.class)
@@ -89,10 +90,6 @@ public class ReporteServiceTest {
                 .addClass(RoleNeededFilterMock.class)
                 .addClass(HoraService.class)
                 .addClass(EstimacionDetalle.class)
-                .addClass(HorasProyectoTipoTareaXCargo.class)
-                .addClass(HorasProyectoTipoTareaCargoXColaborador.class)
-                .addClass(HorasProyectoXCargo.class)
-                .addClass(EstimacionProyectoTipoTareaXCargo.class)
                 .addClass(UserServiceMock.class)
                 .addAsResource("META-INF/persistence.xml")
                 .addAsResource("endpoints.properties")

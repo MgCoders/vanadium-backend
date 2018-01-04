@@ -1,5 +1,6 @@
 package coop.magnesium.sulfur.api;
 
+import coop.magnesium.sulfur.api.dto.HorasProyectoXCargo;
 import coop.magnesium.sulfur.db.dao.TipoTareaDao;
 import coop.magnesium.sulfur.db.entities.Cargo;
 import coop.magnesium.sulfur.db.entities.TipoTarea;
@@ -36,7 +37,8 @@ public class TareaServiceTest {
                 .addPackages(true, Filters.exclude(".*Test.*"),
                         TipoTarea.class.getPackage(),
                         TipoTareaDao.class.getPackage(),
-                        Logged.class.getPackage())
+                        Logged.class.getPackage(),
+                        HorasProyectoXCargo.class.getPackage())
                 .addClass(JAXRSConfiguration.class)
                 .addClass(TareaService.class)
                 .addAsResource("META-INF/persistence.xml")
