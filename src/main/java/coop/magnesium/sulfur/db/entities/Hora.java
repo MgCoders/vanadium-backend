@@ -7,8 +7,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.DurationDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.DurationSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import io.swagger.annotations.ApiModel;
@@ -35,7 +37,7 @@ public class Hora {
     private Long id;
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-    @ApiModelProperty(dataType = "date", example = "23/01/2017")
+    @ApiModelProperty(dataType = "date", example = "23-01-2017")
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate dia;
@@ -51,7 +53,7 @@ public class Hora {
     @JsonDeserialize(using = LocalTimeDeserializer.class)
     @JsonSerialize(using = LocalTimeSerializer.class)
     private LocalTime horaOut;
-    private LocalTime subtotal;
+    private Duration subtotal;
     @NotNull
     @ManyToOne
     private Colaborador colaborador;
@@ -62,7 +64,7 @@ public class Hora {
     )
     private Set<HoraDetalle> horaDetalleList = new HashSet<>();
     private boolean completa = false;
-    private LocalTime subtotalDetalles;
+    private Duration subtotalDetalles;
 
     public Hora() {
     }
@@ -79,16 +81,15 @@ public class Hora {
     @PreUpdate
     public void calcularSubtotal() {
         //Calculo el subtotal
-        Duration duration = Duration.between(horaIn, horaOut);
-        this.subtotal = LocalTime.ofNanoOfDay(duration.toNanos());
-        this.subtotalDetalles = LocalTime.MIN;
+        this.subtotal = Duration.between(horaIn, horaOut);
+        this.subtotalDetalles = Duration.ZERO;
         horaDetalleList.stream().map(HoraDetalle::getDuracion).reduce((h1, h2) -> {
             if (h1 != null && h2 != null)
-                return h1.plusHours(h2.getHour()).plusMinutes(h2.getMinute());
+                return h1.plus(h2);
             else return h1;
-        }).ifPresent(localTime -> this.subtotalDetalles = localTime);
+        }).ifPresent(duration -> this.subtotalDetalles = duration);
         //Veo si está completa
-        this.completa = (this.subtotalDetalles != null) && (!subtotal.isBefore(subtotalDetalles) && !subtotal.isAfter(subtotalDetalles));
+        this.completa = this.subtotal.compareTo(this.subtotalDetalles) == 0;
     }
 
     @JsonProperty
@@ -146,30 +147,30 @@ public class Hora {
     }
 
     @JsonProperty
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-    @ApiModelProperty(dataType = "dateTime", example = "08:00")
-    @JsonDeserialize(using = LocalTimeDeserializer.class)
-    @JsonSerialize(using = LocalTimeSerializer.class)
-    public LocalTime getSubtotal() {
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "'PT'HH'H'MM'M'")
+    @ApiModelProperty(example = "PT23H59M", dataType = "dateTime")
+    @JsonDeserialize(using = DurationDeserializer.class)
+    @JsonSerialize(using = DurationSerializer.class)
+    public Duration getSubtotal() {
         return subtotal;
     }
 
     @JsonIgnore
-    public void setSubtotal(LocalTime subtotal) {
+    public void setSubtotal(Duration subtotal) {
         this.subtotal = subtotal;
     }
 
     @JsonProperty
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-    @ApiModelProperty(dataType = "dateTime", example = "08:00")
-    @JsonDeserialize(using = LocalTimeDeserializer.class)
-    @JsonSerialize(using = LocalTimeSerializer.class)
-    public LocalTime getSubtotalDetalles() {
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "'PT'HH'H'MM'M'")
+    @ApiModelProperty(example = "PT23H59M", dataType = "dateTime")
+    @JsonDeserialize(using = DurationDeserializer.class)
+    @JsonSerialize(using = DurationSerializer.class)
+    public Duration getSubtotalDetalles() {
         return subtotalDetalles;
     }
 
     @JsonIgnore
-    public void setSubtotalDetalles(LocalTime subtotalDetalles) {
+    public void setSubtotalDetalles(Duration subtotalDetalles) {
         this.subtotalDetalles = subtotalDetalles;
     }
 

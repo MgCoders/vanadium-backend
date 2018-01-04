@@ -1,5 +1,6 @@
 package coop.magnesium.sulfur.api;
 
+import coop.magnesium.sulfur.api.dto.HorasProyectoTipoTareaXCargo;
 import coop.magnesium.sulfur.db.dao.CargoDao;
 import coop.magnesium.sulfur.db.dao.EstimacionDao;
 import coop.magnesium.sulfur.db.dao.ProyectoDao;
@@ -27,6 +28,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.logging.Logger;
 
@@ -63,6 +65,7 @@ public class EstimacionServiceTest {
                         Logged.class.getPackage())
                 .addClass(JAXRSConfiguration.class)
                 .addClass(EstimacionService.class)
+                .addClass(HorasProyectoTipoTareaXCargo.class)
                 .addAsResource("META-INF/persistence.xml")
                 .addAsResource("endpoints.properties")
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
@@ -102,8 +105,8 @@ public class EstimacionServiceTest {
     @RunAsClient
     public void createEstmacion2(@ArquillianResteasyResource final WebTarget webTarget) {
         Estimacion estimacion = new Estimacion(this.proyecto, null, LocalDate.now());
-        estimacion.getEstimacionDetalleList().add(new EstimacionDetalle(this.tipoTarea, this.cargo, 3, new BigDecimal(150.5)));
-        estimacion.getEstimacionDetalleList().add(new EstimacionDetalle(this.tipoTarea, this.cargo, 6, new BigDecimal(170)));
+        estimacion.getEstimacionDetalleList().add(new EstimacionDetalle(this.tipoTarea, this.cargo, Duration.ofHours(3), new BigDecimal(150.5)));
+        estimacion.getEstimacionDetalleList().add(new EstimacionDetalle(this.tipoTarea, this.cargo, Duration.ofHours(6), new BigDecimal(170)));
         final Response response = webTarget
                 .path("/estimaciones")
                 .request(MediaType.APPLICATION_JSON)
