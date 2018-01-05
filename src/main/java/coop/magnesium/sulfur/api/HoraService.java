@@ -79,14 +79,14 @@ public class HoraService {
                 throw new MagnesiumSecurityException("Colaborador no coincide");
 
 
-            if (horaDao.existsByColaboradorIncompleta(hora.getColaborador()))
-                throw new MagnesiumException("El colaborador tiene horas incompletas");
+
 
             //si es mismo colaborador, misma fecha, entonces asumo edicion de hora
             Hora horaExists = horaDao.findByColaboradorFecha(hora.getColaborador(), hora.getDia());
             if (horaExists != null) {
                 hora.setId(horaExists.getId());
-            }
+            } else if (horaDao.existsByColaboradorIncompleta(hora.getColaborador()))
+                throw new MagnesiumException("El colaborador tiene horas incompletas");
 
             hora.cacularSubtotalDetalle();
             Hora horaCreada = horaDao.save(hora);
