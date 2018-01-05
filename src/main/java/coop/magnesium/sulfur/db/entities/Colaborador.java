@@ -27,11 +27,9 @@ public class Colaborador {
     @ManyToOne
     private Cargo cargo;
     @NotNull
-    @JsonProperty
     private String password;
     @NotNull
     private String role = Role.USER.name();
-
     @Transient
     private String token;
 
@@ -91,6 +89,7 @@ public class Colaborador {
         return password;
     }
 
+    @JsonProperty
     public void setPassword(String password) {
         this.password = password;
     }

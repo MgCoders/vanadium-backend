@@ -12,7 +12,6 @@ import coop.magnesium.sulfur.db.entities.Hora;
 import coop.magnesium.sulfur.db.entities.Role;
 import coop.magnesium.sulfur.db.entities.SulfurUser;
 import coop.magnesium.sulfur.utils.Logged;
-import coop.magnesium.sulfur.utils.ex.MagnesiumBdAlredyExistsException;
 import coop.magnesium.sulfur.utils.ex.MagnesiumNotFoundException;
 import coop.magnesium.sulfur.utils.ex.MagnesiumSecurityException;
 import io.swagger.annotations.Api;
@@ -77,15 +76,19 @@ public class HoraService {
                 throw new MagnesiumSecurityException("Colaborador no coincide");
             }
 
-            Hora horaExists = hora.getId() != null ? horaDao.findById(hora.getId()) : null;
-            if (horaExists != null) throw new MagnesiumBdAlredyExistsException("Hora ya existe");
+            //si es mismo colaborador, misma fecha, entonces asumo edicion de hora
+            Hora horaExists = horaDao.findAllByColaboradorFecha(hora.getColaborador(), hora.getDia());
+            if (horaExists != null) {
+                hora.setId(horaExists.getId());
+            }
 
-
-            hora = horaDao.save(hora);
-            return Response.status(Response.Status.CREATED).entity(hora).build();
-        } catch (MagnesiumBdAlredyExistsException exists) {
-            logger.warning(exists.getMessage());
-            return Response.status(Response.Status.CONFLICT).entity(exists.getMessage()).build();
+            hora.cacularSubtotalDetalle();
+            Hora horaCreada = horaDao.save(hora);
+            if (horaExists == null) {
+                return Response.status(Response.Status.CREATED).entity(horaCreada).build();
+            } else {
+                return Response.status(Response.Status.OK).entity(horaCreada).build();
+            }
         } catch (MagnesiumNotFoundException e) {
             logger.warning(e.getMessage());
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
@@ -155,6 +158,7 @@ public class HoraService {
         return Response.ok(hora).build();
     }
 
+    @Deprecated
     @PUT
     @Path("{id}")
     @JWTTokenNeeded
@@ -163,25 +167,7 @@ public class HoraService {
     @ApiResponses(value = {
             @ApiResponse(code = 304, message = "Error: objeto no modificado")})
     public Response edit(@PathParam("id") Long id, @Valid Hora hora, @Context SecurityContext securityContext) {
-        try {
-
-            Colaborador colaborador = colaboradorDao.findById(hora.getColaborador().getId());
-            if (colaborador == null) throw new MagnesiumNotFoundException("Colaborador no encontrado");
-            hora.setColaborador(colaborador);
-
-            if (!((SulfurUser) securityContext.getUserPrincipal()).getColaboradorId().equals(colaborador.getId())) {
-                throw new MagnesiumSecurityException("Colaborador no coincide");
-            }
-
-            if (horaDao.findById(id) == null) throw new MagnesiumNotFoundException("Hora no encontrada");
-            hora.setId(id);
-
-
-            hora = horaDao.save(hora);
-            return Response.ok(hora).build();
-        } catch (Exception e) {
-            return Response.notModified().entity(e.getMessage()).build();
-        }
+        return create(hora, securityContext);
     }
 
 

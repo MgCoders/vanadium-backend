@@ -80,17 +80,15 @@ public class Hora {
     @PrePersist
     @PreUpdate
     public void calcularSubtotal() {
-        //Calculo el subtotal
-        this.subtotal = Duration.between(horaIn, horaOut);
-        this.subtotalDetalles = Duration.ZERO;
-        horaDetalleList.stream().map(HoraDetalle::getDuracion).reduce((h1, h2) -> {
-            if (h1 != null && h2 != null)
-                return h1.plus(h2);
-            else return h1;
-        }).ifPresent(duration -> this.subtotalDetalles = duration);
-        //Veo si está completa
-        this.completa = this.subtotal.compareTo(this.subtotalDetalles) == 0;
+        this.subtotal = Duration.between(this.horaIn, this.horaOut);
+        this.completa = (this.subtotal != null && this.subtotalDetalles != null) && (this.subtotal.compareTo(this.subtotalDetalles) == 0);
     }
+
+    public void cacularSubtotalDetalle() {
+        this.subtotalDetalles = Duration.ofMillis(this.getHoraDetalleList().stream().map(HoraDetalle::getDuracion).mapToLong(Duration::toMillis).sum());
+    }
+
+
 
     @JsonProperty
     public boolean isCompleta() {

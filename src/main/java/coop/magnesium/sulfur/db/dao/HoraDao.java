@@ -4,6 +4,7 @@ import coop.magnesium.sulfur.api.dto.HorasProyectoTipoTareaCargoXColaborador;
 import coop.magnesium.sulfur.api.dto.HorasProyectoTipoTareaXCargo;
 import coop.magnesium.sulfur.api.dto.HorasProyectoXCargo;
 import coop.magnesium.sulfur.db.entities.*;
+import coop.magnesium.sulfur.utils.ex.MagnesiumBdMultipleResultsException;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -57,6 +58,24 @@ public class HoraDao extends AbstractDao<Hora, Long> {
         query.setParameter("ini", ini);
         query.setParameter("fin",fin);
         return (List<Hora>) query.getResultList();
+    }
+
+    public Hora findAllByColaboradorFecha(Colaborador colaborador, LocalDate dia) throws MagnesiumBdMultipleResultsException {
+        CriteriaBuilder criteriaBuilder = this.getEntityManager().getCriteriaBuilder();
+        CriteriaQuery criteriaQuery = criteriaBuilder.createQuery();
+        Root entity = criteriaQuery.from(Hora.class);
+        criteriaQuery.select(entity);
+        Predicate colaboradorIsOk = criteriaBuilder.equal(entity.get("colaborador"), criteriaBuilder.parameter(Colaborador.class, "c"));
+        Predicate fechaIsOk = criteriaBuilder.equal(entity.get("dia"), criteriaBuilder.parameter(LocalDate.class, "dia"));
+        criteriaQuery.where(criteriaBuilder.and(colaboradorIsOk, fechaIsOk));
+        Query query = this.getEntityManager().createQuery(criteriaQuery);
+        query.setParameter("c", colaborador);
+        query.setParameter("dia", dia);
+        List<Hora> result = query.getResultList();
+        if (result.size() == 0) return null;
+        if (result.size() > 1)
+            throw new MagnesiumBdMultipleResultsException(Hora.class.getSimpleName() + "multiples resultados encontrados");
+        return result.get(0);
     }
 
     public List<HorasProyectoTipoTareaCargoXColaborador> findHorasProyectoTipoTareaCargoXColaborador(Proyecto proyecto, TipoTarea tipoTarea, Cargo cargo) {

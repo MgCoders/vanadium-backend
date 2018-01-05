@@ -124,7 +124,7 @@ public class HoraServiceTest {
     @InSequence(2)
     @RunAsClient
     public void createHoraAdmin(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
-        Hora hora = new Hora(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, this.colaborador_admin);
+        Hora hora = new Hora(LocalDate.of(2017, 12, 24), LocalTime.MIN, LocalTime.MAX, this.colaborador_admin);
         hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, Duration.ofHours(23)));
 
         System.out.println(objectMapper.writeValueAsString(hora));
@@ -149,7 +149,7 @@ public class HoraServiceTest {
         Hora hora = new Hora(LocalDate.of(2017, 12, 24), LocalTime.MIN, LocalTime.MAX, this.colaborador_user);
         hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, Duration.ofHours(23)));
 
-        System.out.println(objectMapper.writeValueAsString(hora));
+        System.out.println(objectMapper.writeValueAsString(hora) + " " + hora.getHoraDetalleList().size());
 
         final Response response = webTarget
                 .path("/horas")
@@ -162,6 +162,8 @@ public class HoraServiceTest {
         Hora horaCreada = objectMapper.readValue(horaCreadaString, Hora.class);
         assertEquals(2, horaCreada.getId().longValue());
         assertEquals(Duration.parse("PT23H59M"), horaCreada.getSubtotal());
+        assertEquals(Duration.parse("PT23H"), horaCreada.getSubtotalDetalles());
+        assertEquals(false, horaCreada.isCompleta());
     }
 
     @Test
@@ -271,7 +273,7 @@ public class HoraServiceTest {
     @InSequence(10)
     @RunAsClient
     public void editHoraUser(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
-        Hora hora = new Hora(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, this.colaborador_user);
+        Hora hora = new Hora(LocalDate.of(2017, 12, 24), LocalTime.MIN, LocalTime.MAX, this.colaborador_user);
         hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, Duration.ofHours(20)));
         hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, Duration.ofHours(3)));
         hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, Duration.ofMinutes(59)));
@@ -290,7 +292,7 @@ public class HoraServiceTest {
         String horaCreadaString = response.readEntity(String.class);
         System.out.println(horaCreadaString);
         Hora horaCreada = objectMapper.readValue(horaCreadaString, Hora.class);
-        assertEquals(1, horaCreada.getId().longValue());
+        assertEquals(2, horaCreada.getId().longValue());
         assertEquals(23, horaCreada.getSubtotal().toHours());
         assertEquals(horaCreada.getSubtotalDetalles(), horaCreada.getSubtotal());
         assertEquals(true, horaCreada.isCompleta());
@@ -300,7 +302,7 @@ public class HoraServiceTest {
     @InSequence(10)
     @RunAsClient
     public void editHoraUserIncompleta(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
-        Hora hora = new Hora(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, this.colaborador_user);
+        Hora hora = new Hora(LocalDate.of(2017, 12, 24), LocalTime.MIN, LocalTime.MAX, this.colaborador_user);
         hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, Duration.ofHours(20)));
         hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, Duration.ofHours(2)));
 
@@ -317,7 +319,7 @@ public class HoraServiceTest {
         String horaCreadaString = response.readEntity(String.class);
         System.out.println(horaCreadaString);
         Hora horaCreada = objectMapper.readValue(horaCreadaString, Hora.class);
-        assertEquals(1, horaCreada.getId().longValue());
+        assertEquals(2, horaCreada.getId().longValue());
         assertEquals(2, horaCreada.getHoraDetalleList().size());
         assertNotEquals(horaCreada.getSubtotalDetalles(), horaCreada.getSubtotal());
         assertEquals(false, horaCreada.isCompleta());
