@@ -12,6 +12,7 @@ import coop.magnesium.sulfur.db.entities.Hora;
 import coop.magnesium.sulfur.db.entities.Role;
 import coop.magnesium.sulfur.db.entities.SulfurUser;
 import coop.magnesium.sulfur.utils.Logged;
+import coop.magnesium.sulfur.utils.ex.MagnesiumException;
 import coop.magnesium.sulfur.utils.ex.MagnesiumNotFoundException;
 import coop.magnesium.sulfur.utils.ex.MagnesiumSecurityException;
 import io.swagger.annotations.Api;
@@ -69,15 +70,20 @@ public class HoraService {
     public Response create(@Valid Hora hora, @Context SecurityContext securityContext) {
         try {
             Colaborador colaborador = colaboradorDao.findById(hora.getColaborador().getId());
-            if (colaborador == null) throw new MagnesiumNotFoundException("Colaborador no encontrado");
+            if (colaborador == null)
+                throw new MagnesiumNotFoundException("Colaborador no encontrado");
+
             hora.setColaborador(colaborador);
 
-            if (!((SulfurUser) securityContext.getUserPrincipal()).getColaboradorId().equals(colaborador.getId())) {
+            if (!((SulfurUser) securityContext.getUserPrincipal()).getColaboradorId().equals(colaborador.getId()))
                 throw new MagnesiumSecurityException("Colaborador no coincide");
-            }
+
+
+            if (horaDao.existsByColaboradorIncompleta(hora.getColaborador()))
+                throw new MagnesiumException("El colaborador tiene horas incompletas");
 
             //si es mismo colaborador, misma fecha, entonces asumo edicion de hora
-            Hora horaExists = horaDao.findAllByColaboradorFecha(hora.getColaborador(), hora.getDia());
+            Hora horaExists = horaDao.findByColaboradorFecha(hora.getColaborador(), hora.getDia());
             if (horaExists != null) {
                 hora.setId(horaExists.getId());
             }

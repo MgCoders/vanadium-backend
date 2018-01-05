@@ -60,7 +60,7 @@ public class HoraDao extends AbstractDao<Hora, Long> {
         return (List<Hora>) query.getResultList();
     }
 
-    public Hora findAllByColaboradorFecha(Colaborador colaborador, LocalDate dia) throws MagnesiumBdMultipleResultsException {
+    public Hora findByColaboradorFecha(Colaborador colaborador, LocalDate dia) throws MagnesiumBdMultipleResultsException {
         CriteriaBuilder criteriaBuilder = this.getEntityManager().getCriteriaBuilder();
         CriteriaQuery criteriaQuery = criteriaBuilder.createQuery();
         Root entity = criteriaQuery.from(Hora.class);
@@ -76,6 +76,20 @@ public class HoraDao extends AbstractDao<Hora, Long> {
         if (result.size() > 1)
             throw new MagnesiumBdMultipleResultsException(Hora.class.getSimpleName() + "multiples resultados encontrados");
         return result.get(0);
+    }
+
+    public boolean existsByColaboradorIncompleta(Colaborador colaborador) {
+        CriteriaBuilder criteriaBuilder = this.getEntityManager().getCriteriaBuilder();
+        CriteriaQuery criteriaQuery = criteriaBuilder.createQuery();
+        Root entity = criteriaQuery.from(Hora.class);
+        criteriaQuery.select(entity);
+        Predicate colaboradorIsOk = criteriaBuilder.equal(entity.get("colaborador"), criteriaBuilder.parameter(Colaborador.class, "c"));
+        Predicate completaOk = criteriaBuilder.equal(entity.get("completa"), false);
+        criteriaQuery.where(criteriaBuilder.and(colaboradorIsOk, completaOk));
+        Query query = this.getEntityManager().createQuery(criteriaQuery);
+        query.setParameter("c", colaborador);
+        List<Hora> result = query.getResultList();
+        return result.size() > 0;
     }
 
     public List<HorasProyectoTipoTareaCargoXColaborador> findHorasProyectoTipoTareaCargoXColaborador(Proyecto proyecto, TipoTarea tipoTarea, Cargo cargo) {
