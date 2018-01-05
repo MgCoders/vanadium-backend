@@ -41,7 +41,7 @@ public class StartupBean {
         this.recuperacionPassword = new ConcurrentHashMap();
         try {
             if (colaboradorDao.findByEmail("root@magnesium.coop") == null) {
-                colaboradorDao.save(new Colaborador("root@magnesium.coop", "root", null, PasswordUtils.digestPassword(System.getenv("ROOT_PASSWORD")), "ADMIN"));
+                colaboradorDao.save(new Colaborador("root@magnesium.coop", "root", null, PasswordUtils.digestPassword(System.getenv("ROOT_PASSWORD") != null ? System.getenv("ROOT_PASSWORD") : "bu"), "ADMIN"));
             }
         } catch (MagnesiumBdMultipleResultsException e) {
             logger.warning(e.getMessage());
