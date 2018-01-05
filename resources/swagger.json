@@ -13,21 +13,25 @@
   "tags" : [ {
     "name" : "status"
   }, {
-    "name" : "estimacion"
-  }, {
-    "name" : "reportes"
+    "name": "estimacion"
+  },
+    {
+      "name": "reportes"
   }, {
     "name" : "tareas"
   }, {
-    "name" : "horas"
-  }, {
+      "name": "horas"
+    },
+    {
     "name" : "proyectos"
   }, {
     "name" : "colaboradores"
-  }, {
-    "name" : "auth"
-  }, {
-    "name" : "cargos"
+    },
+    {
+      "name": "auth"
+    },
+    {
+      "name": "cargos"
   } ],
   "schemes" : [ "https" ],
   "paths" : {
@@ -710,166 +714,208 @@
         }
       }
     },
-    "/reportes" : {
-      "get" : {
-        "tags" : [ "reportes" ],
-        "summary" : "Get estimaciones",
-        "description" : "",
-        "operationId" : "findAll",
-        "consumes" : [ "application/json" ],
-        "produces" : [ "application/json" ],
-        "parameters" : [ ],
-        "responses" : {
-          "200" : {
-            "description" : "successful operation",
-            "schema" : {
-              "type" : "array",
-              "items" : {
-                "$ref" : "#/definitions/Estimacion"
+    "/reportes": {
+      "get": {
+        "tags": [
+          "reportes"
+        ],
+        "summary": "Get estimaciones",
+        "description": "",
+        "operationId": "findAll",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Estimacion"
               }
             }
           }
         }
       }
     },
-    "/reportes/estimaciones/proyecto/tarea" : {
-      "post" : {
-        "tags" : [ "reportes" ],
-        "summary" : "Estimaciones de Proyecto y TipoTarea agrupadas por Cargo",
-        "description" : "",
-        "operationId" : "findEstimacionesProyectoTipoTareaXCargo",
-        "consumes" : [ "application/json" ],
-        "produces" : [ "application/json" ],
-        "parameters" : [ {
-          "in" : "body",
-          "name" : "body",
-          "required" : false,
-          "schema" : {
-            "$ref" : "#/definitions/Proyecto"
+    "/reportes/estimaciones/proyecto/tarea": {
+      "post": {
+        "tags": [
+          "reportes"
+        ],
+        "summary": "Estimaciones de Proyecto y TipoTarea agrupadas por Cargo",
+        "description": "",
+        "operationId": "findEstimacionesProyectoTipoTareaXCargo",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/Proyecto"
+            }
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/TipoTarea"
+            }
           }
-        }, {
-          "in" : "body",
-          "name" : "body",
-          "required" : false,
-          "schema" : {
-            "$ref" : "#/definitions/TipoTarea"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "successful operation",
-            "schema" : {
-              "type" : "array",
-              "items" : {
-                "$ref" : "#/definitions/EstimacionProyectoTipoTareaXCargo"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/EstimacionProyectoTipoTareaXCargo"
               }
             }
           }
         }
       }
     },
-    "/reportes/horas/proyecto" : {
-      "post" : {
-        "tags" : [ "reportes" ],
-        "summary" : "Horas de Proyecto agrupadas por Cargo",
-        "description" : "",
-        "operationId" : "findHorasProyectoXCargo",
-        "consumes" : [ "application/json" ],
-        "produces" : [ "application/json" ],
-        "parameters" : [ {
-          "in" : "body",
-          "name" : "body",
-          "required" : false,
-          "schema" : {
-            "$ref" : "#/definitions/Proyecto"
+    "/reportes/horas/proyecto": {
+      "post": {
+        "tags": [
+          "reportes"
+        ],
+        "summary": "Horas de Proyecto agrupadas por Cargo",
+        "description": "",
+        "operationId": "findHorasProyectoXCargo",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/Proyecto"
+            }
           }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "successful operation",
-            "schema" : {
-              "type" : "array",
-              "items" : {
-                "$ref" : "#/definitions/HorasProyectoXCargo"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/HorasProyectoXCargo"
               }
             }
           }
         }
       }
     },
-    "/reportes/horas/proyecto/tarea" : {
-      "post" : {
-        "tags" : [ "reportes" ],
-        "summary" : "Horas de Proyecto y TipoTarea agrupadas por Cargo",
-        "description" : "",
-        "operationId" : "findHorasProyectoTipoTareaXCargo",
-        "consumes" : [ "application/json" ],
-        "produces" : [ "application/json" ],
-        "parameters" : [ {
-          "in" : "body",
-          "name" : "body",
-          "required" : false,
-          "schema" : {
-            "$ref" : "#/definitions/Proyecto"
+    "/reportes/horas/proyecto/tarea": {
+      "post": {
+        "tags": [
+          "reportes"
+        ],
+        "summary": "Horas de Proyecto y TipoTarea agrupadas por Cargo",
+        "description": "",
+        "operationId": "findHorasProyectoTipoTareaXCargo",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/Proyecto"
+            }
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/TipoTarea"
+            }
           }
-        }, {
-          "in" : "body",
-          "name" : "body",
-          "required" : false,
-          "schema" : {
-            "$ref" : "#/definitions/TipoTarea"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "successful operation",
-            "schema" : {
-              "type" : "array",
-              "items" : {
-                "$ref" : "#/definitions/HorasProyectoTipoTareaXCargo"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/HorasProyectoTipoTareaXCargo"
               }
             }
           }
         }
       }
     },
-    "/reportes/horas/proyecto/tarea/cargo" : {
-      "post" : {
-        "tags" : [ "reportes" ],
-        "summary" : "Horas de Proyecto, TipoTarea y Cargo agrupadas por Colaborador",
-        "description" : "",
-        "operationId" : "findHorasProyectoTipoTareaCargoXColaborador",
-        "consumes" : [ "application/json" ],
-        "produces" : [ "application/json" ],
-        "parameters" : [ {
-          "in" : "body",
-          "name" : "body",
-          "required" : false,
-          "schema" : {
-            "$ref" : "#/definitions/Proyecto"
+    "/reportes/horas/proyecto/tarea/cargo": {
+      "post": {
+        "tags": [
+          "reportes"
+        ],
+        "summary": "Horas de Proyecto, TipoTarea y Cargo agrupadas por Colaborador",
+        "description": "",
+        "operationId": "findHorasProyectoTipoTareaCargoXColaborador",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/Proyecto"
+            }
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/TipoTarea"
+            }
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/Cargo"
+            }
           }
-        }, {
-          "in" : "body",
-          "name" : "body",
-          "required" : false,
-          "schema" : {
-            "$ref" : "#/definitions/TipoTarea"
-          }
-        }, {
-          "in" : "body",
-          "name" : "body",
-          "required" : false,
-          "schema" : {
-            "$ref" : "#/definitions/Cargo"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "successful operation",
-            "schema" : {
-              "type" : "array",
-              "items" : {
-                "$ref" : "#/definitions/HorasProyectoTipoTareaCargoXColaborador"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/HorasProyectoTipoTareaCargoXColaborador"
               }
             }
           }
@@ -1149,41 +1195,41 @@
         }
       }
     },
-    "HorasProyectoTipoTareaCargoXColaborador" : {
+    "HorasProyectoTipoTareaCargoXColaborador": {
       "type" : "object",
       "properties" : {
-        "cantidadHoras" : {
+        "cantidadHoras": {
           "type" : "integer",
-          "format" : "int64",
+          "format": "int64",
           "readOnly" : true
         },
-        "proyecto" : {
-          "$ref" : "#/definitions/Proyecto"
+        "proyecto": {
+          "$ref": "#/definitions/Proyecto"
         },
-        "tipoTarea" : {
-          "$ref" : "#/definitions/TipoTarea"
+        "tipoTarea": {
+          "$ref": "#/definitions/TipoTarea"
         },
-        "cargo" : {
-          "$ref" : "#/definitions/Cargo"
+        "cargo": {
+          "$ref": "#/definitions/Cargo"
         },
         "colaborador" : {
           "$ref" : "#/definitions/Colaborador"
         }
       }
     },
-    "HorasProyectoXCargo" : {
-      "type" : "object",
-      "properties" : {
-        "cantidadHoras" : {
-          "type" : "integer",
-          "format" : "int64",
+    "HorasProyectoXCargo": {
+      "type": "object",
+      "properties": {
+        "cantidadHoras": {
+          "type": "integer",
+          "format": "int64",
           "readOnly" : true
         },
-        "proyecto" : {
-          "$ref" : "#/definitions/Proyecto"
+        "proyecto": {
+          "$ref": "#/definitions/Proyecto"
         },
-        "cargo" : {
-          "$ref" : "#/definitions/Cargo"
+        "cargo": {
+          "$ref": "#/definitions/Cargo"
         }
       }
     },
@@ -1200,13 +1246,18 @@
         "duracion" : {
           "type" : "string",
           "format" : "date-time",
-          "example" : "PT23H59M"
+          "example": "PT23H59M"
         }
       }
     },
     "EstimacionDetalle" : {
       "type" : "object",
-      "required" : [ "cargo", "duracion", "precioTotal", "tipoTarea" ],
+      "required": [
+        "cargo",
+        "duracion",
+        "precioTotal",
+        "tipoTarea"
+      ],
       "properties" : {
         "tipoTarea" : {
           "$ref" : "#/definitions/TipoTarea"
@@ -1214,10 +1265,10 @@
         "cargo" : {
           "$ref" : "#/definitions/Cargo"
         },
-        "duracion" : {
-          "type" : "string",
-          "format" : "date-time",
-          "example" : "PT23H59M"
+        "duracion": {
+          "type": "string",
+          "format": "date-time",
+          "example": "PT23H59M"
         },
         "precioTotal" : {
           "type" : "number",
@@ -1256,7 +1307,7 @@
         "vigenciaDesde" : {
           "type" : "string",
           "format" : "date",
-          "example" : "23-01-2017"
+          "example": "23-01-2017"
         }
       }
     },
@@ -1278,7 +1329,12 @@
     },
     "Colaborador" : {
       "type" : "object",
-      "required" : [ "email", "nombre", "password", "role" ],
+      "required": [
+        "email",
+        "nombre",
+        "password",
+        "role"
+      ],
       "properties" : {
         "id" : {
           "type" : "integer",
@@ -1293,8 +1349,8 @@
         "cargo" : {
           "$ref" : "#/definitions/Cargo"
         },
-        "password" : {
-          "type" : "string"
+        "password": {
+          "type": "string"
         },
         "role" : {
           "type" : "string"
@@ -1304,119 +1360,127 @@
         }
       }
     },
-    "Hora" : {
-      "type" : "object",
-      "required" : [ "colaborador", "dia", "horaIn", "horaOut" ],
-      "properties" : {
-        "id" : {
-          "type" : "integer",
-          "format" : "int64"
+    "Hora": {
+      "type": "object",
+      "required": [
+        "colaborador",
+        "dia",
+        "horaIn",
+        "horaOut"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
         },
-        "dia" : {
-          "type" : "string",
-          "format" : "date",
-          "example" : "23-01-2017"
+        "dia": {
+          "type": "string",
+          "format": "date",
+          "example": "23-01-2017"
         },
-        "horaIn" : {
-          "type" : "string",
-          "format" : "date-time",
-          "example" : "08:15"
+        "horaIn": {
+          "type": "string",
+          "format": "date-time",
+          "example": "08:15"
         },
-        "horaOut" : {
-          "type" : "string",
-          "format" : "date-time",
-          "example" : "17:34"
+        "horaOut": {
+          "type": "string",
+          "format": "date-time",
+          "example": "17:34"
         },
-        "subtotal" : {
-          "type" : "string",
-          "format" : "date-time",
-          "example" : "PT23H59M",
-          "readOnly" : true
+        "subtotal": {
+          "type": "string",
+          "format": "date-time",
+          "example": "PT23H59M",
+          "readOnly": true
         },
-        "colaborador" : {
-          "$ref" : "#/definitions/Colaborador"
+        "colaborador": {
+          "$ref": "#/definitions/Colaborador"
         },
-        "horaDetalleList" : {
-          "type" : "array",
-          "uniqueItems" : true,
-          "items" : {
-            "$ref" : "#/definitions/HoraDetalle"
+        "horaDetalleList": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/HoraDetalle"
           }
         },
-        "completa" : {
-          "type" : "boolean",
-          "readOnly" : true,
-          "default" : false
+        "completa": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
         },
-        "subtotalDetalles" : {
-          "type" : "string",
-          "format" : "date-time",
-          "example" : "PT23H59M",
-          "readOnly" : true
+        "subtotalDetalles": {
+          "type": "string",
+          "format": "date-time",
+          "example": "PT23H59M",
+          "readOnly": true
         }
       }
     },
-    "Estimacion" : {
-      "type" : "object",
-      "required" : [ "fecha", "proyecto" ],
-      "properties" : {
-        "id" : {
-          "type" : "integer",
-          "format" : "int64"
+    "Estimacion": {
+      "type": "object",
+      "required": [
+        "fecha",
+        "proyecto"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
         },
-        "proyecto" : {
-          "$ref" : "#/definitions/Proyecto"
+        "proyecto": {
+          "$ref": "#/definitions/Proyecto"
         },
-        "descripcion" : {
-          "type" : "string"
+        "descripcion": {
+          "type": "string"
         },
-        "fecha" : {
-          "type" : "string",
-          "format" : "date",
-          "example" : "23-01-2017"
+        "fecha": {
+          "type": "string",
+          "format": "date",
+          "example": "23-01-2017"
         },
-        "estimacionDetalleList" : {
-          "type" : "array",
-          "items" : {
-            "$ref" : "#/definitions/EstimacionDetalle"
+        "estimacionDetalleList": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EstimacionDetalle"
           }
         }
       }
     },
-    "HorasProyectoTipoTareaXCargo" : {
-      "type" : "object",
-      "properties" : {
-        "cantidadHoras" : {
-          "type" : "integer",
-          "format" : "int64",
-          "readOnly" : true
+    "HorasProyectoTipoTareaXCargo": {
+      "type": "object",
+      "properties": {
+        "cantidadHoras": {
+          "type": "integer",
+          "format": "int64",
+          "readOnly": true
         },
-        "proyecto" : {
-          "$ref" : "#/definitions/Proyecto"
+        "proyecto": {
+          "$ref": "#/definitions/Proyecto"
         },
-        "tipoTarea" : {
-          "$ref" : "#/definitions/TipoTarea"
+        "tipoTarea": {
+          "$ref": "#/definitions/TipoTarea"
         },
-        "cargo" : {
-          "$ref" : "#/definitions/Cargo"
+        "cargo": {
+          "$ref": "#/definitions/Cargo"
         }
       }
     },
-    "EstimacionProyectoTipoTareaXCargo" : {
-      "type" : "object",
-      "properties" : {
-        "proyecto" : {
-          "$ref" : "#/definitions/Proyecto"
+    "EstimacionProyectoTipoTareaXCargo": {
+      "type": "object",
+      "properties": {
+        "proyecto": {
+          "$ref": "#/definitions/Proyecto"
         },
-        "tipoTarea" : {
-          "$ref" : "#/definitions/TipoTarea"
+        "tipoTarea": {
+          "$ref": "#/definitions/TipoTarea"
         },
-        "cargo" : {
-          "$ref" : "#/definitions/Cargo"
+        "cargo": {
+          "$ref": "#/definitions/Cargo"
         },
-        "precioTotal" : {
-          "type" : "number",
-          "format" : "double"
+        "precioTotal": {
+          "type": "number",
+          "format": "double"
         }
       }
     }
