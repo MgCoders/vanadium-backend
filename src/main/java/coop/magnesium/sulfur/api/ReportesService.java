@@ -7,11 +7,13 @@ import coop.magnesium.sulfur.api.dto.HorasProyectoTipoTareaXCargo;
 import coop.magnesium.sulfur.api.dto.HorasProyectoXCargo;
 import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
 import coop.magnesium.sulfur.api.utils.RoleNeeded;
-import coop.magnesium.sulfur.db.dao.EstimacionDao;
-import coop.magnesium.sulfur.db.dao.HoraDao;
+import coop.magnesium.sulfur.db.dao.*;
 import coop.magnesium.sulfur.db.entities.*;
+import coop.magnesium.sulfur.utils.ex.MagnesiumBdNotFoundException;
+import coop.magnesium.sulfur.utils.ex.MagnesiumNotFoundException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import sun.rmi.runtime.Log;
 
 import javax.ejb.EJB;
 import javax.inject.Inject;
@@ -39,6 +41,14 @@ public class ReportesService {
     private EstimacionDao estimacionDao;
     @EJB
     private HoraDao horaDao;
+    @EJB
+    private ProyectoDao proyectoDao;
+    @EJB
+    private TipoTareaDao tipoTareaDao;
+    @EJB
+    private CargoDao cargoDao;
+    @EJB
+    private ColaboradorDao colaboradorDao;
 
 
     @GET
@@ -50,53 +60,85 @@ public class ReportesService {
         return Response.ok(estimacionList).build();
     }
 
-    @POST
-    @Path("horas/proyecto/tarea/cargo")
+    @GET
+    @Path("horas/proyecto/{proyecto_id}/tarea/{tarea_id}/cargo/{cargo_id}")
     @JWTTokenNeeded
     @RoleNeeded({Role.ADMIN})
     @ApiOperation(value = "Horas de Proyecto, TipoTarea y Cargo agrupadas por Colaborador", response = HorasProyectoTipoTareaCargoXColaborador.class, responseContainer = "List")
-    public Response findHorasProyectoTipoTareaCargoXColaborador(Proyecto proyecto, TipoTarea tipoTarea, Cargo cargo) {
+    public Response findHorasProyectoTipoTareaCargoXColaborador(@PathParam("proyecto_id") Long proyecto_id, @PathParam("tarea_id") Long tarea_id, @PathParam("cargo_id")Long cargo_id) {
         try {
+            Proyecto proyecto = proyectoDao.findById(proyecto_id);
+            if (proyecto == null)
+                throw new MagnesiumNotFoundException("Proyecto no encontrado");
+            TipoTarea tipoTarea = tipoTareaDao.findById(tarea_id);
+            if (tipoTarea == null)
+                throw new MagnesiumNotFoundException("Tarea no encontrada");
+            Cargo cargo = cargoDao.findById(cargo_id);
+            if (cargo == null)
+                throw new MagnesiumNotFoundException("Cargo no encontrado");
             return Response.ok(horaDao.findHorasProyectoTipoTareaCargoXColaborador(proyecto, tipoTarea, cargo)).build();
+        } catch (MagnesiumNotFoundException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (Exception e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
 
     @POST
-    @Path("horas/proyecto/tarea")
+    @Path("horas/proyecto/{proyecto_id}/tarea/{tarea_id}")
     @JWTTokenNeeded
     @RoleNeeded({Role.ADMIN})
     @ApiOperation(value = "Horas de Proyecto y TipoTarea agrupadas por Cargo", response = HorasProyectoTipoTareaXCargo.class, responseContainer = "List")
-    public Response findHorasProyectoTipoTareaXCargo(Proyecto proyecto, TipoTarea tipoTarea) {
+    public Response findHorasProyectoTipoTareaXCargo(@PathParam("proyecto_id") Long proyecto_id, @PathParam("tarea_id") Long tarea_id) {
         try {
+            Proyecto proyecto = proyectoDao.findById(proyecto_id);
+            if (proyecto == null)
+                throw new MagnesiumNotFoundException("Proyecto no encontrado");
+            TipoTarea tipoTarea = tipoTareaDao.findById(tarea_id);
+            if (tipoTarea == null)
+                throw new MagnesiumNotFoundException("Tarea no encontrada");
             return Response.ok(horaDao.findHorasProyectoTipoTareaXCargo(proyecto, tipoTarea)).build();
+        } catch (MagnesiumNotFoundException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (Exception e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
 
     @POST
-    @Path("estimaciones/proyecto/tarea")
+    @Path("estimaciones/proyecto/{proyecto_id}/tarea/{tarea_id}")
     @JWTTokenNeeded
     @RoleNeeded({Role.ADMIN})
     @ApiOperation(value = "Estimaciones de Proyecto y TipoTarea agrupadas por Cargo", response = EstimacionProyectoTipoTareaXCargo.class, responseContainer = "List")
-    public Response findEstimacionesProyectoTipoTareaXCargo(Proyecto proyecto, TipoTarea tipoTarea) {
+    public Response findEstimacionesProyectoTipoTareaXCargo(@PathParam("proyecto_id") Long proyecto_id, @PathParam("tarea_id") Long tarea_id) {
         try {
+            Proyecto proyecto = proyectoDao.findById(proyecto_id);
+            if (proyecto == null)
+                throw new MagnesiumNotFoundException("Proyecto no encontrado");
+            TipoTarea tipoTarea = tipoTareaDao.findById(tarea_id);
+            if (tipoTarea == null)
+                throw new MagnesiumNotFoundException("Tarea no encontrada");
             return Response.ok(estimacionDao.findEstimacionProyectoTipoTareaXCargo(proyecto, tipoTarea)).build();
+        } catch (MagnesiumNotFoundException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (Exception e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
 
     @POST
-    @Path("horas/proyecto")
+    @Path("horas/proyecto/{proyecto_id}")
     @JWTTokenNeeded
     @RoleNeeded({Role.ADMIN})
     @ApiOperation(value = "Horas de Proyecto agrupadas por Cargo", response = HorasProyectoXCargo.class, responseContainer = "List")
-    public Response findHorasProyectoXCargo(Proyecto proyecto) {
+    public Response findHorasProyectoXCargo(@PathParam("proyecto_id") Long proyecto_id) {
         try {
+            Proyecto proyecto = proyectoDao.findById(proyecto_id);
+            if (proyecto == null)
+                throw new MagnesiumNotFoundException("Proyecto no encontrado");
             return Response.ok(horaDao.findHorasProyectoXCargo(proyecto)).build();
+        } catch (MagnesiumNotFoundException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (Exception e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
