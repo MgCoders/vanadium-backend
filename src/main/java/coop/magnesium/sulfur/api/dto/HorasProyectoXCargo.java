@@ -22,6 +22,9 @@ public class HorasProyectoXCargo {
     public Proyecto proyecto;
     public Cargo cargo;
 
+    public HorasProyectoXCargo() {
+    }
+
     public HorasProyectoXCargo(Long cantidadHoras, Proyecto proyecto, Cargo cargo) {
         this.cantidadHoras = Duration.ofNanos(cantidadHoras);
         this.proyecto = proyecto;

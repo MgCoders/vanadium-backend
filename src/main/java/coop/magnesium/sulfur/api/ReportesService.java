@@ -9,11 +9,9 @@ import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
 import coop.magnesium.sulfur.api.utils.RoleNeeded;
 import coop.magnesium.sulfur.db.dao.*;
 import coop.magnesium.sulfur.db.entities.*;
-import coop.magnesium.sulfur.utils.ex.MagnesiumBdNotFoundException;
 import coop.magnesium.sulfur.utils.ex.MagnesiumNotFoundException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import sun.rmi.runtime.Log;
 
 import javax.ejb.EJB;
 import javax.inject.Inject;
@@ -84,7 +82,7 @@ public class ReportesService {
         }
     }
 
-    @POST
+    @GET
     @Path("horas/proyecto/{proyecto_id}/tarea/{tarea_id}")
     @JWTTokenNeeded
     @RoleNeeded({Role.ADMIN})
@@ -105,7 +103,7 @@ public class ReportesService {
         }
     }
 
-    @POST
+    @GET
     @Path("estimaciones/proyecto/{proyecto_id}/tarea/{tarea_id}")
     @JWTTokenNeeded
     @RoleNeeded({Role.ADMIN})
@@ -126,7 +124,7 @@ public class ReportesService {
         }
     }
 
-    @POST
+    @GET
     @Path("horas/proyecto/{proyecto_id}")
     @JWTTokenNeeded
     @RoleNeeded({Role.ADMIN})

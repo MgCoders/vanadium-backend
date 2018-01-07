@@ -13,6 +13,8 @@ import coop.magnesium.sulfur.db.dao.*;
 import coop.magnesium.sulfur.db.entities.*;
 import coop.magnesium.sulfur.utils.Logged;
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.RunAsClient;
+import org.jboss.arquillian.extension.rest.client.ArquillianResteasyResource;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.junit.InSequence;
 import org.jboss.shrinkwrap.api.Filters;
@@ -25,6 +27,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import javax.inject.Inject;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.File;
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -89,6 +95,7 @@ public class ReporteServiceTest {
                 .addClass(JWTTokenNeededFilterMock.class)
                 .addClass(RoleNeededFilterMock.class)
                 .addClass(HoraService.class)
+                .addClass(ReportesService.class)
                 .addClass(EstimacionDetalle.class)
                 .addClass(UserServiceMock.class)
                 .addAsResource("META-INF/persistence.xml")
@@ -242,6 +249,24 @@ public class ReporteServiceTest {
         assertEquals(cargo2.getCodigo(), horasProyectoTipoTareaCargoXColaborador.get(0).cargo.getCodigo());
         assertEquals(1, horasProyectoTipoTareaCargoXColaborador.size());
     }
+
+    @Test
+    @InSequence(7)
+    @RunAsClient
+    public void getHorasProyectoTareaXCargo(@ArquillianResteasyResource final WebTarget webTarget) {
+        final Response response = webTarget
+                .path("/reportes/horas/proyecto/1/tarea/1")
+                .request(MediaType.APPLICATION_JSON)
+                .header("AUTHORIZATION", "ADMIN:2")
+                .get();
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        List<HorasProyectoTipoTareaXCargo> horaList = response.readEntity(new GenericType<List<HorasProyectoTipoTareaXCargo>>() {
+        });
+        assertEquals(2, horaList.size());
+        assertEquals(44, horaList.get(0).cantidadHoras.toHours());
+        assertEquals(36, horaList.get(1).cantidadHoras.toHours());
+    }
+
 
 
 }
