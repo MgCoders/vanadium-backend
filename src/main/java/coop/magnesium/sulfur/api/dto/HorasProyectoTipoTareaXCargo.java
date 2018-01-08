@@ -24,6 +24,9 @@ public class HorasProyectoTipoTareaXCargo {
     public TipoTarea tipoTarea;
     public Cargo cargo;
 
+    public HorasProyectoTipoTareaXCargo() {
+    }
+
     public HorasProyectoTipoTareaXCargo(Long cantidadHoras, Proyecto proyecto, TipoTarea tipoTarea, Cargo cargo) {
         this.cantidadHoras = Duration.ofNanos(cantidadHoras);
         this.proyecto = proyecto;
@@ -36,16 +39,33 @@ public class HorasProyectoTipoTareaXCargo {
         return cantidadHoras.toHours();
     }
 
+    @JsonProperty
+    public void setCantidadHoras(Long cantidadHoras) {
+        this.cantidadHoras = Duration.ofHours(cantidadHoras);
+    }
+
     public Proyecto getProyecto() {
         return proyecto;
+    }
+
+    public void setProyecto(Proyecto proyecto) {
+        this.proyecto = proyecto;
     }
 
     public TipoTarea getTipoTarea() {
         return tipoTarea;
     }
 
+    public void setTipoTarea(TipoTarea tipoTarea) {
+        this.tipoTarea = tipoTarea;
+    }
+
     public Cargo getCargo() {
         return cargo;
+    }
+
+    public void setCargo(Cargo cargo) {
+        this.cargo = cargo;
     }
 
     @Override

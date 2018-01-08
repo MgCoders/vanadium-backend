@@ -24,6 +24,9 @@ public class EstimacionProyectoTipoTareaXCargo {
     @JsonIgnore
     public Duration cantidadHoras;
 
+    public EstimacionProyectoTipoTareaXCargo() {
+    }
+
     public EstimacionProyectoTipoTareaXCargo(Proyecto proyecto, TipoTarea tipoTarea, Cargo cargo, BigDecimal precioTotal, Long cantidadHoras) {
         this.proyecto = proyecto;
         this.tipoTarea = tipoTarea;

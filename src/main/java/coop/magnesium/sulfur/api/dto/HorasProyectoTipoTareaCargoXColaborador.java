@@ -26,6 +26,9 @@ public class HorasProyectoTipoTareaCargoXColaborador {
     public Cargo cargo;
     public Colaborador colaborador;
 
+    public HorasProyectoTipoTareaCargoXColaborador() {
+    }
+
     public HorasProyectoTipoTareaCargoXColaborador(Long cantidadHoras, Proyecto proyecto, TipoTarea tipoTarea, Cargo cargo, Colaborador colaborador) {
         this.cantidadHoras = Duration.ofNanos(cantidadHoras);
         this.proyecto = proyecto;
