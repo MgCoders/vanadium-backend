@@ -1,6 +1,5 @@
 package coop.magnesium.sulfur.api;
 
-import coop.magnesium.sulfur.api.dto.HorasProyectoTipoTareaXCargo;
 import coop.magnesium.sulfur.api.dto.HorasProyectoXCargo;
 import coop.magnesium.sulfur.db.dao.CargoDao;
 import coop.magnesium.sulfur.db.dao.EstimacionDao;

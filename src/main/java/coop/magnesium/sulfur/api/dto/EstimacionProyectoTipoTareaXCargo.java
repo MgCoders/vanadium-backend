@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import coop.magnesium.sulfur.db.entities.Cargo;
 import coop.magnesium.sulfur.db.entities.Proyecto;
 import coop.magnesium.sulfur.db.entities.TipoTarea;
+import coop.magnesium.sulfur.utils.TimeUtils;
 import io.swagger.annotations.ApiModel;
 
 import java.math.BigDecimal;
@@ -22,7 +23,7 @@ public class EstimacionProyectoTipoTareaXCargo {
     public Cargo cargo;
     public BigDecimal precioTotal;
     @JsonIgnore
-    public Duration cantidadHoras;
+    public BigDecimal cantidadHoras;
 
     public EstimacionProyectoTipoTareaXCargo() {
     }
@@ -32,7 +33,7 @@ public class EstimacionProyectoTipoTareaXCargo {
         this.tipoTarea = tipoTarea;
         this.cargo = cargo;
         this.precioTotal = precioTotal;
-        this.cantidadHoras = Duration.ofNanos(cantidadHoras);
+        this.cantidadHoras = TimeUtils.durationToBigDecimal(Duration.ofNanos(cantidadHoras));
     }
 
     public Proyecto getProyecto() {
@@ -51,7 +52,7 @@ public class EstimacionProyectoTipoTareaXCargo {
         return precioTotal;
     }
 
-    public Duration getCantidadHoras() {
+    public BigDecimal getCantidadHoras() {
         return cantidadHoras;
     }
 

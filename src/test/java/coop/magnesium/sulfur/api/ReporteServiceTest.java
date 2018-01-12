@@ -5,13 +5,14 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import coop.magnesium.sulfur.api.dto.EstimacionProyectoTipoTareaXCargo;
 import coop.magnesium.sulfur.api.dto.HorasProyectoTipoTareaCargoXColaborador;
-import coop.magnesium.sulfur.api.dto.HorasProyectoTipoTareaXCargo;
 import coop.magnesium.sulfur.api.dto.HorasProyectoXCargo;
+import coop.magnesium.sulfur.api.dto.ReporteHoras1;
 import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
 import coop.magnesium.sulfur.api.utils.RoleNeeded;
 import coop.magnesium.sulfur.db.dao.*;
 import coop.magnesium.sulfur.db.entities.*;
 import coop.magnesium.sulfur.utils.Logged;
+import coop.magnesium.sulfur.utils.TimeUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.extension.rest.client.ArquillianResteasyResource;
@@ -33,6 +34,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -74,6 +76,8 @@ public class ReporteServiceTest {
     EstimacionDao estimacionDao;
     @Inject
     HoraDao horaDao;
+    @Inject
+    ReportesDao reporteDao;
     @Inject
     Logger logger;
 
@@ -129,34 +133,44 @@ public class ReporteServiceTest {
         estimacion.getEstimacionDetalleList().add(new EstimacionDetalle(tipoTarea1, cargo2, Duration.ofHours(6), new BigDecimal(170)));
         estimacionDao.save(estimacion);
 
-        Estimacion estimacion2 = new Estimacion(proyecto1, null, LocalDate.now());
+        Estimacion estimacion2 = new Estimacion(proyecto1, null, LocalDate.now().plusDays(1));
         estimacion2.getEstimacionDetalleList().add(new EstimacionDetalle(tipoTarea1, cargo1, Duration.ofHours(3), new BigDecimal(150.5)));
         estimacionDao.save(estimacion2);
 
-        Hora hora = new Hora(LocalDate.of(2017, 12, 24), LocalTime.MIN, LocalTime.MAX, colaborador1);
-        hora.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea1, Duration.ofHours(23).plus(Duration.ofMinutes(30))));
+        Hora hora = new Hora(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, colaborador1);
+        hora.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea1, Duration.ofHours(20)));
         horaDao.save(hora);
 
-        Hora hora2 = new Hora(LocalDate.of(2017, 12, 24), LocalTime.MIN, LocalTime.MAX, colaborador2);
-        hora2.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea1, Duration.ofHours(15).plus(Duration.ofMinutes(30))));
+        Hora hora2 = new Hora(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, colaborador2);
+        hora2.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea1, Duration.ofHours(15)));
         horaDao.save(hora2);
 
-        Hora hora3 = new Hora(LocalDate.of(2017, 12, 25), LocalTime.MIN, LocalTime.MAX, colaborador2);
-        hora3.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea1, Duration.ofHours(20).plus(Duration.ofMinutes(30))));
+        Hora hora3 = new Hora(LocalDate.now().plusDays(1), LocalTime.MIN, LocalTime.MAX, colaborador2);
+        hora3.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea1, Duration.ofHours(10)));
         horaDao.save(hora3);
 
-        Hora hora4 = new Hora(LocalDate.of(2017, 12, 25), LocalTime.MIN, LocalTime.MAX, colaborador1);
-        hora4.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea1, Duration.ofHours(20).plus(Duration.ofMinutes(30))));
+        Hora hora4 = new Hora(LocalDate.now().plusDays(1), LocalTime.MIN, LocalTime.MAX, colaborador1);
+        hora4.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea1, Duration.ofHours(5)));
         horaDao.save(hora4);
 
-        Hora hora5 = new Hora(LocalDate.of(2017, 12, 25), LocalTime.MIN, LocalTime.MAX, colaborador1);
-        hora5.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea2, Duration.ofHours(8)));
+        Hora hora5 = new Hora(LocalDate.now().plusDays(1), LocalTime.MIN, LocalTime.MAX, colaborador1);
+        hora5.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea2, Duration.ofHours(20)));
         horaDao.save(hora5);
 
-        Hora hora6 = new Hora(LocalDate.of(2017, 12, 25), LocalTime.MIN, LocalTime.MAX, colaborador2);
-        hora6.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea2, Duration.ofHours(10)));
+        Hora hora6 = new Hora(LocalDate.now().plusDays(1), LocalTime.MIN, LocalTime.MAX, colaborador2);
+        hora6.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea2, Duration.ofHours(10).plusMinutes(10)));
         horaDao.save(hora6);
 
+        //Cargo 1, P1, T1, 40h
+        //Cargo 2, P1, T1, 20h
+
+        //Cargo 1, P1, T2, 20h
+        //Cargo 2, P1, T2, 10h
+
+        //Cargo 1 45h
+        //Cargo 2 45:10h
+
+        List<HoraDetalle> lt = horaDao.prueba(proyecto1, tipoTarea1);
     }
 
 
@@ -168,18 +182,18 @@ public class ReporteServiceTest {
         tipoTarea1.setId(1L);
 
 
-        List<HorasProyectoTipoTareaXCargo> horasProyectoTipoTareaXCargos = horaDao.findHorasProyectoTipoTareaXCargo(proyecto1, tipoTarea1);
-        horasProyectoTipoTareaXCargos.forEach(horasProyectoTipoTareaXCargo -> {
-            logger.info(horasProyectoTipoTareaXCargo.toString());
-            if (horasProyectoTipoTareaXCargo.cargo.getCodigo().equals("C1")) {
-                assertEquals(44, horasProyectoTipoTareaXCargo.cantidadHoras.toHours());
-
-            } else {
-                assertEquals(36, horasProyectoTipoTareaXCargo.cantidadHoras.toHours());
-            }
+        horaDao.findAll().forEach(hora -> {
+            logger.info(hora.toString());
+            Cargo cargo = hora.getColaborador().getCargo();
+            hora.getHoraDetalleList().forEach(horaDetalle -> {
+                logger.info(horaDetalle.toString());
+                if (horaDetalle.getProyecto().getId().equals(proyecto1.getId()) && horaDetalle.getTipoTarea().getId().equals(tipoTarea1.getId())) {
+                    BigDecimal costoXHora = cargo.getPrecioHora(hora.getDia()).get().getPrecioHora();
+                    BigDecimal cantHoras = TimeUtils.durationToBigDecimal(horaDetalle.getDuracion());
+                    BigDecimal costoHoras = costoXHora.multiply(cantHoras);
+                }
+            });
         });
-
-        assertEquals(2, horasProyectoTipoTareaXCargos.size());
 
     }
 
@@ -193,10 +207,10 @@ public class ReporteServiceTest {
         estimacionProyectoTipoTareaXCargos.forEach(estimacionProyectoTipoTareaXCargo -> {
             logger.info(estimacionProyectoTipoTareaXCargo.toString());
             if (estimacionProyectoTipoTareaXCargo.cargo.getCodigo().equals("C1")) {
-                assertEquals(6, estimacionProyectoTipoTareaXCargo.cantidadHoras.toHours());
+                assertEquals(BigDecimal.valueOf(6).setScale(2, RoundingMode.CEILING), estimacionProyectoTipoTareaXCargo.cantidadHoras);
 
             } else {
-                assertEquals(6, estimacionProyectoTipoTareaXCargo.cantidadHoras.toHours());
+                assertEquals(BigDecimal.valueOf(6).setScale(2, RoundingMode.CEILING), estimacionProyectoTipoTareaXCargo.cantidadHoras);
             }
         });
 
@@ -212,10 +226,10 @@ public class ReporteServiceTest {
         horasProyectoXCargo.forEach(horasProyectoXCargo1 -> {
             logger.info(horasProyectoXCargo1.toString());
             if (horasProyectoXCargo1.cargo.getCodigo().equals("C1")) {
-                assertEquals(52, horasProyectoXCargo1.cantidadHoras.toHours());
+                assertEquals(45, horasProyectoXCargo1.cantidadHoras.toHours());
 
             } else {
-                assertEquals(46, horasProyectoXCargo1.cantidadHoras.toHours());
+                assertEquals(45, horasProyectoXCargo1.cantidadHoras.toHours());
             }
         });
 
@@ -231,7 +245,7 @@ public class ReporteServiceTest {
 
         List<HorasProyectoTipoTareaCargoXColaborador> horasProyectoTipoTareaCargoXColaborador = horaDao.findHorasProyectoTipoTareaCargoXColaborador(proyecto1, tipoTarea1, cargo1);
         logger.info(horasProyectoTipoTareaCargoXColaborador.get(0).toString());
-        assertEquals(44, horasProyectoTipoTareaCargoXColaborador.get(0).cantidadHoras.toHours());
+        assertEquals(45, horasProyectoTipoTareaCargoXColaborador.get(0).cantidadHoras.toHours());
         assertEquals(cargo1.getCodigo(), horasProyectoTipoTareaCargoXColaborador.get(0).cargo.getCodigo());
         assertEquals(1, horasProyectoTipoTareaCargoXColaborador.size());
     }
@@ -245,7 +259,7 @@ public class ReporteServiceTest {
 
         List<HorasProyectoTipoTareaCargoXColaborador> horasProyectoTipoTareaCargoXColaborador = horaDao.findHorasProyectoTipoTareaCargoXColaborador(proyecto1, tipoTarea1, cargo2);
         logger.info(horasProyectoTipoTareaCargoXColaborador.get(0).toString());
-        assertEquals(36, horasProyectoTipoTareaCargoXColaborador.get(0).cantidadHoras.toHours());
+        assertEquals(45, horasProyectoTipoTareaCargoXColaborador.get(0).cantidadHoras.toHours());
         assertEquals(cargo2.getCodigo(), horasProyectoTipoTareaCargoXColaborador.get(0).cargo.getCodigo());
         assertEquals(1, horasProyectoTipoTareaCargoXColaborador.size());
     }
@@ -260,11 +274,11 @@ public class ReporteServiceTest {
                 .header("AUTHORIZATION", "ADMIN:2")
                 .get();
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-        List<HorasProyectoTipoTareaXCargo> horaList = response.readEntity(new GenericType<List<HorasProyectoTipoTareaXCargo>>() {
+        List<ReporteHoras1> horaList = response.readEntity(new GenericType<List<ReporteHoras1>>() {
         });
-        assertEquals(2, horaList.size());
-        assertEquals(44, horaList.get(0).cantidadHoras.toHours());
-        assertEquals(36, horaList.get(1).cantidadHoras.toHours());
+        assertEquals(3, horaList.size());
+        assertEquals(45, horaList.get(0).cantidadHoras);
+        assertEquals(45, horaList.get(1).cantidadHoras);
     }
 
 

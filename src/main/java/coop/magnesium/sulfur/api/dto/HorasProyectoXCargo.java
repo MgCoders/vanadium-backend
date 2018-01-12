@@ -46,7 +46,7 @@ public class HorasProyectoXCargo {
 
     @Override
     public String toString() {
-        return "HorasProyectoTipoTareaXCargo{" +
+        return "HorasProyectoTipoTareaXCargoDia{" +
                 "cantidadHoras=" + cantidadHoras +
                 ", proyecto=" + proyecto +
                 ", cargo=" + cargo +

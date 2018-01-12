@@ -3,8 +3,8 @@ package coop.magnesium.sulfur.api;
 
 import coop.magnesium.sulfur.api.dto.EstimacionProyectoTipoTareaXCargo;
 import coop.magnesium.sulfur.api.dto.HorasProyectoTipoTareaCargoXColaborador;
-import coop.magnesium.sulfur.api.dto.HorasProyectoTipoTareaXCargo;
 import coop.magnesium.sulfur.api.dto.HorasProyectoXCargo;
+import coop.magnesium.sulfur.api.dto.ReporteHoras1;
 import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
 import coop.magnesium.sulfur.api.utils.RoleNeeded;
 import coop.magnesium.sulfur.db.dao.*;
@@ -40,6 +40,8 @@ public class ReportesService {
     @EJB
     private HoraDao horaDao;
     @EJB
+    private ReportesDao reportesDao;
+    @EJB
     private ProyectoDao proyectoDao;
     @EJB
     private TipoTareaDao tipoTareaDao;
@@ -63,7 +65,7 @@ public class ReportesService {
     @JWTTokenNeeded
     @RoleNeeded({Role.ADMIN})
     @ApiOperation(value = "Horas de Proyecto, TipoTarea y Cargo agrupadas por Colaborador", response = HorasProyectoTipoTareaCargoXColaborador.class, responseContainer = "List")
-    public Response findHorasProyectoTipoTareaCargoXColaborador(@PathParam("proyecto_id") Long proyecto_id, @PathParam("tarea_id") Long tarea_id, @PathParam("cargo_id")Long cargo_id) {
+    public Response findHorasProyectoTipoTareaCargoXColaborador(@PathParam("proyecto_id") Long proyecto_id, @PathParam("tarea_id") Long tarea_id, @PathParam("cargo_id") Long cargo_id) {
         try {
             Proyecto proyecto = proyectoDao.findById(proyecto_id);
             if (proyecto == null)
@@ -86,7 +88,7 @@ public class ReportesService {
     @Path("horas/proyecto/{proyecto_id}/tarea/{tarea_id}")
     @JWTTokenNeeded
     @RoleNeeded({Role.ADMIN})
-    @ApiOperation(value = "Horas de Proyecto y TipoTarea agrupadas por Cargo", response = HorasProyectoTipoTareaXCargo.class, responseContainer = "List")
+    @ApiOperation(value = "Horas de Proyecto y TipoTarea agrupadas por Cargo", response = ReporteHoras1.class, responseContainer = "List")
     public Response findHorasProyectoTipoTareaXCargo(@PathParam("proyecto_id") Long proyecto_id, @PathParam("tarea_id") Long tarea_id) {
         try {
             Proyecto proyecto = proyectoDao.findById(proyecto_id);
@@ -95,7 +97,9 @@ public class ReportesService {
             TipoTarea tipoTarea = tipoTareaDao.findById(tarea_id);
             if (tipoTarea == null)
                 throw new MagnesiumNotFoundException("Tarea no encontrada");
-            return Response.ok(horaDao.findHorasProyectoTipoTareaXCargo(proyecto, tipoTarea)).build();
+
+            return Response.ok(reportesDao.reporteHoras1(proyecto, tipoTarea)).build();
+
         } catch (MagnesiumNotFoundException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (Exception e) {
@@ -116,7 +120,9 @@ public class ReportesService {
             TipoTarea tipoTarea = tipoTareaDao.findById(tarea_id);
             if (tipoTarea == null)
                 throw new MagnesiumNotFoundException("Tarea no encontrada");
-            return Response.ok(estimacionDao.findEstimacionProyectoTipoTareaXCargo(proyecto, tipoTarea)).build();
+
+
+            return Response.ok().build();
         } catch (MagnesiumNotFoundException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (Exception e) {

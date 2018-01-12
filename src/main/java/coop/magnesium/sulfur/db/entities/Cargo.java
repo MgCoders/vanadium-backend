@@ -78,7 +78,7 @@ public class Cargo {
      * @return
      */
     public Optional<PrecioHora> getPrecioHora(LocalDate diaReferencia) {
-        return precioHoraHistoria.stream().sorted(Comparator.comparing(PrecioHora::getVigenciaDesde).reversed()).filter(precioHora -> precioHora.getVigenciaDesde().isBefore(diaReferencia)).findFirst();
+        return precioHoraHistoria.stream().sorted(Comparator.comparing(PrecioHora::getVigenciaDesde).reversed()).filter(precioHora -> !precioHora.getVigenciaDesde().isAfter(diaReferencia)).findFirst();
     }
 
     @Override
