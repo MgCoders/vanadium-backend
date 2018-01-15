@@ -82,7 +82,7 @@ public class HoraService {
 
             //si es mismo colaborador, misma fecha, error
             Hora horaExists = horaDao.findByColaboradorFecha(hora.getColaborador(), hora.getDia());
-            if (horaExists == null)
+            if (horaExists != null)
                 throw new MagnesiumBdAlredyExistsException("Ya existe hora para esa fecha y colaborador");
 
             //si tiene horas incompletas
