@@ -26,7 +26,6 @@ public class Colaborador {
     @Valid
     @ManyToOne
     private Cargo cargo;
-    @NotNull
     private String password;
     @NotNull
     private String role = Role.USER.name();
