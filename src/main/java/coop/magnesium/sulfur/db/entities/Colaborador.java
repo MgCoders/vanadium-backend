@@ -18,16 +18,16 @@ public class Colaborador {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotNull
+    @NotNull(message = "El campo email no puede estar vacío")
     @Column(unique = true)
     private String email;
-    @NotNull
+    @NotNull(message = "El campo nombre no puede estar vacío")
     private String nombre;
     @Valid
     @ManyToOne
     private Cargo cargo;
     private String password;
-    @NotNull
+    @NotNull(message = "El campo rol no puede estar vacío")
     private String role = Role.USER.name();
     @Transient
     private String token;
