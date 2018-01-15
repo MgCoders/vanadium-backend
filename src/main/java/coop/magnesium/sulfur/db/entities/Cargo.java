@@ -23,9 +23,9 @@ public class Cargo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotNull
+    @NotNull(message = "El campo nombre no puede estar vacío")
     private String nombre;
-    @NotNull
+    @NotNull(message = "El campo código no puede estar vacío")
     @Column(unique = true)
     private String codigo;
     @ElementCollection(fetch = FetchType.EAGER)

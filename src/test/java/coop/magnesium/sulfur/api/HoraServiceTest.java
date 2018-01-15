@@ -292,7 +292,7 @@ public class HoraServiceTest {
         String horaCreadaString = response.readEntity(String.class);
         System.out.println(horaCreadaString);
         Hora horaCreada = objectMapper.readValue(horaCreadaString, Hora.class);
-        assertEquals(2, horaCreada.getId().longValue());
+        assertEquals(1, horaCreada.getId().longValue());
         assertEquals(23, horaCreada.getSubtotal().toHours());
         assertEquals(horaCreada.getSubtotalDetalles(), horaCreada.getSubtotal());
         assertEquals(true, horaCreada.isCompleta());
@@ -319,7 +319,7 @@ public class HoraServiceTest {
         String horaCreadaString = response.readEntity(String.class);
         System.out.println(horaCreadaString);
         Hora horaCreada = objectMapper.readValue(horaCreadaString, Hora.class);
-        assertEquals(2, horaCreada.getId().longValue());
+        assertEquals(1, horaCreada.getId().longValue());
         assertEquals(2, horaCreada.getHoraDetalleList().size());
         assertNotEquals(horaCreada.getSubtotalDetalles(), horaCreada.getSubtotal());
         assertEquals(false, horaCreada.isCompleta());
