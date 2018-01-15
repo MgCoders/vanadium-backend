@@ -9,8 +9,10 @@ import java.time.Duration;
 public class TimeUtils {
 
     public static BigDecimal durationToBigDecimal(Duration duration) {
-        BigDecimal bdhours = BigDecimal.valueOf(duration.toHours());
-        BigDecimal bdminutes = new BigDecimal((duration.toMinutes() % 60) / 60L);
-        return bdhours.add(bdminutes).setScale(2, BigDecimal.ROUND_CEILING);
+        BigDecimal hour = new BigDecimal(Math.floorDiv(duration.getSeconds(), 3600));
+        Long segundosRestantes = duration.getSeconds() % 3600;
+        BigDecimal minutosRestantes = new BigDecimal(Math.floorDiv(segundosRestantes, 60));
+        BigDecimal horaDecimal = minutosRestantes.divide(new BigDecimal(60));
+        return hour.add(horaDecimal).setScale(2, BigDecimal.ROUND_CEILING);
     }
 }

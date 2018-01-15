@@ -12,7 +12,6 @@ import coop.magnesium.sulfur.api.utils.RoleNeeded;
 import coop.magnesium.sulfur.db.dao.*;
 import coop.magnesium.sulfur.db.entities.*;
 import coop.magnesium.sulfur.utils.Logged;
-import coop.magnesium.sulfur.utils.TimeUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.extension.rest.client.ArquillianResteasyResource;
@@ -182,18 +181,8 @@ public class ReporteServiceTest {
         tipoTarea1.setId(1L);
 
 
-        horaDao.findAll().forEach(hora -> {
-            logger.info(hora.toString());
-            Cargo cargo = hora.getColaborador().getCargo();
-            hora.getHoraDetalleList().forEach(horaDetalle -> {
-                logger.info(horaDetalle.toString());
-                if (horaDetalle.getProyecto().getId().equals(proyecto1.getId()) && horaDetalle.getTipoTarea().getId().equals(tipoTarea1.getId())) {
-                    BigDecimal costoXHora = cargo.getPrecioHora(hora.getDia()).get().getPrecioHora();
-                    BigDecimal cantHoras = TimeUtils.durationToBigDecimal(horaDetalle.getDuracion());
-                    BigDecimal costoHoras = costoXHora.multiply(cantHoras);
-                }
-            });
-        });
+        List<ReporteHoras1> reporteHoras1 = reporteDao.reporteHoras1(proyecto1, tipoTarea1);
+        reporteHoras1.forEach(reporteHoras11 -> logger.info(reporteHoras11.toString()));
 
     }
 
@@ -277,8 +266,29 @@ public class ReporteServiceTest {
         List<ReporteHoras1> horaList = response.readEntity(new GenericType<List<ReporteHoras1>>() {
         });
         assertEquals(3, horaList.size());
-        assertEquals(45, horaList.get(0).cantidadHoras);
-        assertEquals(45, horaList.get(1).cantidadHoras);
+        assertEquals(25, horaList.get(0).cantidadHoras);
+        assertEquals(25, horaList.get(1).cantidadHoras);
+        assertEquals(50, horaList.get(2).cantidadHoras);
+
+    }
+
+    @Test
+    @InSequence(8)
+    @RunAsClient
+    public void getHorasProyectoTareaXCargo2(@ArquillianResteasyResource final WebTarget webTarget) {
+        final Response response = webTarget
+                .path("/reportes/horas/proyecto/1/tarea/2")
+                .request(MediaType.APPLICATION_JSON)
+                .header("AUTHORIZATION", "ADMIN:2")
+                .get();
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        List<ReporteHoras1> horaList = response.readEntity(new GenericType<List<ReporteHoras1>>() {
+        });
+        assertEquals(3, horaList.size());
+        assertEquals(20, horaList.get(0).cantidadHoras);
+        assertEquals(20.10, horaList.get(1).cantidadHoras);
+        assertEquals(40.10, horaList.get(2).cantidadHoras);
+
     }
 
 

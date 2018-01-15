@@ -59,13 +59,10 @@ public class ExtraTests {
 
     @Test
     public void durationToBigDecimalTest() {
-        assertEquals(new BigDecimal(23).setScale(2, RoundingMode.CEILING), TimeUtils.durationToBigDecimal(Duration.ofHours(23)));
         assertEquals(new BigDecimal(23.5).setScale(2, RoundingMode.CEILING), TimeUtils.durationToBigDecimal(Duration.ofHours(23).plusMinutes(30)));
-
+        assertEquals(new BigDecimal(23).setScale(2, RoundingMode.CEILING), TimeUtils.durationToBigDecimal(Duration.ofHours(23)));
         assertEquals(new BigDecimal(1.25).setScale(2, RoundingMode.CEILING), TimeUtils.durationToBigDecimal(Duration.ofHours(1).plusMinutes(15)));
         assertEquals(new BigDecimal(3.75).setScale(2, RoundingMode.CEILING), TimeUtils.durationToBigDecimal(Duration.ofHours(3).plusMinutes(45)));
-        Duration d = Duration.ofHours(10).plusMinutes(15);
-        System.out.println(d.toHours() + " " + d.toString());
         assertEquals(new BigDecimal(10.25).setScale(2, RoundingMode.CEILING), TimeUtils.durationToBigDecimal(Duration.ofHours(10).plusMinutes(15)));
 
     }
