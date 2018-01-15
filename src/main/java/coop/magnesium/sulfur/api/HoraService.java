@@ -12,6 +12,7 @@ import coop.magnesium.sulfur.db.entities.Hora;
 import coop.magnesium.sulfur.db.entities.Role;
 import coop.magnesium.sulfur.db.entities.SulfurUser;
 import coop.magnesium.sulfur.utils.Logged;
+import coop.magnesium.sulfur.utils.ex.MagnesiumBdAlredyExistsException;
 import coop.magnesium.sulfur.utils.ex.MagnesiumException;
 import coop.magnesium.sulfur.utils.ex.MagnesiumNotFoundException;
 import coop.magnesium.sulfur.utils.ex.MagnesiumSecurityException;
@@ -79,22 +80,19 @@ public class HoraService {
                 throw new MagnesiumSecurityException("Colaborador no coincide");
 
 
-
-
-            //si es mismo colaborador, misma fecha, entonces asumo edicion de hora
+            //si es mismo colaborador, misma fecha, error
             Hora horaExists = horaDao.findByColaboradorFecha(hora.getColaborador(), hora.getDia());
-            if (horaExists != null) {
-                hora.setId(horaExists.getId());
-            } else if (horaDao.existsByColaboradorIncompleta(hora.getColaborador()))
+            if (horaExists == null)
+                throw new MagnesiumBdAlredyExistsException("Ya existe hora para esa fecha y colaborador");
+
+            //si tiene horas incompletas
+            if (horaDao.existsByColaboradorIncompleta(hora.getColaborador()))
                 throw new MagnesiumException("El colaborador tiene horas incompletas");
 
             hora.cacularSubtotalDetalle();
             Hora horaCreada = horaDao.save(hora);
-            if (horaExists == null) {
-                return Response.status(Response.Status.CREATED).entity(horaCreada).build();
-            } else {
-                return Response.status(Response.Status.OK).entity(horaCreada).build();
-            }
+            return Response.status(Response.Status.CREATED).entity(horaCreada).build();
+
         } catch (MagnesiumNotFoundException e) {
             logger.warning(e.getMessage());
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
@@ -173,7 +171,25 @@ public class HoraService {
     @ApiResponses(value = {
             @ApiResponse(code = 304, message = "Error: objeto no modificado")})
     public Response edit(@PathParam("id") Long id, @Valid Hora hora, @Context SecurityContext securityContext) {
-        return create(hora, securityContext);
+        try {
+
+            Colaborador colaborador = colaboradorDao.findById(hora.getColaborador().getId());
+            if (colaborador == null) throw new MagnesiumNotFoundException("Colaborador no encontrado");
+            hora.setColaborador(colaborador);
+
+            if (!((SulfurUser) securityContext.getUserPrincipal()).getColaboradorId().equals(colaborador.getId())) {
+                throw new MagnesiumSecurityException("Colaborador no coincide");
+            }
+
+            if (horaDao.findById(id) == null) throw new MagnesiumNotFoundException("Hora no encontrada");
+            hora.setId(id);
+
+            hora.cacularSubtotalDetalle();
+            hora = horaDao.save(hora);
+            return Response.ok(hora).build();
+        } catch (Exception e) {
+            return Response.notModified().entity(e.getMessage()).build();
+        }
     }
 
 
