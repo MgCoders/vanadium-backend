@@ -109,16 +109,23 @@ public class ColaboradorService {
 
     @PUT
     @Path("{id}")
+    @Logged
     @JWTTokenNeeded
     @RoleNeeded({Role.ADMIN})
     @ApiOperation(value = "Edit colaborador", response = Colaborador.class)
     public Response edit(@PathParam("id") Long id, @Valid Colaborador colaborador) {
         try {
-            if (colaboradorDao.findById(id) == null) throw new MagnesiumNotFoundException("Colaborador no encontrado");
+            Colaborador found = colaboradorDao.findById(id);
+            if (found == null) throw new MagnesiumNotFoundException("Colaborador no encontrado");
             colaborador.setId(id);
-            Cargo cargo = cargoDao.findById(colaborador.getCargo().getId());
-            if (cargo == null) throw new MagnesiumNotFoundException("Cargo no encontrado");
-            colaborador.setCargo(cargo);
+            colaborador.setPassword(found.getPassword());
+
+            if (colaborador.getCargo() != null) {
+                Cargo cargo = cargoDao.findById(colaborador.getCargo().getId());
+                if (cargo == null) throw new MagnesiumNotFoundException("Cargo no encontrado");
+                colaborador.setCargo(cargo);
+            }
+
             colaborador = colaboradorDao.save(colaborador);
             return Response.ok(colaborador).build();
         } catch (Exception e) {
