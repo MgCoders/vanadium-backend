@@ -1,12 +1,18 @@
 package coop.magnesium.sulfur.api;
 
 
+import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
+import coop.magnesium.sulfur.api.utils.RoleNeeded;
 import coop.magnesium.sulfur.db.dao.CargoDao;
 import coop.magnesium.sulfur.db.dao.ColaboradorDao;
 import coop.magnesium.sulfur.db.entities.Cargo;
 import coop.magnesium.sulfur.db.entities.Colaborador;
+import coop.magnesium.sulfur.db.entities.Role;
+import coop.magnesium.sulfur.system.MailEvent;
+import coop.magnesium.sulfur.system.MailService;
 import coop.magnesium.sulfur.utils.Logged;
 import coop.magnesium.sulfur.utils.PasswordUtils;
+import coop.magnesium.sulfur.utils.PropertiesFromFile;
 import coop.magnesium.sulfur.utils.ex.MagnesiumBdAlredyExistsException;
 import coop.magnesium.sulfur.utils.ex.MagnesiumBdMultipleResultsException;
 import coop.magnesium.sulfur.utils.ex.MagnesiumNotFoundException;
@@ -14,12 +20,16 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 import javax.ejb.EJB;
+import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -35,27 +45,34 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 public class ColaboradorService {
 
     @Inject
+    Event<MailEvent> mailEvent;
+    @Inject
+    @PropertiesFromFile
+    Properties endpointsProperties;
+    @Inject
     private Logger logger;
     @EJB
     private ColaboradorDao colaboradorDao;
     @EJB
     private CargoDao cargoDao;
 
-
     @POST
     @Logged
+    @JWTTokenNeeded
+    @RoleNeeded({Role.ADMIN})
     @ApiOperation(value = "Create colaborador", response = Colaborador.class)
     public Response create(@Valid Colaborador colaborador) {
         try {
             Colaborador colaboradorExists = colaboradorDao.findByEmail(colaborador.getEmail());
             if (colaboradorExists != null) throw new MagnesiumBdAlredyExistsException("Email ya existe");
-            colaborador.setPassword(PasswordUtils.digestPassword(colaborador.getPassword()));
+            colaborador.setPassword(PasswordUtils.digestPassword(UUID.randomUUID().toString()));
             if (colaborador.getCargo() != null) {
                 Cargo cargo = cargoDao.findById(colaborador.getCargo().getId());
                 if (cargo == null) throw new MagnesiumNotFoundException("Cargo no existe");
                 colaborador.setCargo(cargo);
             }
             colaborador = colaboradorDao.save(colaborador);
+            mailEvent.fire(new MailEvent(Arrays.asList(colaborador.getEmail()), MailService.generarEmailNuevoUsuario(endpointsProperties.getProperty("frontend.host")), "MARQ: Nuevo Usuario"));
             return Response.status(Response.Status.CREATED).entity(colaborador).build();
         } catch (MagnesiumBdMultipleResultsException | MagnesiumBdAlredyExistsException exists) {
             logger.warning("Email ya existe");
@@ -71,8 +88,8 @@ public class ColaboradorService {
 
 
     @GET
-    //@JWTTokenNeeded
-    //@RoleNeeded({Role.USER, Role.ADMIN})
+    @JWTTokenNeeded
+    @RoleNeeded({Role.ADMIN})
     @ApiOperation(value = "Get colaboradores", response = Colaborador.class, responseContainer = "List")
     public Response findAll() {
         List<Colaborador> allSulfurUsers = colaboradorDao.findAll();
@@ -81,8 +98,8 @@ public class ColaboradorService {
 
     @GET
     @Path("{id}")
-    //@JWTTokenNeeded
-    //@RoleNeeded({Role.USER, Role.ADMIN})
+    @JWTTokenNeeded
+    @RoleNeeded({Role.ADMIN})
     @ApiOperation(value = "Get colaborador", response = Colaborador.class)
     public Response find(@PathParam("id") Long id) {
         Colaborador colaborador = colaboradorDao.findById(id);
@@ -92,16 +109,23 @@ public class ColaboradorService {
 
     @PUT
     @Path("{id}")
-    //@JWTTokenNeeded
-    //@RoleNeeded({Role.USER, Role.ADMIN})
+    @Logged
+    @JWTTokenNeeded
+    @RoleNeeded({Role.ADMIN})
     @ApiOperation(value = "Edit colaborador", response = Colaborador.class)
     public Response edit(@PathParam("id") Long id, @Valid Colaborador colaborador) {
         try {
-            if (colaboradorDao.findById(id) == null) throw new MagnesiumNotFoundException("Colaborador no encontrado");
+            Colaborador found = colaboradorDao.findById(id);
+            if (found == null) throw new MagnesiumNotFoundException("Colaborador no encontrado");
             colaborador.setId(id);
-            Cargo cargo = cargoDao.findById(colaborador.getCargo().getId());
-            if (cargo == null) throw new MagnesiumNotFoundException("Cargo no encontrado");
-            colaborador.setCargo(cargo);
+            colaborador.setPassword(found.getPassword());
+
+            if (colaborador.getCargo() != null) {
+                Cargo cargo = cargoDao.findById(colaborador.getCargo().getId());
+                if (cargo == null) throw new MagnesiumNotFoundException("Cargo no encontrado");
+                colaborador.setCargo(cargo);
+            }
+
             colaborador = colaboradorDao.save(colaborador);
             return Response.ok(colaborador).build();
         } catch (Exception e) {

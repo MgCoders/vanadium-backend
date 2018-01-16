@@ -38,6 +38,16 @@ public class MailService {
 
     }
 
+    public static String generarEmailNuevoUsuario(String frontendHost) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Se ha creado un nuevo usuario en MARQ: Registro de Horas.").append("\n");
+        sb.append("Hacé click en el siguiente enlace para obtener una contraseña.").append("\n\n");
+        String url = frontendHost + "/#/extra/forgot-password";
+        sb.append(url).append("\n\n");
+        return sb.toString();
+
+    }
+
     @PostConstruct
     public void init() {
     }
