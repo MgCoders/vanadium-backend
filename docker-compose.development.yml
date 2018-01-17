@@ -11,12 +11,12 @@ services:
         DB_USER: sulfur_user
         DB_PASS: sulfur_pass
         LOGSTASH_HOST: logstash
-        ZOHO_MAIL_FROM: ${ZOHO_MAIL_FROM}
-        ZOHO_MAIL_PASS: ${ZOHO_MAIL_PASS}
-        ROOT_PASSWORD: ${ROOT_PASSWORD}
+        ZOHO_MAIL_FROM: prueba@magnesium.coop
+        ZOHO_MAIL_PASS: prueba
+        ROOT_PASSWORD: root
       ports:
-        - 127.0.0.1:8080:8080
-        - 127.0.0.1:9990:9990
+        - 8080:8080
+        - 9990:9990
       links:
         - db
       volumes:
