@@ -13,7 +13,6 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.DurationSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
-import coop.magnesium.sulfur.api.dto.HoraCompleta;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -31,16 +30,6 @@ import java.util.Set;
 @Entity
 @JsonAutoDetect
 @ApiModel
-@SqlResultSetMapping(name = "HoraCompletaResult", classes = {
-        @ConstructorResult(targetClass = HoraCompleta.class,
-                columns = {@ColumnResult(name = "proyecto"),
-                        @ColumnResult(name = "tipoTarea"),
-                        @ColumnResult(name = "tipoTarea"),
-                        @ColumnResult(name = "duracion"),
-                        @ColumnResult(name = "dia"),
-                        @ColumnResult(name = "colaborador"),
-                        @ColumnResult(name = "cargo")})
-})
 public class Hora {
 
     @Id
@@ -68,11 +57,8 @@ public class Hora {
     @NotNull
     @ManyToOne
     private Colaborador colaborador;
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
-            name = "horadetalle",
-            joinColumns = @JoinColumn(name = "hora_id")
-    )
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "hora_id")
     private Set<HoraDetalle> horaDetalleList = new HashSet<>();
     private boolean completa = false;
     private Duration subtotalDetalles;

@@ -94,7 +94,7 @@ public class EstimacionServiceTest {
         final Response response = webTarget
                 .path("/estimaciones")
                 .request(MediaType.APPLICATION_JSON)
-                .post(Entity.json(new Estimacion(this.proyecto, null, LocalDate.now())));
+                .post(Entity.json(new Estimacion(this.proyecto, null, LocalDate.now(), new BigDecimal(150))));
         assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
         Estimacion estimacion = response.readEntity(Estimacion.class);
         assertEquals(1, estimacion.getId().longValue());
@@ -104,9 +104,9 @@ public class EstimacionServiceTest {
     @InSequence(3)
     @RunAsClient
     public void createEstmacion2(@ArquillianResteasyResource final WebTarget webTarget) {
-        Estimacion estimacion = new Estimacion(this.proyecto, null, LocalDate.now());
-        estimacion.getEstimacionDetalleList().add(new EstimacionDetalle(this.tipoTarea, this.cargo, Duration.ofHours(3), new BigDecimal(150.5)));
-        estimacion.getEstimacionDetalleList().add(new EstimacionDetalle(this.tipoTarea, this.cargo, Duration.ofHours(6), new BigDecimal(170)));
+        Estimacion estimacion = new Estimacion(this.proyecto, null, LocalDate.now(), new BigDecimal(160));
+        estimacion.getEstimacionDetalleList().add(new EstimacionDetalle(this.tipoTarea, this.cargo, Duration.ofHours(3)));
+        estimacion.getEstimacionDetalleList().add(new EstimacionDetalle(this.tipoTarea, this.cargo, Duration.ofHours(6)));
         final Response response = webTarget
                 .path("/estimaciones")
                 .request(MediaType.APPLICATION_JSON)

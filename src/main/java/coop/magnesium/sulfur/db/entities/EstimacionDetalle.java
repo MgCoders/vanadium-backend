@@ -9,20 +9,21 @@ import com.fasterxml.jackson.datatype.jsr310.ser.DurationSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import javax.persistence.Embeddable;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.math.BigDecimal;
 import java.time.Duration;
 
 /**
  * Created by rsperoni on 18/12/17.
  */
-@Embeddable
+@Entity
 @JsonAutoDetect
 @ApiModel
 public class EstimacionDetalle {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     @NotNull
     @ManyToOne
     private TipoTarea tipoTarea;
@@ -35,17 +36,15 @@ public class EstimacionDetalle {
     @JsonDeserialize(using = DurationDeserializer.class)
     @JsonSerialize(using = DurationSerializer.class)
     private Duration duracion;
-    @NotNull
-    private BigDecimal precioTotal;
+
 
     public EstimacionDetalle() {
     }
 
-    public EstimacionDetalle(TipoTarea tipoTarea, Cargo cargo, Duration duracion, BigDecimal precioTotal) {
+    public EstimacionDetalle(TipoTarea tipoTarea, Cargo cargo, Duration duracion) {
         this.tipoTarea = tipoTarea;
         this.cargo = cargo;
         this.duracion = duracion;
-        this.precioTotal = precioTotal;
     }
 
     public TipoTarea getTipoTarea() {
@@ -72,21 +71,22 @@ public class EstimacionDetalle {
         this.duracion = duracion;
     }
 
-    public BigDecimal getPrecioTotal() {
-        return precioTotal;
+
+    public Long getId() {
+        return id;
     }
 
-    public void setPrecioTotal(BigDecimal precioTotal) {
-        this.precioTotal = precioTotal;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     @Override
     public String toString() {
         return "EstimacionDetalle{" +
-                "tipoTarea=" + tipoTarea +
-                ", cargo=" + cargo +
-                ", duration=" + duracion +
-                ", precioTotal=" + precioTotal +
+                "id=" + id +
+                ", tipoTarea=" + tipoTarea.getCodigo() +
+                ", cargo=" + cargo.getCodigo() +
+                ", duracion=" + duracion +
                 '}';
     }
 }

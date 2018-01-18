@@ -10,7 +10,8 @@ import java.math.BigDecimal;
 
 /**
  * Created by rsperoni on 19/12/17.
- * Para extraer horas por proyecto y tipoTarea agrupadas por Cargo del Colaborador.
+ * Para extraer horas por proyecto y tipoTarea agrupadas por Cargo.
+ * Con fila total con cargo en null.
  */
 @JsonAutoDetect
 @ApiModel
@@ -103,7 +104,7 @@ public class ReporteHoras1 {
                 ", precioEstimado=" + precioEstimado +
                 ", proyecto=" + proyecto.getCodigo() +
                 ", tipoTarea=" + tipoTarea.getCodigo() +
-                ", cargo=" + cargo +
+                ", cargo=" + ((cargo != null) ? cargo.getCodigo() : "-") +
                 '}';
     }
 }

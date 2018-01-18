@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import coop.magnesium.sulfur.api.dto.EstimacionProyectoTipoTareaXCargo;
-import coop.magnesium.sulfur.api.dto.HorasProyectoTipoTareaCargoXColaborador;
 import coop.magnesium.sulfur.api.dto.HorasProyectoXCargo;
 import coop.magnesium.sulfur.api.dto.ReporteHoras1;
 import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
@@ -127,13 +126,13 @@ public class ReporteServiceTest {
         Colaborador colaborador1 = colaboradorDao.save(this.colaborador_admin);
         Colaborador colaborador2 = colaboradorDao.save(this.colaborador_user);
 
-        Estimacion estimacion = new Estimacion(proyecto1, null, LocalDate.now());
-        estimacion.getEstimacionDetalleList().add(new EstimacionDetalle(tipoTarea1, cargo1, Duration.ofHours(3), new BigDecimal(150.5)));
-        estimacion.getEstimacionDetalleList().add(new EstimacionDetalle(tipoTarea1, cargo2, Duration.ofHours(6), new BigDecimal(170)));
+        Estimacion estimacion = new Estimacion(proyecto1, null, LocalDate.now(), new BigDecimal(150));
+        estimacion.getEstimacionDetalleList().add(new EstimacionDetalle(tipoTarea1, cargo1, Duration.ofHours(3)));
+        estimacion.getEstimacionDetalleList().add(new EstimacionDetalle(tipoTarea1, cargo2, Duration.ofHours(6)));
         estimacionDao.save(estimacion);
 
-        Estimacion estimacion2 = new Estimacion(proyecto1, null, LocalDate.now().plusDays(1));
-        estimacion2.getEstimacionDetalleList().add(new EstimacionDetalle(tipoTarea1, cargo1, Duration.ofHours(3), new BigDecimal(150.5)));
+        Estimacion estimacion2 = new Estimacion(proyecto1, null, LocalDate.now().plusDays(1), new BigDecimal(150));
+        estimacion2.getEstimacionDetalleList().add(new EstimacionDetalle(tipoTarea1, cargo1, Duration.ofHours(3)));
         estimacionDao.save(estimacion2);
 
         Hora hora = new Hora(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, colaborador1);
@@ -173,18 +172,7 @@ public class ReporteServiceTest {
     }
 
 
-    @Test
-    @InSequence(2)
-    public void horasXCargo() {
 
-        proyecto1.setId(1L);
-        tipoTarea1.setId(1L);
-
-
-        List<ReporteHoras1> reporteHoras1 = reporteDao.reporteHoras1(proyecto1, tipoTarea1);
-        reporteHoras1.forEach(reporteHoras11 -> logger.info(reporteHoras11.toString()));
-
-    }
 
     @Test
     @InSequence(3)
@@ -196,62 +184,16 @@ public class ReporteServiceTest {
         estimacionProyectoTipoTareaXCargos.forEach(estimacionProyectoTipoTareaXCargo -> {
             logger.info(estimacionProyectoTipoTareaXCargo.toString());
             if (estimacionProyectoTipoTareaXCargo.cargo.getCodigo().equals("C1")) {
-                assertEquals(BigDecimal.valueOf(6).setScale(2, RoundingMode.CEILING), estimacionProyectoTipoTareaXCargo.cantidadHoras);
+                assertEquals(BigDecimal.valueOf(6).setScale(2, RoundingMode.HALF_DOWN), estimacionProyectoTipoTareaXCargo.cantidadHoras);
 
             } else {
-                assertEquals(BigDecimal.valueOf(6).setScale(2, RoundingMode.CEILING), estimacionProyectoTipoTareaXCargo.cantidadHoras);
+                assertEquals(BigDecimal.valueOf(6).setScale(2, RoundingMode.HALF_DOWN), estimacionProyectoTipoTareaXCargo.cantidadHoras);
             }
         });
 
         assertEquals(2, estimacionProyectoTipoTareaXCargos.size());
     }
 
-    @Test
-    @InSequence(4)
-    public void totalHorasXCargo() {
-        proyecto1.setId(1L);
-
-        List<HorasProyectoXCargo> horasProyectoXCargo = horaDao.findHorasProyectoXCargo(proyecto1);
-        horasProyectoXCargo.forEach(horasProyectoXCargo1 -> {
-            logger.info(horasProyectoXCargo1.toString());
-            if (horasProyectoXCargo1.cargo.getCodigo().equals("C1")) {
-                assertEquals(45, horasProyectoXCargo1.cantidadHoras.toHours());
-
-            } else {
-                assertEquals(45, horasProyectoXCargo1.cantidadHoras.toHours());
-            }
-        });
-
-        assertEquals(2, horasProyectoXCargo.size());
-    }
-
-    @Test
-    @InSequence(5)
-    public void totalHorasCargo1() {
-        proyecto1.setId(1L);
-        tipoTarea1.setId(1L);
-        cargo1.setId(1L);
-
-        List<HorasProyectoTipoTareaCargoXColaborador> horasProyectoTipoTareaCargoXColaborador = horaDao.findHorasProyectoTipoTareaCargoXColaborador(proyecto1, tipoTarea1, cargo1);
-        logger.info(horasProyectoTipoTareaCargoXColaborador.get(0).toString());
-        assertEquals(45, horasProyectoTipoTareaCargoXColaborador.get(0).cantidadHoras.toHours());
-        assertEquals(cargo1.getCodigo(), horasProyectoTipoTareaCargoXColaborador.get(0).cargo.getCodigo());
-        assertEquals(1, horasProyectoTipoTareaCargoXColaborador.size());
-    }
-
-    @Test
-    @InSequence(6)
-    public void totalHorasCargo2() {
-        proyecto1.setId(1L);
-        tipoTarea1.setId(1L);
-        cargo2.setId(2L);
-
-        List<HorasProyectoTipoTareaCargoXColaborador> horasProyectoTipoTareaCargoXColaborador = horaDao.findHorasProyectoTipoTareaCargoXColaborador(proyecto1, tipoTarea1, cargo2);
-        logger.info(horasProyectoTipoTareaCargoXColaborador.get(0).toString());
-        assertEquals(45, horasProyectoTipoTareaCargoXColaborador.get(0).cantidadHoras.toHours());
-        assertEquals(cargo2.getCodigo(), horasProyectoTipoTareaCargoXColaborador.get(0).cargo.getCodigo());
-        assertEquals(1, horasProyectoTipoTareaCargoXColaborador.size());
-    }
 
     @Test
     @InSequence(7)
@@ -266,9 +208,13 @@ public class ReporteServiceTest {
         List<ReporteHoras1> horaList = response.readEntity(new GenericType<List<ReporteHoras1>>() {
         });
         assertEquals(3, horaList.size());
-        assertEquals(25, horaList.get(0).cantidadHoras);
-        assertEquals(25, horaList.get(1).cantidadHoras);
-        assertEquals(50, horaList.get(2).cantidadHoras);
+        horaList.forEach(reporteHoras1 -> {
+            //Fila total
+            if (reporteHoras1.cargo == null) {
+                assertEquals(new BigDecimal(50).setScale(2, RoundingMode.HALF_DOWN), reporteHoras1.cantidadHoras);
+
+            }
+        });
 
     }
 
@@ -285,9 +231,13 @@ public class ReporteServiceTest {
         List<ReporteHoras1> horaList = response.readEntity(new GenericType<List<ReporteHoras1>>() {
         });
         assertEquals(3, horaList.size());
-        assertEquals(20, horaList.get(0).cantidadHoras);
-        assertEquals(20.10, horaList.get(1).cantidadHoras);
-        assertEquals(40.10, horaList.get(2).cantidadHoras);
+        horaList.forEach(reporteHoras1 -> {
+            //Fila total
+            if (reporteHoras1.cargo == null) {
+                assertEquals(new BigDecimal(30.17).setScale(2, RoundingMode.HALF_DOWN), reporteHoras1.cantidadHoras);
+
+            }
+        });
 
     }
 
