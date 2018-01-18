@@ -198,7 +198,7 @@ public class ReporteServiceTest {
     @Test
     @InSequence(7)
     @RunAsClient
-    public void getHorasProyectoTareaXCargo(@ArquillianResteasyResource final WebTarget webTarget) {
+    public void getReporte1V1(@ArquillianResteasyResource final WebTarget webTarget) {
         final Response response = webTarget
                 .path("/reportes/horas/proyecto/1/tarea/1")
                 .request(MediaType.APPLICATION_JSON)
@@ -221,7 +221,7 @@ public class ReporteServiceTest {
     @Test
     @InSequence(8)
     @RunAsClient
-    public void getHorasProyectoTareaXCargo2(@ArquillianResteasyResource final WebTarget webTarget) {
+    public void getReporte1V2(@ArquillianResteasyResource final WebTarget webTarget) {
         final Response response = webTarget
                 .path("/reportes/horas/proyecto/1/tarea/2")
                 .request(MediaType.APPLICATION_JSON)
@@ -235,6 +235,29 @@ public class ReporteServiceTest {
             //Fila total
             if (reporteHoras1.cargo == null) {
                 assertEquals(new BigDecimal(30.17).setScale(2, RoundingMode.HALF_DOWN), reporteHoras1.cantidadHoras);
+
+            }
+        });
+
+    }
+
+    @Test
+    @InSequence(9)
+    @RunAsClient
+    public void getReporte1Totales(@ArquillianResteasyResource final WebTarget webTarget) {
+        final Response response = webTarget
+                .path("/reportes/horas/proyecto/1")
+                .request(MediaType.APPLICATION_JSON)
+                .header("AUTHORIZATION", "ADMIN:2")
+                .get();
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        List<ReporteHoras1> horaList = response.readEntity(new GenericType<List<ReporteHoras1>>() {
+        });
+        assertEquals(3, horaList.size());
+        horaList.forEach(reporteHoras1 -> {
+            //Fila total
+            if (reporteHoras1.cargo == null) {
+                assertEquals(new BigDecimal(80.17).setScale(2, RoundingMode.HALF_DOWN), reporteHoras1.cantidadHoras);
 
             }
         });

@@ -110,6 +110,29 @@ public class ReportesService {
     }
 
     @GET
+    @Path("horas/proyecto/{proyecto_id}")
+    @JWTTokenNeeded
+    @RoleNeeded({Role.ADMIN})
+    @Logged
+    @ApiOperation(value = "Horas de Proyecto agrupadas por Cargo", response = ReporteHoras1.class, responseContainer = "List")
+    public Response reporte1Totales(@PathParam("proyecto_id") Long proyecto_id) {
+        try {
+            Proyecto proyecto = proyectoDao.findById(proyecto_id);
+            if (proyecto == null)
+                throw new MagnesiumNotFoundException("Proyecto no encontrado");
+
+            List<ReporteHoras1> reporteHoras1List = reportesDao.reporteHoras1Totales(proyecto);
+            reporteHoras1List.forEach(reporteHoras1 -> logger.info(reporteHoras1.toString()));
+            return Response.ok(reporteHoras1List).build();
+
+        } catch (MagnesiumNotFoundException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        } catch (Exception e) {
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+
+    @GET
     @Path("estimaciones/proyecto/{proyecto_id}/tarea/{tarea_id}")
     @JWTTokenNeeded
     @RoleNeeded({Role.ADMIN})
@@ -124,24 +147,6 @@ public class ReportesService {
                 throw new MagnesiumNotFoundException("Tarea no encontrada");
 
 
-            return Response.ok(null).build();
-        } catch (MagnesiumNotFoundException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
-        } catch (Exception e) {
-            return Response.serverError().entity(e.getMessage()).build();
-        }
-    }
-
-    @GET
-    @Path("horas/proyecto/{proyecto_id}")
-    @JWTTokenNeeded
-    @RoleNeeded({Role.ADMIN})
-    @ApiOperation(value = "Horas de Proyecto agrupadas por Cargo", response = ReporteHoras1.class, responseContainer = "List")
-    public Response findHorasProyectoXCargo(@PathParam("proyecto_id") Long proyecto_id) {
-        try {
-            Proyecto proyecto = proyectoDao.findById(proyecto_id);
-            if (proyecto == null)
-                throw new MagnesiumNotFoundException("Proyecto no encontrado");
             return Response.ok(null).build();
         } catch (MagnesiumNotFoundException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
