@@ -174,26 +174,6 @@ public class ReporteServiceTest {
 
 
 
-    @Test
-    @InSequence(3)
-    public void estimacionesXCargo() {
-        proyecto1.setId(1L);
-        tipoTarea1.setId(1L);
-
-        List<EstimacionProyectoTipoTareaXCargo> estimacionProyectoTipoTareaXCargos = estimacionDao.findEstimacionProyectoTipoTareaXCargo(proyecto1, tipoTarea1);
-        estimacionProyectoTipoTareaXCargos.forEach(estimacionProyectoTipoTareaXCargo -> {
-            logger.info(estimacionProyectoTipoTareaXCargo.toString());
-            if (estimacionProyectoTipoTareaXCargo.cargo.getCodigo().equals("C1")) {
-                assertEquals(BigDecimal.valueOf(6).setScale(2, RoundingMode.HALF_DOWN), estimacionProyectoTipoTareaXCargo.cantidadHoras);
-
-            } else {
-                assertEquals(BigDecimal.valueOf(6).setScale(2, RoundingMode.HALF_DOWN), estimacionProyectoTipoTareaXCargo.cantidadHoras);
-            }
-        });
-
-        assertEquals(2, estimacionProyectoTipoTareaXCargos.size());
-    }
-
 
     @Test
     @InSequence(7)

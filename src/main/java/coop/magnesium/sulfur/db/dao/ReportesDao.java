@@ -38,17 +38,7 @@ public class ReportesDao {
     public List<ReporteHoras1> reporteHoras1(Proyecto proyecto, TipoTarea tipoTarea) {
 
         //Busco las estimaciones
-        Map<Cargo, EstimacionProyectoTipoTareaXCargo> estimacionesXCargo = new HashMap<>();
-        estimacionDao.findAllByProyecto(proyecto)
-                .forEach(estimacion -> estimacion.getEstimacionDetalleList().forEach(estimacionDetalle -> {
-                    if (estimacionDetalle.getTipoTarea().equals(tipoTarea)) {
-                        estimacionesXCargo.computeIfAbsent(estimacionDetalle.getCargo(), k -> new EstimacionProyectoTipoTareaXCargo(estimacion.getProyecto(), estimacionDetalle.getTipoTarea(), estimacionDetalle.getCargo(), estimacion.getPrecioTotal(), TimeUtils.durationToBigDecimal(estimacionDetalle.getDuracion())));
-                        estimacionesXCargo.computeIfPresent(estimacionDetalle.getCargo(), (cargo, estimacionProyectoTipoTareaXCargo) -> {
-                            estimacionProyectoTipoTareaXCargo.cantidadHoras.add(TimeUtils.durationToBigDecimal(estimacionDetalle.getDuracion()));
-                            return estimacionProyectoTipoTareaXCargo;
-                        });
-                    }
-                }));
+        Map<Cargo, EstimacionProyectoTipoTareaXCargo> estimacionesXCargo = estimacionDao.findEstimacionProyectoTipoTareaXCargo(proyecto, tipoTarea);
 
 
         //Aca va el resultado
@@ -105,15 +95,7 @@ public class ReportesDao {
      */
     public List<ReporteHoras1> reporteHoras1Totales(Proyecto proyecto) {
 //Busco las estimaciones
-        Map<Cargo, EstimacionProyectoTipoTareaXCargo> estimacionesXCargo = new HashMap<>();
-        estimacionDao.findAllByProyecto(proyecto)
-                .forEach(estimacion -> estimacion.getEstimacionDetalleList().forEach(estimacionDetalle -> {
-                    estimacionesXCargo.computeIfAbsent(estimacionDetalle.getCargo(), k -> new EstimacionProyectoTipoTareaXCargo(estimacion.getProyecto(), estimacionDetalle.getTipoTarea(), estimacionDetalle.getCargo(), estimacion.getPrecioTotal(), TimeUtils.durationToBigDecimal(estimacionDetalle.getDuracion())));
-                    estimacionesXCargo.computeIfPresent(estimacionDetalle.getCargo(), (cargo, estimacionProyectoTipoTareaXCargo) -> {
-                        estimacionProyectoTipoTareaXCargo.cantidadHoras.add(TimeUtils.durationToBigDecimal(estimacionDetalle.getDuracion()));
-                        return estimacionProyectoTipoTareaXCargo;
-                    });
-                }));
+        Map<Cargo, EstimacionProyectoTipoTareaXCargo> estimacionesXCargo = estimacionDao.findEstimacionProyectoXCargo(proyecto);
 
 
         //Aca va el resultado
