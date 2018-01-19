@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,8 @@ public class Estimacion {
     @NotNull
     @ManyToOne
     private Proyecto proyecto;
-
+    @NotNull
+    private BigDecimal precioTotal;
     private String descripcion;
 
     @NotNull
@@ -39,21 +41,19 @@ public class Estimacion {
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate fecha;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
-            name = "estimaciondetalle",
-            joinColumns = @JoinColumn(name = "estimacion_id")
-    )
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "estimacion_id")
     private List<EstimacionDetalle> estimacionDetalleList = new ArrayList<>();
 
 
     public Estimacion() {
     }
 
-    public Estimacion(Proyecto proyecto, String descripcion, LocalDate fecha) {
+    public Estimacion(Proyecto proyecto, String descripcion, LocalDate fecha, BigDecimal precioTotal) {
         this.proyecto = proyecto;
         this.descripcion = descripcion;
         this.fecha = fecha;
+        this.precioTotal = precioTotal;
     }
 
     public Long getId() {
@@ -92,11 +92,20 @@ public class Estimacion {
         this.fecha = fecha;
     }
 
+    public BigDecimal getPrecioTotal() {
+        return precioTotal;
+    }
+
+    public void setPrecioTotal(BigDecimal precioTotal) {
+        this.precioTotal = precioTotal;
+    }
+
     @Override
     public String toString() {
         return "Estimacion{" +
                 "id=" + id +
-                ", proyecto=" + proyecto +
+                ", proyecto=" + proyecto.getCodigo() +
+                ", precioTotal=" + precioTotal +
                 ", descripcion='" + descripcion + '\'' +
                 ", fecha=" + fecha +
                 ", estimacionDetalleList=" + estimacionDetalleList +

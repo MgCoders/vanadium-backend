@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import coop.magnesium.sulfur.db.entities.Cargo;
 import coop.magnesium.sulfur.db.entities.Proyecto;
 import coop.magnesium.sulfur.db.entities.TipoTarea;
+import coop.magnesium.sulfur.utils.TimeUtils;
 import io.swagger.annotations.ApiModel;
 
 import java.math.BigDecimal;
@@ -22,9 +23,17 @@ public class EstimacionProyectoTipoTareaXCargo {
     public Cargo cargo;
     public BigDecimal precioTotal;
     @JsonIgnore
-    public Duration cantidadHoras;
+    public BigDecimal cantidadHoras;
 
     public EstimacionProyectoTipoTareaXCargo() {
+    }
+
+    public EstimacionProyectoTipoTareaXCargo(Proyecto proyecto, TipoTarea tipoTarea, Cargo cargo, BigDecimal precioTotal, BigDecimal cantidadHoras) {
+        this.proyecto = proyecto;
+        this.tipoTarea = tipoTarea;
+        this.cargo = cargo;
+        this.precioTotal = precioTotal;
+        this.cantidadHoras = cantidadHoras;
     }
 
     public EstimacionProyectoTipoTareaXCargo(Proyecto proyecto, TipoTarea tipoTarea, Cargo cargo, BigDecimal precioTotal, Long cantidadHoras) {
@@ -32,7 +41,7 @@ public class EstimacionProyectoTipoTareaXCargo {
         this.tipoTarea = tipoTarea;
         this.cargo = cargo;
         this.precioTotal = precioTotal;
-        this.cantidadHoras = Duration.ofNanos(cantidadHoras);
+        this.cantidadHoras = TimeUtils.durationToBigDecimal(Duration.ofNanos(cantidadHoras));
     }
 
     public Proyecto getProyecto() {
@@ -51,16 +60,16 @@ public class EstimacionProyectoTipoTareaXCargo {
         return precioTotal;
     }
 
-    public Duration getCantidadHoras() {
+    public BigDecimal getCantidadHoras() {
         return cantidadHoras;
     }
 
     @Override
     public String toString() {
         return "EstimacionProyectoTipoTareaXCargo{" +
-                "proyecto=" + proyecto +
-                ", tipoTarea=" + tipoTarea +
-                ", cargo=" + cargo +
+                "proyecto=" + proyecto.getCodigo() +
+                ", tipoTarea=" + tipoTarea.getCodigo() +
+                ", cargo=" + cargo.getCodigo() +
                 ", precioTotal=" + precioTotal +
                 ", cantidadHoras=" + cantidadHoras +
                 '}';

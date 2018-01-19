@@ -9,29 +9,32 @@ import com.fasterxml.jackson.datatype.jsr310.ser.DurationSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import javax.persistence.Embeddable;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.Duration;
 
 /**
  * Created by rsperoni on 17/12/17.
  */
-@Embeddable
+@Entity
 @JsonAutoDetect
 @ApiModel
 public class HoraDetalle {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     @NotNull
-    @ManyToOne
+    @ManyToOne(optional = false)
     private Proyecto proyecto;
     @NotNull
-    @ManyToOne
+    @ManyToOne(optional = false)
     private TipoTarea tipoTarea;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "'PT'HH'H'MM'M'")
     @ApiModelProperty(example = "PT23H59M", dataType = "dateTime")
     @JsonDeserialize(using = DurationDeserializer.class)
     @JsonSerialize(using = DurationSerializer.class)
+    @Column(nullable = false)
     private Duration duracion;
 
     public HoraDetalle() {
@@ -67,11 +70,20 @@ public class HoraDetalle {
         this.duracion = duracion;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
         return "HoraDetalle{" +
-                "proyecto=" + proyecto +
-                ", tipoTarea=" + tipoTarea +
+                "id=" + id +
+                ", proyecto=" + proyecto.getCodigo() +
+                ", tipoTarea=" + tipoTarea.getCodigo() +
                 ", duracion=" + duracion +
                 '}';
     }

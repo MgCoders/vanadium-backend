@@ -1,7 +1,8 @@
 package coop.magnesium.sulfur.api;
 
-import coop.magnesium.sulfur.api.dto.HorasProyectoTipoTareaXCargo;
+import coop.magnesium.sulfur.api.dto.EstimacionProyectoTipoTareaXCargo;
 import coop.magnesium.sulfur.api.dto.HorasProyectoXCargo;
+import coop.magnesium.sulfur.api.dto.ReporteHoras1;
 import coop.magnesium.sulfur.db.dao.CargoDao;
 import coop.magnesium.sulfur.db.dao.EstimacionDao;
 import coop.magnesium.sulfur.db.dao.ProyectoDao;
@@ -23,14 +24,18 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import javax.inject.Inject;
+import javax.validation.groups.ConvertGroup;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
@@ -53,6 +58,8 @@ public class EstimacionServiceTest {
     TipoTareaDao tipoTareaDao;
     @Inject
     Logger logger;
+    @Inject
+    EstimacionDao estimacionDao;
 
 
     @Deployment(testable = true)
@@ -95,7 +102,7 @@ public class EstimacionServiceTest {
         final Response response = webTarget
                 .path("/estimaciones")
                 .request(MediaType.APPLICATION_JSON)
-                .post(Entity.json(new Estimacion(this.proyecto, null, LocalDate.now())));
+                .post(Entity.json(new Estimacion(this.proyecto, null, LocalDate.now(), new BigDecimal(150))));
         assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
         Estimacion estimacion = response.readEntity(Estimacion.class);
         assertEquals(1, estimacion.getId().longValue());
@@ -105,9 +112,9 @@ public class EstimacionServiceTest {
     @InSequence(3)
     @RunAsClient
     public void createEstmacion2(@ArquillianResteasyResource final WebTarget webTarget) {
-        Estimacion estimacion = new Estimacion(this.proyecto, null, LocalDate.now());
-        estimacion.getEstimacionDetalleList().add(new EstimacionDetalle(this.tipoTarea, this.cargo, Duration.ofHours(3), new BigDecimal(150.5)));
-        estimacion.getEstimacionDetalleList().add(new EstimacionDetalle(this.tipoTarea, this.cargo, Duration.ofHours(6), new BigDecimal(170)));
+        Estimacion estimacion = new Estimacion(this.proyecto, null, LocalDate.now(), new BigDecimal(160));
+        estimacion.getEstimacionDetalleList().add(new EstimacionDetalle(this.tipoTarea, this.cargo, Duration.ofHours(3)));
+        estimacion.getEstimacionDetalleList().add(new EstimacionDetalle(this.tipoTarea, this.cargo, Duration.ofHours(6)));
         final Response response = webTarget
                 .path("/estimaciones")
                 .request(MediaType.APPLICATION_JSON)
@@ -117,7 +124,30 @@ public class EstimacionServiceTest {
         assertEquals(2, estimacionCreated.getId().longValue());
     }
 
-    //Todo: servicios y tests de consultas sobre las estimaciones.
+    @Test
+    @InSequence(4)
+    public void consulta1() {
+        estimacionDao.findEstimacionProyectoTipoTareaXCargo(this.proyecto, this.tipoTarea).forEach((key, value) -> {
+            assertEquals(this.cargo.getId(),value.cargo.getId());
+            assertEquals(new BigDecimal(9).setScale(2),value.cantidadHoras);
+            assertEquals(new BigDecimal(160).setScale(2),value.precioTotal);
+        });
+
+    }
+
+    @Test
+    @InSequence(5)
+    @RunAsClient
+    public void consulta2(@ArquillianResteasyResource final WebTarget webTarget) {
+        final Response response = webTarget
+                .path("/estimaciones/proyecto/1")
+                .request(MediaType.APPLICATION_JSON)
+                .get();
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        List<Estimacion> list = response.readEntity(new GenericType<List<Estimacion>>() {
+        });
+        assertEquals(2, list.size());
+    }
 
 
 }

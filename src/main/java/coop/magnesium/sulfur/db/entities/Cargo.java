@@ -28,11 +28,8 @@ public class Cargo {
     @NotNull(message = "El campo código no puede estar vacío")
     @Column(unique = true)
     private String codigo;
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
-            name = "precioHoraHistoria",
-            joinColumns = @JoinColumn(name = "cargo_id")
-    )
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "cargo_id")
     private Set<PrecioHora> precioHoraHistoria = new HashSet<>();
 
     public Cargo() {
@@ -42,6 +39,11 @@ public class Cargo {
         this.codigo = codigo;
         this.nombre = nombre;
         this.precioHoraHistoria.add(new PrecioHora(precioHora, LocalDate.now()));
+    }
+
+    @PostPersist
+    public void prePersist() {
+        System.out.println(this.toString());
     }
 
     public String getCodigo() {
@@ -78,7 +80,7 @@ public class Cargo {
      * @return
      */
     public Optional<PrecioHora> getPrecioHora(LocalDate diaReferencia) {
-        return precioHoraHistoria.stream().sorted(Comparator.comparing(PrecioHora::getVigenciaDesde).reversed()).filter(precioHora -> precioHora.getVigenciaDesde().isBefore(diaReferencia)).findFirst();
+        return precioHoraHistoria.stream().sorted(Comparator.comparing(PrecioHora::getVigenciaDesde).reversed()).filter(precioHora -> !precioHora.getVigenciaDesde().isAfter(diaReferencia)).findFirst();
     }
 
     @Override
