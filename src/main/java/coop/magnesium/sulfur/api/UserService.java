@@ -3,7 +3,7 @@ package coop.magnesium.sulfur.api;
 
 import coop.magnesium.sulfur.db.dao.ColaboradorDao;
 import coop.magnesium.sulfur.db.entities.Colaborador;
-import coop.magnesium.sulfur.db.entities.NotificacionColaborador;
+import coop.magnesium.sulfur.db.entities.Notificacion;
 import coop.magnesium.sulfur.db.entities.TipoNotificacion;
 import coop.magnesium.sulfur.system.MailEvent;
 import coop.magnesium.sulfur.system.MailService;
@@ -50,7 +50,7 @@ public class UserService {
     Event<MailEvent> mailEvent;
 
     @Inject
-    Event<NotificacionColaborador> notificacionEvent;
+    Event<Notificacion> notificacionEvent;
 
     @Inject
     @PropertiesFromFile
@@ -85,7 +85,7 @@ public class UserService {
             String token = issueToken(email, map);
             sulfurUser.setToken(token);
             //Notificacion login
-            notificacionEvent.fire(new NotificacionColaborador(TipoNotificacion.LOGIN, null, sulfurUser, null));
+            notificacionEvent.fire(new Notificacion(TipoNotificacion.LOGIN, null, sulfurUser, null));
             return Response.ok(sulfurUser).build();
         } catch (MagnesiumSecurityException | MagnesiumBdMultipleResultsException | MagnesiumBdNotFoundException e) {
             logger.warning(e.getMessage());
