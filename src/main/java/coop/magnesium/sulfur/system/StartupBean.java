@@ -1,6 +1,5 @@
 package coop.magnesium.sulfur.system;
 
-import coop.magnesium.sulfur.db.dao.CargoDao;
 import coop.magnesium.sulfur.db.dao.ColaboradorDao;
 import coop.magnesium.sulfur.db.entities.Colaborador;
 import coop.magnesium.sulfur.utils.DataRecuperacionPassword;
@@ -25,8 +24,6 @@ import java.util.logging.Logger;
 @Startup
 public class StartupBean {
 
-    @EJB
-    CargoDao cargoDao;
     @EJB
     ColaboradorDao colaboradorDao;
     @Inject
