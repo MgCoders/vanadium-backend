@@ -88,7 +88,7 @@ public class HoraService {
 
             hora.cacularSubtotalDetalle();
             Hora horaCreada = horaDao.save(hora);
-            notificacionEvent.fire(new Notificacion(TipoNotificacion.NUEVA_HORA, null, hora.getColaborador(), null, hora));
+            notificacionEvent.fire(new Notificacion(TipoNotificacion.NUEVA_HORA, hora.getColaborador(), "Carga de horas.", hora));
 
             return Response.status(Response.Status.CREATED).entity(horaCreada).build();
 
@@ -185,7 +185,7 @@ public class HoraService {
 
             hora.cacularSubtotalDetalle();
             hora = horaDao.save(hora);
-            notificacionEvent.fire(new Notificacion(TipoNotificacion.EDICION_HORA, null, hora.getColaborador(), null, hora));
+            notificacionEvent.fire(new Notificacion(TipoNotificacion.EDICION_HORA, hora.getColaborador(), "Edición de horas", hora));
 
             return Response.ok(hora).build();
         } catch (Exception e) {

@@ -8,6 +8,7 @@ import coop.magnesium.sulfur.db.dao.NotificacionDao;
 import coop.magnesium.sulfur.db.entities.Colaborador;
 import coop.magnesium.sulfur.db.entities.Notificacion;
 import coop.magnesium.sulfur.db.entities.Role;
+import coop.magnesium.sulfur.system.StartupBean;
 import coop.magnesium.sulfur.utils.ex.MagnesiumNotFoundException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -43,6 +44,8 @@ public class NotificacionService {
     private NotificacionDao notificacionDao;
     @EJB
     private ColaboradorDao colaboradorDao;
+    @EJB
+    private StartupBean startupBean;
 
 
     @GET
@@ -74,6 +77,20 @@ public class NotificacionService {
             return Response.ok(notificacionList).build();
         } catch (MagnesiumNotFoundException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        } catch (Exception e) {
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+
+    @PUT
+    @Path("alertas/horas-sin-cargar")
+    @JWTTokenNeeded
+    @RoleNeeded({Role.ADMIN})
+    @ApiOperation(value = "Disparar alerta horas sin cargar", response = Response.class)
+    public Response findByColaborador() {
+        try {
+            startupBean.alertaHorasSinCargar();
+            return Response.ok().build();
         } catch (Exception e) {
             return Response.serverError().entity(e.getMessage()).build();
         }

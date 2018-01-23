@@ -8,6 +8,7 @@ import javax.ejb.*;
 import javax.enterprise.event.Observes;
 import javax.enterprise.event.TransactionPhase;
 import javax.inject.Inject;
+import java.time.LocalDate;
 import java.util.logging.Logger;
 
 /**
@@ -24,9 +25,16 @@ public class NotificationesService {
     @Logged
     @Asynchronous
     @Lock(LockType.READ)
-    public void nuevaNotificacionHoras(@Observes(during = TransactionPhase.AFTER_SUCCESS) Notificacion notificacionHoras) {
+    public void nuevaNotificacionHoras(@Observes(during = TransactionPhase.AFTER_SUCCESS) Notificacion notificacion) {
         try {
-            notificacionDao.save(notificacionHoras);
+            Notificacion notificacionSaved = notificacionDao.save(notificacion);
+            switch (notificacionSaved.getTipo()) {
+                case NUEVA_HORA:
+                case EDICION_HORA:
+                    if (notificacion.getHora().getDia().isBefore(LocalDate.now().minusDays(2))) {
+                        logger.info("Alerta. Hora atrasada!!!!");
+                    }
+            }
         } catch (Exception e) {
             logger.severe(e.getMessage());
         }

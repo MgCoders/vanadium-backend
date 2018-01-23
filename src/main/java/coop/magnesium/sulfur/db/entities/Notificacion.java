@@ -31,9 +31,8 @@ public class Notificacion {
     @Enumerated(EnumType.STRING)
     private TipoNotificacion tipo;
     private String texto;
-    private boolean email;
-    private Colaborador notificado;
-    private Colaborador protagonista;
+    @ManyToOne
+    private Colaborador colaborador;
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy'T'HH:mm")
     @ApiModelProperty(dataType = "date", example = "23-01-2017T16:45")
@@ -41,26 +40,27 @@ public class Notificacion {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime fechaHora;
 
-    public Notificacion(TipoNotificacion tipo, Colaborador notificado, Colaborador protagonista, String texto) {
+    public Notificacion(TipoNotificacion tipo, Colaborador colaborador, String texto) {
         this.tipo = tipo;
-        this.email = notificado != null;
-        this.notificado = notificado;
-        this.protagonista = protagonista;
+        this.colaborador = colaborador;
         this.fechaHora = LocalDateTime.now();
+        this.texto = texto;
     }
 
-    public Notificacion(TipoNotificacion tipo, Colaborador notificado, Colaborador protagonista, String texto, Hora hora) {
+    public Notificacion(TipoNotificacion tipo, Colaborador colaborador, String texto, Hora hora) {
+        this.tipo = tipo;
+        this.colaborador = colaborador;
+        this.fechaHora = LocalDateTime.now();
+        this.texto = texto;
         this.hora = hora;
-        if (getTexto() == null) {
-            switch (tipo) {
-                case LOGIN:
-                    setTexto(getProtagonista().getNombre() + " inició sesión en el sistema.");
-                    break;
-                default:
-                    setTexto("");
+    }
 
-            }
-        }
+    public Hora getHora() {
+        return hora;
+    }
+
+    public void setHora(Hora hora) {
+        this.hora = hora;
     }
 
     public Long getId() {
@@ -87,28 +87,12 @@ public class Notificacion {
         this.texto = texto;
     }
 
-    public boolean isEmail() {
-        return email;
+    public Colaborador getColaborador() {
+        return colaborador;
     }
 
-    public void setEmail(boolean email) {
-        this.email = email;
-    }
-
-    public Colaborador getNotificado() {
-        return notificado;
-    }
-
-    public void setNotificado(Colaborador notificado) {
-        this.notificado = notificado;
-    }
-
-    public Colaborador getProtagonista() {
-        return protagonista;
-    }
-
-    public void setProtagonista(Colaborador protagonista) {
-        this.protagonista = protagonista;
+    public void setColaborador(Colaborador colaborador) {
+        this.colaborador = colaborador;
     }
 
     public LocalDateTime getFechaHora() {
@@ -122,12 +106,11 @@ public class Notificacion {
     @Override
     public String toString() {
         return "Notificacion{" +
-                "id=" + id +
+                "hora=" + hora +
+                ", id=" + id +
                 ", tipo=" + tipo +
                 ", texto='" + texto + '\'' +
-                ", email=" + email +
-                ", notificado=" + notificado.getEmail() +
-                ", protagonista=" + protagonista.getEmail() +
+                ", colaborador=" + colaborador +
                 ", fechaHora=" + fechaHora +
                 '}';
     }

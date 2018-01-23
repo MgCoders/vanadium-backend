@@ -1,7 +1,10 @@
 package coop.magnesium.sulfur.system;
 
 import coop.magnesium.sulfur.db.dao.ColaboradorDao;
+import coop.magnesium.sulfur.db.dao.HoraDao;
 import coop.magnesium.sulfur.db.entities.Colaborador;
+import coop.magnesium.sulfur.db.entities.Notificacion;
+import coop.magnesium.sulfur.db.entities.TipoNotificacion;
 import coop.magnesium.sulfur.utils.DataRecuperacionPassword;
 import coop.magnesium.sulfur.utils.PasswordUtils;
 import coop.magnesium.sulfur.utils.ex.MagnesiumBdMultipleResultsException;
@@ -9,10 +12,9 @@ import coop.magnesium.sulfur.utils.ex.MagnesiumBdMultipleResultsException;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.*;
+import javax.enterprise.event.Event;
 import javax.inject.Inject;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
@@ -24,12 +26,17 @@ import java.util.logging.Logger;
 @Startup
 public class StartupBean {
 
-    @EJB
-    ColaboradorDao colaboradorDao;
+
     @Inject
     Logger logger;
     @Resource
     TimerService timerService;
+    @EJB
+    HoraDao horaDao;
+    @EJB
+    ColaboradorDao colaboradorDao;
+    @Inject
+    Event<Notificacion> notificacionEvent;
 
     private ConcurrentHashMap recuperacionPassword = null;
 
@@ -66,6 +73,21 @@ public class StartupBean {
         } else {
             recuperacionPassword.remove(token);
             return null;
+        }
+    }
+
+    @Schedule(hour = "7", persistent = false)
+    public void alertaHorasSinCargar() {
+        LocalDate hoy = LocalDate.now();
+        //Solo días de semana
+        if (!hoy.getDayOfWeek().equals(DayOfWeek.SATURDAY) && !hoy.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
+            colaboradorDao.findAll().stream().filter(colaborador -> colaborador.getCargo() != null)
+                    .forEach(colaborador -> {
+                        //Si hace más de 3 días que no hay horas
+                        if (horaDao.findAllByColaborador(colaborador, LocalDate.now().minusDays(3), LocalDate.now()).isEmpty()) {
+                            notificacionEvent.fire(new Notificacion(TipoNotificacion.FALTAN_HORAS, colaborador, "Más de dos días sin ingresar horas"));
+                        }
+                    });
         }
     }
 

@@ -85,7 +85,7 @@ public class UserService {
             String token = issueToken(email, map);
             sulfurUser.setToken(token);
             //Notificacion login
-            notificacionEvent.fire(new Notificacion(TipoNotificacion.LOGIN, null, sulfurUser, null));
+            notificacionEvent.fire(new Notificacion(TipoNotificacion.LOGIN, sulfurUser, "Login"));
             return Response.ok(sulfurUser).build();
         } catch (MagnesiumSecurityException | MagnesiumBdMultipleResultsException | MagnesiumBdNotFoundException e) {
             logger.warning(e.getMessage());
@@ -160,6 +160,7 @@ public class UserService {
             Colaborador colaborador = colaboradorDao.findByEmail(dataRecuperacionPassword.getEmail());
             if (colaborador == null) throw new MagnesiumBdNotFoundException("no existe colaborador");
             colaborador.setPassword(PasswordUtils.digestPassword(password));
+            notificacionEvent.fire(new Notificacion(TipoNotificacion.CAMBIO_PASSWORD, colaborador, "Cambio password."));
             return Response.ok().build();
         } catch (MagnesiumBdNotFoundException e) {
             logger.warning(e.getMessage());

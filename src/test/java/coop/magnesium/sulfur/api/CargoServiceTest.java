@@ -35,6 +35,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.logging.Logger;
@@ -167,7 +168,7 @@ public class CargoServiceTest {
     @InSequence(6)
     @RunAsClient
     public void editarCargoExiste(@ArquillianResteasyResource final WebTarget webTarget) {
-        Cargo cargo = new Cargo("JXR", "JUNIOR 2", new BigDecimal(33.2));
+        Cargo cargo = new Cargo("JXR", "JUNIOR 2", new BigDecimal(33.2).setScale(2, RoundingMode.CEILING));
         cargo.setId(1L);
         final Response response = webTarget
                 .path("/cargos/1")
@@ -176,14 +177,14 @@ public class CargoServiceTest {
         Cargo returned = response.readEntity(Cargo.class);
         assertEquals(cargo.getCodigo(), returned.getCodigo());
         assertEquals(cargo.getNombre(), returned.getNombre());
-        assertEquals(cargo.getPrecioHora(LocalDate.now()), returned.getPrecioHora(LocalDate.now()));
+        assertEquals(cargo.getPrecioHora(LocalDate.now()).get().getPrecioHora(), returned.getPrecioHora(LocalDate.now()).get().getPrecioHora());
     }
 
     @Test
     @InSequence(6)
     @RunAsClient
     public void editarCargoNoExiste(@ArquillianResteasyResource final WebTarget webTarget) {
-        Cargo cargo = new Cargo("JXR", "JUNIOR 2", new BigDecimal(33.2));
+        Cargo cargo = new Cargo("JXR", "JUNIOR 2", new BigDecimal(33.2).setScale(2, RoundingMode.CEILING));
         cargo.setId(2L);
         final Response response = webTarget
                 .path("/cargos/2")
@@ -204,7 +205,9 @@ public class CargoServiceTest {
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
         Cargo returned = response.readEntity(Cargo.class);
         assertEquals(2, returned.getPrecioHoraHistoria().size());
-        assertEquals(new BigDecimal(50.2), returned.getPrecioHora(LocalDate.now()).get().getPrecioHora());
+        assertEquals(new BigDecimal(50.2), returned.getPrecioHora(LocalDate.of(2017, 12, 01)).get().getPrecioHora());
+        assertEquals(new BigDecimal(33.2).setScale(2, RoundingMode.CEILING), returned.getPrecioHora(LocalDate.now()).get().getPrecioHora());
+
     }
 
     @Test
@@ -218,7 +221,7 @@ public class CargoServiceTest {
                 .post(Entity.json(precioHora));
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
         Cargo returned = response.readEntity(Cargo.class);
-        assertEquals(cuarentaYcinco, returned.getPrecioHora(LocalDate.now()).get().getPrecioHora());
+        assertEquals(cuarentaYcinco, returned.getPrecioHora(LocalDate.of(2017, 12, 15)).get().getPrecioHora());
         assertEquals(3, returned.getPrecioHoraHistoria().size());
     }
 
@@ -233,7 +236,7 @@ public class CargoServiceTest {
                 .post(Entity.json(precioHora));
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
         Cargo returned = response.readEntity(Cargo.class);
-        assertEquals(cuarentaYcinco, returned.getPrecioHora(LocalDate.now()).get().getPrecioHora().setScale(1, 1));
+        assertEquals(new BigDecimal(60.5), returned.getPrecioHora(LocalDate.of(2017, 12, 10)).get().getPrecioHora().setScale(1, 1));
         assertEquals(4, returned.getPrecioHoraHistoria().size());
     }
 
