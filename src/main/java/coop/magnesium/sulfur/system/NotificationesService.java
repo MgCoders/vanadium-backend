@@ -30,7 +30,6 @@ public class NotificationesService {
             Notificacion notificacionSaved = notificacionDao.save(notificacion);
             switch (notificacionSaved.getTipo()) {
                 case NUEVA_HORA:
-                case EDICION_HORA:
                     if (notificacion.getHora().getDia().isBefore(LocalDate.now().minusDays(2))) {
                         logger.info("Alerta. Hora atrasada!!!!");
                     }

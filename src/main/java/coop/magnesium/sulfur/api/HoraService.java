@@ -88,7 +88,7 @@ public class HoraService {
 
             hora.cacularSubtotalDetalle();
             Hora horaCreada = horaDao.save(hora);
-            notificacionEvent.fire(new Notificacion(TipoNotificacion.NUEVA_HORA, hora.getColaborador(), "Carga de horas.", hora));
+            notificacionEvent.fire(new Notificacion(TipoNotificacion.NUEVA_HORA, horaCreada.getColaborador(), "Carga de horas.", horaCreada));
 
             return Response.status(Response.Status.CREATED).entity(horaCreada).build();
 

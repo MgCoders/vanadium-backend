@@ -3,6 +3,7 @@ package coop.magnesium.sulfur.db.dao;
 import coop.magnesium.sulfur.db.entities.Colaborador;
 import coop.magnesium.sulfur.db.entities.Notificacion;
 
+import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -16,6 +17,7 @@ import java.util.List;
 /**
  * Created by rsperoni on 22/01/18.
  */
+@Stateless
 public class NotificacionDao extends AbstractDao<Notificacion, Long> {
 
     @PersistenceContext

@@ -34,11 +34,14 @@ public class Notificacion {
     @ManyToOne
     private Colaborador colaborador;
     @NotNull
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy'T'HH:mm")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @ApiModelProperty(dataType = "date", example = "23-01-2017T16:45")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime fechaHora;
+
+    public Notificacion() {
+    }
 
     public Notificacion(TipoNotificacion tipo, Colaborador colaborador, String texto) {
         this.tipo = tipo;
