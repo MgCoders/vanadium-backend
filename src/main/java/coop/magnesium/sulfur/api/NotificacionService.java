@@ -18,7 +18,7 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.logging.Logger;
@@ -53,7 +53,9 @@ public class NotificacionService {
     @RoleNeeded({Role.ADMIN})
     @ApiOperation(value = "Get notificaciones", response = Notificacion.class, responseContainer = "List")
     public Response findAll() {
-        List<Notificacion> notificacionList = notificacionDao.findAll();
+        LocalDateTime fechaFin = LocalDateTime.now();
+        LocalDateTime fechaIni = fechaFin.minusDays(3);
+        List<Notificacion> notificacionList = notificacionDao.findAll(fechaIni, fechaFin);
         return Response.ok(notificacionList).build();
     }
 
@@ -70,8 +72,8 @@ public class NotificacionService {
             if (colaborador == null)
                 throw new MagnesiumNotFoundException("colaborador no encontrado");
 
-            LocalDate fechaIni = LocalDate.parse(fechaIniString, formatter);
-            LocalDate fechaFin = LocalDate.parse(fechaFinString, formatter);
+            LocalDateTime fechaIni = LocalDateTime.parse(fechaIniString, formatter);
+            LocalDateTime fechaFin = LocalDateTime.parse(fechaFinString, formatter);
 
             List<Notificacion> notificacionList = notificacionDao.findAllByColaborador(colaborador, fechaIni, fechaFin);
             return Response.ok(notificacionList).build();

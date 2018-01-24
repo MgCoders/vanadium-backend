@@ -11,7 +11,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -33,17 +33,31 @@ public class NotificacionDao extends AbstractDao<Notificacion, Long> {
         return em;
     }
 
-    public List<Notificacion> findAllByColaborador(Colaborador colaborador, LocalDate ini, LocalDate fin) {
+    public List<Notificacion> findAllByColaborador(Colaborador colaborador, LocalDateTime ini, LocalDateTime fin) {
         CriteriaBuilder criteriaBuilder = this.getEntityManager().getCriteriaBuilder();
         CriteriaQuery criteriaQuery = criteriaBuilder.createQuery();
         Root entity = criteriaQuery.from(Notificacion.class);
         criteriaQuery.select(entity);
         Predicate colaboradorIsOk = criteriaBuilder.equal(entity.get("colaborador"), criteriaBuilder.parameter(Colaborador.class, "c"));
-        Predicate diaEntreFechas = criteriaBuilder.between(entity.get("fechaHora"), criteriaBuilder.parameter(LocalDate.class, "ini"), criteriaBuilder.parameter(LocalDate.class, "fin"));
+        Predicate diaEntreFechas = criteriaBuilder.between(entity.get("fechaHora"), criteriaBuilder.parameter(LocalDateTime.class, "ini"), criteriaBuilder.parameter(LocalDateTime.class, "fin"));
         criteriaQuery.where(criteriaBuilder.and(colaboradorIsOk, diaEntreFechas));
-        criteriaQuery.orderBy(criteriaBuilder.asc(entity.get("fechaHora")));
+        criteriaQuery.orderBy(criteriaBuilder.desc(entity.get("fechaHora")));
         Query query = this.getEntityManager().createQuery(criteriaQuery);
         query.setParameter("c", colaborador);
+        query.setParameter("ini", ini);
+        query.setParameter("fin", fin);
+        return (List<Notificacion>) query.getResultList();
+    }
+
+    public List<Notificacion> findAll(LocalDateTime ini, LocalDateTime fin) {
+        CriteriaBuilder criteriaBuilder = this.getEntityManager().getCriteriaBuilder();
+        CriteriaQuery criteriaQuery = criteriaBuilder.createQuery();
+        Root entity = criteriaQuery.from(Notificacion.class);
+        criteriaQuery.select(entity);
+        Predicate diaEntreFechas = criteriaBuilder.between(entity.get("fechaHora"), criteriaBuilder.parameter(LocalDateTime.class, "ini"), criteriaBuilder.parameter(LocalDateTime.class, "fin"));
+        criteriaQuery.where(diaEntreFechas);
+        criteriaQuery.orderBy(criteriaBuilder.desc(entity.get("fechaHora")));
+        Query query = this.getEntityManager().createQuery(criteriaQuery);
         query.setParameter("ini", ini);
         query.setParameter("fin", fin);
         return (List<Notificacion>) query.getResultList();

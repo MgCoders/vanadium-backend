@@ -86,6 +86,8 @@ public class HoraService {
             if (horaDao.existsByColaboradorIncompleta(hora.getColaborador()))
                 throw new MagnesiumException("El colaborador tiene horas incompletas");
 
+            //horas futuras
+
             hora.cacularSubtotalDetalle();
             Hora horaCreada = horaDao.save(hora);
             notificacionEvent.fire(new Notificacion(TipoNotificacion.NUEVA_HORA, horaCreada.getColaborador(), "Carga de horas.", horaCreada));
