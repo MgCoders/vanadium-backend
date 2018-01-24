@@ -5,10 +5,12 @@ import coop.magnesium.sulfur.db.entities.Notificacion;
 import coop.magnesium.sulfur.utils.Logged;
 
 import javax.ejb.*;
+import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.enterprise.event.TransactionPhase;
 import javax.inject.Inject;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 /**
@@ -21,6 +23,8 @@ public class NotificationesService {
     Logger logger;
     @EJB
     NotificacionDao notificacionDao;
+    @Inject
+    Event<MailEvent> mailEvent;
 
     @Logged
     @Asynchronous
@@ -31,11 +35,20 @@ public class NotificationesService {
             switch (notificacionSaved.getTipo()) {
                 case NUEVA_HORA:
                     if (notificacion.getHora().getDia().isBefore(LocalDate.now().minusDays(2))) {
-                        logger.info("Alerta. Hora atrasada!!!!");
+                        mailEvent.fire(
+                                new MailEvent(Arrays.asList("rsperoni@magnesium.coop,cbauza@magnesium.coop"),
+                                        MailService.generarEmailAviso(notificacion),
+                                        "MARQ: Alerta, carga de hora antigua"));
                     }
                     break;
                 case FALTAN_HORAS:
-
+                    mailEvent.fire(
+                            new MailEvent(Arrays.asList("rsperoni@magnesium.coop,cbauza@magnesium.coop"),
+                                    MailService.generarEmailAviso(notificacion),
+                                    "MARQ: Alerta, faltan horas"));
+                    break;
+                default:
+                    break;
             }
         } catch (Exception e) {
             logger.severe(e.getMessage());
