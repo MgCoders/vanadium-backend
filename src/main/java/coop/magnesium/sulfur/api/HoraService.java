@@ -8,7 +8,6 @@ import coop.magnesium.sulfur.db.dao.HoraDao;
 import coop.magnesium.sulfur.db.dao.ProyectoDao;
 import coop.magnesium.sulfur.db.entities.*;
 import coop.magnesium.sulfur.utils.Logged;
-import coop.magnesium.sulfur.utils.ex.MagnesiumBdAlredyExistsException;
 import coop.magnesium.sulfur.utils.ex.MagnesiumException;
 import coop.magnesium.sulfur.utils.ex.MagnesiumNotFoundException;
 import coop.magnesium.sulfur.utils.ex.MagnesiumSecurityException;
@@ -77,16 +76,14 @@ public class HoraService {
                 throw new MagnesiumSecurityException("Colaborador no coincide");
 
 
-            //si es mismo colaborador, misma fecha, error
-            Hora horaExists = horaDao.findByColaboradorFecha(hora.getColaborador(), hora.getDia());
-            if (horaExists != null)
-                throw new MagnesiumBdAlredyExistsException("Ya existe hora para esa fecha y colaborador");
-
             //si tiene horas incompletas
             if (horaDao.existsByColaboradorIncompleta(hora.getColaborador()))
                 throw new MagnesiumException("El colaborador tiene horas incompletas");
 
             //horas futuras
+            LocalDate hoy = LocalDate.now();
+            if (hora.getDia().isAfter(hoy))
+                throw new MagnesiumException("Está intentando cargar horas futuras");
 
             hora.cacularSubtotalDetalle();
             Hora horaCreada = horaDao.save(hora);

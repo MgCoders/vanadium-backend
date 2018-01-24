@@ -33,6 +33,9 @@ public class NotificationesService {
                     if (notificacion.getHora().getDia().isBefore(LocalDate.now().minusDays(2))) {
                         logger.info("Alerta. Hora atrasada!!!!");
                     }
+                    break;
+                case FALTAN_HORAS:
+
             }
         } catch (Exception e) {
             logger.severe(e.getMessage());
