@@ -4,9 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import coop.magnesium.sulfur.api.dto.EstimacionProyectoTipoTareaXCargo;
-import coop.magnesium.sulfur.api.dto.HorasProyectoTipoTareaCargoXColaborador;
-import coop.magnesium.sulfur.api.dto.HorasProyectoTipoTareaXCargo;
 import coop.magnesium.sulfur.api.dto.HorasProyectoXCargo;
+import coop.magnesium.sulfur.api.dto.ReporteHoras1;
 import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
 import coop.magnesium.sulfur.api.utils.RoleNeeded;
 import coop.magnesium.sulfur.db.dao.*;
@@ -33,6 +32,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -74,6 +74,8 @@ public class ReporteServiceTest {
     EstimacionDao estimacionDao;
     @Inject
     HoraDao horaDao;
+    @Inject
+    ReportesDao reporteDao;
     @Inject
     Logger logger;
 
@@ -124,147 +126,122 @@ public class ReporteServiceTest {
         Colaborador colaborador1 = colaboradorDao.save(this.colaborador_admin);
         Colaborador colaborador2 = colaboradorDao.save(this.colaborador_user);
 
-        Estimacion estimacion = new Estimacion(proyecto1, null, LocalDate.now());
-        estimacion.getEstimacionDetalleList().add(new EstimacionDetalle(tipoTarea1, cargo1, Duration.ofHours(3), new BigDecimal(150.5)));
-        estimacion.getEstimacionDetalleList().add(new EstimacionDetalle(tipoTarea1, cargo2, Duration.ofHours(6), new BigDecimal(170)));
+        Estimacion estimacion = new Estimacion(proyecto1, null, LocalDate.now(), new BigDecimal(150));
+        estimacion.getEstimacionDetalleList().add(new EstimacionDetalle(tipoTarea1, cargo1, Duration.ofHours(3)));
+        estimacion.getEstimacionDetalleList().add(new EstimacionDetalle(tipoTarea1, cargo2, Duration.ofHours(6)));
         estimacionDao.save(estimacion);
 
-        Estimacion estimacion2 = new Estimacion(proyecto1, null, LocalDate.now());
-        estimacion2.getEstimacionDetalleList().add(new EstimacionDetalle(tipoTarea1, cargo1, Duration.ofHours(3), new BigDecimal(150.5)));
+        Estimacion estimacion2 = new Estimacion(proyecto1, null, LocalDate.now().plusDays(1), new BigDecimal(150));
+        estimacion2.getEstimacionDetalleList().add(new EstimacionDetalle(tipoTarea1, cargo1, Duration.ofHours(3)));
         estimacionDao.save(estimacion2);
 
-        Hora hora = new Hora(LocalDate.of(2017, 12, 24), LocalTime.MIN, LocalTime.MAX, colaborador1);
-        hora.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea1, Duration.ofHours(23).plus(Duration.ofMinutes(30))));
+        Hora hora = new Hora(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, colaborador1);
+        hora.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea1, Duration.ofHours(20)));
         horaDao.save(hora);
 
-        Hora hora2 = new Hora(LocalDate.of(2017, 12, 24), LocalTime.MIN, LocalTime.MAX, colaborador2);
-        hora2.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea1, Duration.ofHours(15).plus(Duration.ofMinutes(30))));
+        Hora hora2 = new Hora(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, colaborador2);
+        hora2.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea1, Duration.ofHours(15)));
         horaDao.save(hora2);
 
-        Hora hora3 = new Hora(LocalDate.of(2017, 12, 25), LocalTime.MIN, LocalTime.MAX, colaborador2);
-        hora3.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea1, Duration.ofHours(20).plus(Duration.ofMinutes(30))));
+        Hora hora3 = new Hora(LocalDate.now().plusDays(1), LocalTime.MIN, LocalTime.MAX, colaborador2);
+        hora3.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea1, Duration.ofHours(10)));
         horaDao.save(hora3);
 
-        Hora hora4 = new Hora(LocalDate.of(2017, 12, 25), LocalTime.MIN, LocalTime.MAX, colaborador1);
-        hora4.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea1, Duration.ofHours(20).plus(Duration.ofMinutes(30))));
+        Hora hora4 = new Hora(LocalDate.now().plusDays(1), LocalTime.MIN, LocalTime.MAX, colaborador1);
+        hora4.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea1, Duration.ofHours(5)));
         horaDao.save(hora4);
 
-        Hora hora5 = new Hora(LocalDate.of(2017, 12, 25), LocalTime.MIN, LocalTime.MAX, colaborador1);
-        hora5.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea2, Duration.ofHours(8)));
+        Hora hora5 = new Hora(LocalDate.now().plusDays(1), LocalTime.MIN, LocalTime.MAX, colaborador1);
+        hora5.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea2, Duration.ofHours(20)));
         horaDao.save(hora5);
 
-        Hora hora6 = new Hora(LocalDate.of(2017, 12, 25), LocalTime.MIN, LocalTime.MAX, colaborador2);
-        hora6.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea2, Duration.ofHours(10)));
+        Hora hora6 = new Hora(LocalDate.now().plusDays(1), LocalTime.MIN, LocalTime.MAX, colaborador2);
+        hora6.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea2, Duration.ofHours(10).plusMinutes(10)));
         horaDao.save(hora6);
 
+        //Cargo 1, P1, T1, 40h
+        //Cargo 2, P1, T1, 20h
+
+        //Cargo 1, P1, T2, 20h
+        //Cargo 2, P1, T2, 10h
+
+        //Cargo 1 45h
+        //Cargo 2 45:10h
+
+        List<HoraDetalle> lt = horaDao.prueba(proyecto1, tipoTarea1);
     }
 
 
-    @Test
-    @InSequence(2)
-    public void horasXCargo() {
-
-        proyecto1.setId(1L);
-        tipoTarea1.setId(1L);
 
 
-        List<HorasProyectoTipoTareaXCargo> horasProyectoTipoTareaXCargos = horaDao.findHorasProyectoTipoTareaXCargo(proyecto1, tipoTarea1);
-        horasProyectoTipoTareaXCargos.forEach(horasProyectoTipoTareaXCargo -> {
-            logger.info(horasProyectoTipoTareaXCargo.toString());
-            if (horasProyectoTipoTareaXCargo.cargo.getCodigo().equals("C1")) {
-                assertEquals(44, horasProyectoTipoTareaXCargo.cantidadHoras.toHours());
-
-            } else {
-                assertEquals(36, horasProyectoTipoTareaXCargo.cantidadHoras.toHours());
-            }
-        });
-
-        assertEquals(2, horasProyectoTipoTareaXCargos.size());
-
-    }
-
-    @Test
-    @InSequence(3)
-    public void estimacionesXCargo() {
-        proyecto1.setId(1L);
-        tipoTarea1.setId(1L);
-
-        List<EstimacionProyectoTipoTareaXCargo> estimacionProyectoTipoTareaXCargos = estimacionDao.findEstimacionProyectoTipoTareaXCargo(proyecto1, tipoTarea1);
-        estimacionProyectoTipoTareaXCargos.forEach(estimacionProyectoTipoTareaXCargo -> {
-            logger.info(estimacionProyectoTipoTareaXCargo.toString());
-            if (estimacionProyectoTipoTareaXCargo.cargo.getCodigo().equals("C1")) {
-                assertEquals(6, estimacionProyectoTipoTareaXCargo.cantidadHoras.toHours());
-
-            } else {
-                assertEquals(6, estimacionProyectoTipoTareaXCargo.cantidadHoras.toHours());
-            }
-        });
-
-        assertEquals(2, estimacionProyectoTipoTareaXCargos.size());
-    }
-
-    @Test
-    @InSequence(4)
-    public void totalHorasXCargo() {
-        proyecto1.setId(1L);
-
-        List<HorasProyectoXCargo> horasProyectoXCargo = horaDao.findHorasProyectoXCargo(proyecto1);
-        horasProyectoXCargo.forEach(horasProyectoXCargo1 -> {
-            logger.info(horasProyectoXCargo1.toString());
-            if (horasProyectoXCargo1.cargo.getCodigo().equals("C1")) {
-                assertEquals(52, horasProyectoXCargo1.cantidadHoras.toHours());
-
-            } else {
-                assertEquals(46, horasProyectoXCargo1.cantidadHoras.toHours());
-            }
-        });
-
-        assertEquals(2, horasProyectoXCargo.size());
-    }
-
-    @Test
-    @InSequence(5)
-    public void totalHorasCargo1() {
-        proyecto1.setId(1L);
-        tipoTarea1.setId(1L);
-        cargo1.setId(1L);
-
-        List<HorasProyectoTipoTareaCargoXColaborador> horasProyectoTipoTareaCargoXColaborador = horaDao.findHorasProyectoTipoTareaCargoXColaborador(proyecto1, tipoTarea1, cargo1);
-        logger.info(horasProyectoTipoTareaCargoXColaborador.get(0).toString());
-        assertEquals(44, horasProyectoTipoTareaCargoXColaborador.get(0).cantidadHoras.toHours());
-        assertEquals(cargo1.getCodigo(), horasProyectoTipoTareaCargoXColaborador.get(0).cargo.getCodigo());
-        assertEquals(1, horasProyectoTipoTareaCargoXColaborador.size());
-    }
-
-    @Test
-    @InSequence(6)
-    public void totalHorasCargo2() {
-        proyecto1.setId(1L);
-        tipoTarea1.setId(1L);
-        cargo2.setId(2L);
-
-        List<HorasProyectoTipoTareaCargoXColaborador> horasProyectoTipoTareaCargoXColaborador = horaDao.findHorasProyectoTipoTareaCargoXColaborador(proyecto1, tipoTarea1, cargo2);
-        logger.info(horasProyectoTipoTareaCargoXColaborador.get(0).toString());
-        assertEquals(36, horasProyectoTipoTareaCargoXColaborador.get(0).cantidadHoras.toHours());
-        assertEquals(cargo2.getCodigo(), horasProyectoTipoTareaCargoXColaborador.get(0).cargo.getCodigo());
-        assertEquals(1, horasProyectoTipoTareaCargoXColaborador.size());
-    }
 
     @Test
     @InSequence(7)
     @RunAsClient
-    public void getHorasProyectoTareaXCargo(@ArquillianResteasyResource final WebTarget webTarget) {
+    public void getReporte1V1(@ArquillianResteasyResource final WebTarget webTarget) {
         final Response response = webTarget
                 .path("/reportes/horas/proyecto/1/tarea/1")
                 .request(MediaType.APPLICATION_JSON)
                 .header("AUTHORIZATION", "ADMIN:2")
                 .get();
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-        List<HorasProyectoTipoTareaXCargo> horaList = response.readEntity(new GenericType<List<HorasProyectoTipoTareaXCargo>>() {
+        List<ReporteHoras1> horaList = response.readEntity(new GenericType<List<ReporteHoras1>>() {
         });
-        assertEquals(2, horaList.size());
-        assertEquals(44, horaList.get(0).cantidadHoras.toHours());
-        assertEquals(36, horaList.get(1).cantidadHoras.toHours());
+        assertEquals(3, horaList.size());
+        horaList.forEach(reporteHoras1 -> {
+            //Fila total
+            if (reporteHoras1.cargo == null) {
+                assertEquals(new BigDecimal(50).setScale(2, RoundingMode.HALF_DOWN), reporteHoras1.cantidadHoras);
+
+            }
+        });
+
+    }
+
+    @Test
+    @InSequence(8)
+    @RunAsClient
+    public void getReporte1V2(@ArquillianResteasyResource final WebTarget webTarget) {
+        final Response response = webTarget
+                .path("/reportes/horas/proyecto/1/tarea/2")
+                .request(MediaType.APPLICATION_JSON)
+                .header("AUTHORIZATION", "ADMIN:2")
+                .get();
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        List<ReporteHoras1> horaList = response.readEntity(new GenericType<List<ReporteHoras1>>() {
+        });
+        assertEquals(3, horaList.size());
+        horaList.forEach(reporteHoras1 -> {
+            //Fila total
+            if (reporteHoras1.cargo == null) {
+                assertEquals(new BigDecimal(30.17).setScale(2, RoundingMode.HALF_DOWN), reporteHoras1.cantidadHoras);
+
+            }
+        });
+
+    }
+
+    @Test
+    @InSequence(9)
+    @RunAsClient
+    public void getReporte1Totales(@ArquillianResteasyResource final WebTarget webTarget) {
+        final Response response = webTarget
+                .path("/reportes/horas/proyecto/1")
+                .request(MediaType.APPLICATION_JSON)
+                .header("AUTHORIZATION", "ADMIN:2")
+                .get();
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        List<ReporteHoras1> horaList = response.readEntity(new GenericType<List<ReporteHoras1>>() {
+        });
+        assertEquals(3, horaList.size());
+        horaList.forEach(reporteHoras1 -> {
+            //Fila total
+            if (reporteHoras1.cargo == null) {
+                assertEquals(new BigDecimal(80.17).setScale(2, RoundingMode.HALF_DOWN), reporteHoras1.cantidadHoras);
+
+            }
+        });
+
     }
 
 

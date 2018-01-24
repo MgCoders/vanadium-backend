@@ -57,11 +57,8 @@ public class Hora {
     @NotNull
     @ManyToOne
     private Colaborador colaborador;
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
-            name = "horadetalle",
-            joinColumns = @JoinColumn(name = "hora_id")
-    )
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "hora_id")
     private Set<HoraDetalle> horaDetalleList = new HashSet<>();
     private boolean completa = false;
     private Duration subtotalDetalles;

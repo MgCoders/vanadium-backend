@@ -1,5 +1,6 @@
 package coop.magnesium.sulfur.system;
 
+import coop.magnesium.sulfur.db.entities.Notificacion;
 import coop.magnesium.sulfur.utils.Logged;
 
 import javax.annotation.PostConstruct;
@@ -44,6 +45,21 @@ public class MailService {
         sb.append("Hacé click en el siguiente enlace para obtener una contraseña.").append("\n\n");
         String url = frontendHost + "/#/extra/forgot-password";
         sb.append(url).append("\n\n");
+        return sb.toString();
+
+    }
+
+    public static String generarEmailAviso(Notificacion notificacion) {
+        StringBuilder sb = new StringBuilder();
+        switch (notificacion.getTipo()) {
+            case NUEVA_HORA:
+                sb.append(notificacion.getColaborador().getNombre() + " cargó horas de la fecha " + notificacion.getHora().getDia()).append("\n");
+                break;
+            case FALTAN_HORAS:
+                sb.append(notificacion.getColaborador().getNombre() + " no cargó horas en más de 2 días.").append("\n");
+                break;
+        }
+        sb.append("\n\n");
         return sb.toString();
 
     }

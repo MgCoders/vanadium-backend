@@ -6,13 +6,8 @@ import coop.magnesium.sulfur.api.utils.RoleNeeded;
 import coop.magnesium.sulfur.db.dao.ColaboradorDao;
 import coop.magnesium.sulfur.db.dao.HoraDao;
 import coop.magnesium.sulfur.db.dao.ProyectoDao;
-import coop.magnesium.sulfur.db.dao.TipoTareaDao;
-import coop.magnesium.sulfur.db.entities.Colaborador;
-import coop.magnesium.sulfur.db.entities.Hora;
-import coop.magnesium.sulfur.db.entities.Role;
-import coop.magnesium.sulfur.db.entities.SulfurUser;
+import coop.magnesium.sulfur.db.entities.*;
 import coop.magnesium.sulfur.utils.Logged;
-import coop.magnesium.sulfur.utils.ex.MagnesiumBdAlredyExistsException;
 import coop.magnesium.sulfur.utils.ex.MagnesiumException;
 import coop.magnesium.sulfur.utils.ex.MagnesiumNotFoundException;
 import coop.magnesium.sulfur.utils.ex.MagnesiumSecurityException;
@@ -22,6 +17,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 import javax.ejb.EJB;
+import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -48,6 +44,8 @@ public class HoraService {
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
     @Inject
+    Event<Notificacion> notificacionEvent;
+    @Inject
     private Logger logger;
     @EJB
     private HoraDao horaDao;
@@ -55,8 +53,6 @@ public class HoraService {
     private ProyectoDao proyectoDao;
     @EJB
     private ColaboradorDao colaboradorDao;
-    @EJB
-    private TipoTareaDao tipoTareaDao;
 
     @POST
     @Logged
@@ -80,17 +76,19 @@ public class HoraService {
                 throw new MagnesiumSecurityException("Colaborador no coincide");
 
 
-            //si es mismo colaborador, misma fecha, error
-            Hora horaExists = horaDao.findByColaboradorFecha(hora.getColaborador(), hora.getDia());
-            if (horaExists != null)
-                throw new MagnesiumBdAlredyExistsException("Ya existe hora para esa fecha y colaborador");
-
             //si tiene horas incompletas
             if (horaDao.existsByColaboradorIncompleta(hora.getColaborador()))
                 throw new MagnesiumException("El colaborador tiene horas incompletas");
 
+            //horas futuras
+            LocalDate hoy = LocalDate.now();
+            if (hora.getDia().isAfter(hoy))
+                throw new MagnesiumException("Está intentando cargar horas futuras");
+
             hora.cacularSubtotalDetalle();
             Hora horaCreada = horaDao.save(hora);
+            notificacionEvent.fire(new Notificacion(TipoNotificacion.NUEVA_HORA, horaCreada.getColaborador(), "Carga de horas.", horaCreada));
+
             return Response.status(Response.Status.CREATED).entity(horaCreada).build();
 
         } catch (MagnesiumNotFoundException e) {
@@ -186,6 +184,8 @@ public class HoraService {
 
             hora.cacularSubtotalDetalle();
             hora = horaDao.save(hora);
+            notificacionEvent.fire(new Notificacion(TipoNotificacion.EDICION_HORA, hora.getColaborador(), "Edición de horas", hora));
+
             return Response.ok(hora).build();
         } catch (Exception e) {
             return Response.notModified().entity(e.getMessage()).build();

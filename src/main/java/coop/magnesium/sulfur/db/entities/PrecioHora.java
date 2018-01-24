@@ -9,7 +9,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import javax.persistence.Embeddable;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -17,14 +17,19 @@ import java.time.LocalDate;
 /**
  * Created by rsperoni on 18/12/17.
  */
-@Embeddable
+@Entity
 @JsonAutoDetect
 @ApiModel
 public class PrecioHora {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     @NotNull
+    @Column(nullable = false)
     private BigDecimal precioHora;
     @NotNull
+    @Column(nullable = false)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @ApiModelProperty(dataType = "date", example = "23-01-2017")
     @JsonDeserialize(using = LocalDateDeserializer.class)
@@ -52,11 +57,23 @@ public class PrecioHora {
         return vigenciaDesde;
     }
 
+    public void setVigenciaDesde(LocalDate vigenciaDesde) {
+        this.vigenciaDesde = vigenciaDesde;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     @Override
     public String toString() {
         return "PrecioHora{" +
-                "precioHora=" + precioHora +
+                "id=" + id +
+                ", precioHora=" + precioHora +
                 ", vigenciaDesde=" + vigenciaDesde +
                 '}';
     }

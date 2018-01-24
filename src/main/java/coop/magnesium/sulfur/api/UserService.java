@@ -3,6 +3,8 @@ package coop.magnesium.sulfur.api;
 
 import coop.magnesium.sulfur.db.dao.ColaboradorDao;
 import coop.magnesium.sulfur.db.entities.Colaborador;
+import coop.magnesium.sulfur.db.entities.Notificacion;
+import coop.magnesium.sulfur.db.entities.TipoNotificacion;
 import coop.magnesium.sulfur.system.MailEvent;
 import coop.magnesium.sulfur.system.MailService;
 import coop.magnesium.sulfur.system.StartupBean;
@@ -46,6 +48,10 @@ public class UserService {
 
     @Inject
     Event<MailEvent> mailEvent;
+
+    @Inject
+    Event<Notificacion> notificacionEvent;
+
     @Inject
     @PropertiesFromFile
     Properties endpointsProperties;
@@ -78,6 +84,8 @@ public class UserService {
             // Issue a token for the sulfurUser
             String token = issueToken(email, map);
             sulfurUser.setToken(token);
+            //Notificacion login
+            notificacionEvent.fire(new Notificacion(TipoNotificacion.LOGIN, sulfurUser, "Login"));
             return Response.ok(sulfurUser).build();
         } catch (MagnesiumSecurityException | MagnesiumBdMultipleResultsException | MagnesiumBdNotFoundException e) {
             logger.warning(e.getMessage());
@@ -152,6 +160,7 @@ public class UserService {
             Colaborador colaborador = colaboradorDao.findByEmail(dataRecuperacionPassword.getEmail());
             if (colaborador == null) throw new MagnesiumBdNotFoundException("no existe colaborador");
             colaborador.setPassword(PasswordUtils.digestPassword(password));
+            notificacionEvent.fire(new Notificacion(TipoNotificacion.CAMBIO_PASSWORD, colaborador, "Cambio password."));
             return Response.ok().build();
         } catch (MagnesiumBdNotFoundException e) {
             logger.warning(e.getMessage());

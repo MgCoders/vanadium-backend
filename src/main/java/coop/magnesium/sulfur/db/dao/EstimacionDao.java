@@ -1,24 +1,37 @@
 package coop.magnesium.sulfur.db.dao;
 
 import coop.magnesium.sulfur.api.dto.EstimacionProyectoTipoTareaXCargo;
+import coop.magnesium.sulfur.db.entities.Cargo;
 import coop.magnesium.sulfur.db.entities.Estimacion;
 import coop.magnesium.sulfur.db.entities.Proyecto;
 import coop.magnesium.sulfur.db.entities.TipoTarea;
+import coop.magnesium.sulfur.utils.Logged;
+import coop.magnesium.sulfur.utils.TimeUtils;
 
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * Created by rsperoni on 28/10/17.
  */
 @Stateless
 public class EstimacionDao extends AbstractDao<Estimacion, Long> {
+
+    @Inject
+    EstimacionDao estimacionDao;
+
+    @Inject
+    Logger logger;
 
     @PersistenceContext
     EntityManager em;
@@ -37,22 +50,40 @@ public class EstimacionDao extends AbstractDao<Estimacion, Long> {
         CriteriaBuilder criteriaBuilder = this.getEntityManager().getCriteriaBuilder();
         CriteriaQuery criteriaQuery = criteriaBuilder.createQuery();
         Root entity = criteriaQuery.from(Estimacion.class);
-        criteriaQuery.select(entity);
+        criteriaQuery.select(entity).distinct(true);
         criteriaQuery.where(criteriaBuilder.equal(entity.get("proyecto"), criteriaBuilder.parameter(Proyecto.class, "p")));
         Query query = this.getEntityManager().createQuery(criteriaQuery);
         query.setParameter("p", proyecto);
         return (List<Estimacion>) query.getResultList();
     }
 
-    public List<EstimacionProyectoTipoTareaXCargo> findEstimacionProyectoTipoTareaXCargo(Proyecto proyecto, TipoTarea tipoTarea) {
-        Query query = em.createQuery("" +
-                "select new coop.magnesium.sulfur.api.dto.EstimacionProyectoTipoTareaXCargo(e.proyecto,ed.tipoTarea,ed.cargo, sum(ed.precioTotal), sum(ed.duracion)) " +
-                "from Estimacion e JOIN e.estimacionDetalleList ed " +
-                "where e.proyecto = :proyecto and ed.tipoTarea = :tipoTarea " +
-                "group by e.proyecto, ed.tipoTarea, ed.cargo");
-        query.setParameter("proyecto", proyecto);
-        query.setParameter("tipoTarea", tipoTarea);
-        return query.getResultList();
+    @Logged
+    public Map<Cargo, EstimacionProyectoTipoTareaXCargo> findEstimacionProyectoTipoTareaXCargo(Proyecto proyecto, TipoTarea tipoTarea) {
+        Map<Cargo, EstimacionProyectoTipoTareaXCargo> estimacionesXCargo = new HashMap<>();
+        estimacionDao.findAllByProyecto(proyecto)
+                .forEach(estimacion -> estimacion.getEstimacionDetalleList().forEach(estimacionDetalle -> {
+                    if (estimacionDetalle.getTipoTarea().getId().equals(tipoTarea.getId())) {
+                        estimacionesXCargo.computeIfPresent(estimacionDetalle.getCargo(), (cargo, estimacionProyectoTipoTareaXCargo) -> {
+                            estimacionProyectoTipoTareaXCargo.cantidadHoras = estimacionProyectoTipoTareaXCargo.cantidadHoras.add(TimeUtils.durationToBigDecimal(estimacionDetalle.getDuracion()));
+                            return estimacionProyectoTipoTareaXCargo;
+                        });
+                        estimacionesXCargo.computeIfAbsent(estimacionDetalle.getCargo(), cargo -> new EstimacionProyectoTipoTareaXCargo(estimacion.getProyecto(), estimacionDetalle.getTipoTarea(), estimacionDetalle.getCargo(), estimacion.getPrecioTotal(), TimeUtils.durationToBigDecimal(estimacionDetalle.getDuracion())));
+                    }
+                }));
+        return estimacionesXCargo;
+    }
+
+    public Map<Cargo, EstimacionProyectoTipoTareaXCargo> findEstimacionProyectoXCargo(Proyecto proyecto) {
+        Map<Cargo, EstimacionProyectoTipoTareaXCargo> estimacionesXCargo = new HashMap<>();
+        estimacionDao.findAllByProyecto(proyecto)
+                .forEach(estimacion -> estimacion.getEstimacionDetalleList().forEach(estimacionDetalle -> {
+                        estimacionesXCargo.computeIfPresent(estimacionDetalle.getCargo(), (cargo, estimacionProyectoTipoTareaXCargo) -> {
+                            estimacionProyectoTipoTareaXCargo.cantidadHoras = estimacionProyectoTipoTareaXCargo.cantidadHoras.add(TimeUtils.durationToBigDecimal(estimacionDetalle.getDuracion()));
+                            return estimacionProyectoTipoTareaXCargo;
+                        });
+                        estimacionesXCargo.computeIfAbsent(estimacionDetalle.getCargo(), cargo -> new EstimacionProyectoTipoTareaXCargo(estimacion.getProyecto(), estimacionDetalle.getTipoTarea(), estimacionDetalle.getCargo(), estimacion.getPrecioTotal(), TimeUtils.durationToBigDecimal(estimacionDetalle.getDuracion())));
+                }));
+        return estimacionesXCargo;
     }
 
 
