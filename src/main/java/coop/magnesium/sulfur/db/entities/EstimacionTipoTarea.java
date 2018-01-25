@@ -19,7 +19,7 @@ import java.time.Duration;
 @Entity
 @JsonAutoDetect
 @ApiModel
-public class EstimacionDetalle {
+public class EstimacionTipoTarea {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,9 +27,7 @@ public class EstimacionDetalle {
     @NotNull
     @ManyToOne
     private TipoTarea tipoTarea;
-    @NotNull
-    @ManyToOne
-    private Cargo cargo;
+
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "'PT'HH'H'MM'M'")
     @ApiModelProperty(example = "PT23H59M", dataType = "dateTime")
@@ -38,12 +36,11 @@ public class EstimacionDetalle {
     private Duration duracion;
 
 
-    public EstimacionDetalle() {
+    public EstimacionTipoTarea() {
     }
 
-    public EstimacionDetalle(TipoTarea tipoTarea, Cargo cargo, Duration duracion) {
+    public EstimacionTipoTarea(TipoTarea tipoTarea, Duration duracion) {
         this.tipoTarea = tipoTarea;
-        this.cargo = cargo;
         this.duracion = duracion;
     }
 
@@ -53,14 +50,6 @@ public class EstimacionDetalle {
 
     public void setTipoTarea(TipoTarea tipoTarea) {
         this.tipoTarea = tipoTarea;
-    }
-
-    public Cargo getCargo() {
-        return cargo;
-    }
-
-    public void setCargo(Cargo cargo) {
-        this.cargo = cargo;
     }
 
     public Duration getDuracion() {
@@ -82,10 +71,9 @@ public class EstimacionDetalle {
 
     @Override
     public String toString() {
-        return "EstimacionDetalle{" +
+        return "EstimacionTipoTarea{" +
                 "id=" + id +
                 ", tipoTarea=" + tipoTarea.getCodigo() +
-                ", cargo=" + cargo.getCodigo() +
                 ", duracion=" + duracion +
                 '}';
     }

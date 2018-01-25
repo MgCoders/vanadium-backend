@@ -1,8 +1,6 @@
 package coop.magnesium.sulfur.api;
 
-import coop.magnesium.sulfur.api.dto.EstimacionProyectoTipoTareaXCargo;
 import coop.magnesium.sulfur.api.dto.HorasProyectoXCargo;
-import coop.magnesium.sulfur.api.dto.ReporteHoras1;
 import coop.magnesium.sulfur.db.dao.CargoDao;
 import coop.magnesium.sulfur.db.dao.EstimacionDao;
 import coop.magnesium.sulfur.db.dao.ProyectoDao;
@@ -24,7 +22,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import javax.inject.Inject;
-import javax.validation.groups.ConvertGroup;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
@@ -35,7 +32,6 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
@@ -99,22 +95,28 @@ public class EstimacionServiceTest {
     @InSequence(2)
     @RunAsClient
     public void createEstmacion(@ArquillianResteasyResource final WebTarget webTarget) {
+        Estimacion estimacion = new Estimacion(this.proyecto, null, LocalDate.now());
+        EstimacionCargo estimacionCargo = new EstimacionCargo(this.cargo, new BigDecimal(150));
+        estimacion.getEstimacionCargos().add(estimacionCargo);
         final Response response = webTarget
                 .path("/estimaciones")
                 .request(MediaType.APPLICATION_JSON)
-                .post(Entity.json(new Estimacion(this.proyecto, null, LocalDate.now(), new BigDecimal(150))));
+                .post(Entity.json(estimacion));
         assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
-        Estimacion estimacion = response.readEntity(Estimacion.class);
-        assertEquals(1, estimacion.getId().longValue());
+        Estimacion estimacionCreated = response.readEntity(Estimacion.class);
+        assertEquals(1, estimacionCreated.getId().longValue());
     }
 
     @Test
     @InSequence(3)
     @RunAsClient
     public void createEstmacion2(@ArquillianResteasyResource final WebTarget webTarget) {
-        Estimacion estimacion = new Estimacion(this.proyecto, null, LocalDate.now(), new BigDecimal(160));
-        estimacion.getEstimacionDetalleList().add(new EstimacionDetalle(this.tipoTarea, this.cargo, Duration.ofHours(3)));
-        estimacion.getEstimacionDetalleList().add(new EstimacionDetalle(this.tipoTarea, this.cargo, Duration.ofHours(6)));
+        Estimacion estimacion = new Estimacion(this.proyecto, null, LocalDate.now());
+        EstimacionCargo estimacionCargo = new EstimacionCargo(this.cargo, new BigDecimal(160));
+        estimacionCargo.getEstimacionTipoTareas().add(new EstimacionTipoTarea(this.tipoTarea, Duration.ofHours(6)));
+        estimacion.getEstimacionCargos().add(estimacionCargo);
+
+        estimacionCargo.getEstimacionTipoTareas().add(new EstimacionTipoTarea(this.tipoTarea, Duration.ofHours(3)));
         final Response response = webTarget
                 .path("/estimaciones")
                 .request(MediaType.APPLICATION_JSON)

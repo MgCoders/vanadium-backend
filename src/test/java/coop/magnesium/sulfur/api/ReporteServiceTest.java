@@ -3,7 +3,6 @@ package coop.magnesium.sulfur.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import coop.magnesium.sulfur.api.dto.EstimacionProyectoTipoTareaXCargo;
 import coop.magnesium.sulfur.api.dto.HorasProyectoXCargo;
 import coop.magnesium.sulfur.api.dto.ReporteHoras1;
 import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
@@ -98,7 +97,7 @@ public class ReporteServiceTest {
                 .addClass(RoleNeededFilterMock.class)
                 .addClass(HoraService.class)
                 .addClass(ReportesService.class)
-                .addClass(EstimacionDetalle.class)
+                .addClass(EstimacionTipoTarea.class)
                 .addClass(UserServiceMock.class)
                 .addAsResource("META-INF/persistence.xml")
                 .addAsResource("endpoints.properties")
@@ -126,13 +125,17 @@ public class ReporteServiceTest {
         Colaborador colaborador1 = colaboradorDao.save(this.colaborador_admin);
         Colaborador colaborador2 = colaboradorDao.save(this.colaborador_user);
 
-        Estimacion estimacion = new Estimacion(proyecto1, null, LocalDate.now(), new BigDecimal(150));
-        estimacion.getEstimacionDetalleList().add(new EstimacionDetalle(tipoTarea1, cargo1, Duration.ofHours(3)));
-        estimacion.getEstimacionDetalleList().add(new EstimacionDetalle(tipoTarea1, cargo2, Duration.ofHours(6)));
+        EstimacionCargo estimacionCargo = new EstimacionCargo(cargo1, new BigDecimal(150));
+        Estimacion estimacion = new Estimacion(proyecto1, null, LocalDate.now());
+        estimacion.getEstimacionCargos().add(estimacionCargo);
+        estimacionCargo.getEstimacionTipoTareas().add(new EstimacionTipoTarea(tipoTarea1, Duration.ofHours(3)));
+        estimacionCargo.getEstimacionTipoTareas().add(new EstimacionTipoTarea(tipoTarea1, Duration.ofHours(6)));
         estimacionDao.save(estimacion);
 
-        Estimacion estimacion2 = new Estimacion(proyecto1, null, LocalDate.now().plusDays(1), new BigDecimal(150));
-        estimacion2.getEstimacionDetalleList().add(new EstimacionDetalle(tipoTarea1, cargo1, Duration.ofHours(3)));
+        EstimacionCargo estimacionCargo2 = new EstimacionCargo(cargo1, new BigDecimal(150));
+        Estimacion estimacion2 = new Estimacion(proyecto1, null, LocalDate.now().plusDays(1));
+        estimacion2.getEstimacionCargos().add(estimacionCargo2);
+        estimacionCargo2.getEstimacionTipoTareas().add(new EstimacionTipoTarea(tipoTarea1, Duration.ofHours(3)));
         estimacionDao.save(estimacion2);
 
         Hora hora = new Hora(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, colaborador1);
