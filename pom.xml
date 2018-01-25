@@ -156,11 +156,11 @@
         <profile>
             <id>produccion</id>
             <properties>
-                <jboss.host>https://sulfur.mgcoders.com</jboss.host>
+                <jboss.host>https://sulfur.magnesium.coop</jboss.host>
                 <jboss.port>80</jboss.port>
                 <rest.base.path>api</rest.base.path>
-                <rest.base.host>sulfur.mgcoders.com</rest.base.host>
-                <frontend.host>https://marq.mgcoders.com</frontend.host>
+                <rest.base.host>sulfur.magnesium.coop</rest.base.host>
+                <frontend.host>https://marq.magnesium.coop</frontend.host>
                 <frontend.path>/#/extra/new-password?token=</frontend.path>
             </properties>
         </profile>
