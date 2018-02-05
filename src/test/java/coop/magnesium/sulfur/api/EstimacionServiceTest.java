@@ -98,6 +98,8 @@ public class EstimacionServiceTest {
         Estimacion estimacion = new Estimacion(this.proyecto, null, LocalDate.now());
         EstimacionCargo estimacionCargo = new EstimacionCargo(this.cargo, new BigDecimal(150));
         estimacion.getEstimacionCargos().add(estimacionCargo);
+        EstimacionTipoTarea estimacionTipoTarea = new EstimacionTipoTarea(this.tipoTarea,Duration.ofMinutes(23));
+        estimacionCargo.getEstimacionTipoTareas().add(estimacionTipoTarea);
         final Response response = webTarget
                 .path("/estimaciones")
                 .request(MediaType.APPLICATION_JSON)

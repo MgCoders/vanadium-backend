@@ -10,7 +10,9 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.*;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,18 +28,21 @@ public class Estimacion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotNull
+    @NotNull(message = "El proyecto no puede ser vacío")
     @ManyToOne
     private Proyecto proyecto;
     private String descripcion;
 
-    @NotNull
+    @NotNull(message = "La fecha no puede ser vacía")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @ApiModelProperty(dataType = "date", example = "23-01-2017")
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate fecha;
 
+    @Valid
+    @NotNull
+    @Size(min = 1, message = "La lista de Estimaciones por cargo no puede ser vacia")
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "estimacion_id")
     private List<EstimacionCargo> estimacionCargos = new ArrayList<>();

@@ -24,11 +24,11 @@ public class EstimacionTipoTarea {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotNull
+    @NotNull(message = "El tipo de tarea no puede ser vacía")
     @ManyToOne
     private TipoTarea tipoTarea;
 
-    @NotNull
+    @NotNull(message = "La duración no puede ser vacía")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "'PT'HH'H'MM'M'")
     @ApiModelProperty(example = "PT23H59M", dataType = "dateTime")
     @JsonDeserialize(using = DurationDeserializer.class)
