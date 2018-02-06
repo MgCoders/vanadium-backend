@@ -10,8 +10,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.*;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,33 +27,33 @@ public class Estimacion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotNull
+    @NotNull(message = "El proyecto no puede ser vacío")
     @ManyToOne
     private Proyecto proyecto;
-    @NotNull
-    private BigDecimal precioTotal;
     private String descripcion;
 
-    @NotNull
+    @NotNull(message = "La fecha no puede ser vacía")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @ApiModelProperty(dataType = "date", example = "23-01-2017")
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate fecha;
 
+    @Valid
+    //@NotNull
+    //@Size(min = 1, message = "La lista de Estimaciones por cargo no puede ser vacia")
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "estimacion_id")
-    private List<EstimacionDetalle> estimacionDetalleList = new ArrayList<>();
+    private List<EstimacionCargo> estimacionCargos = new ArrayList<>();
 
 
     public Estimacion() {
     }
 
-    public Estimacion(Proyecto proyecto, String descripcion, LocalDate fecha, BigDecimal precioTotal) {
+    public Estimacion(Proyecto proyecto, String descripcion, LocalDate fecha) {
         this.proyecto = proyecto;
         this.descripcion = descripcion;
         this.fecha = fecha;
-        this.precioTotal = precioTotal;
     }
 
     public Long getId() {
@@ -64,8 +64,8 @@ public class Estimacion {
         this.id = id;
     }
 
-    public List<EstimacionDetalle> getEstimacionDetalleList() {
-        return estimacionDetalleList;
+    public List<EstimacionCargo> getEstimacionCargos() {
+        return estimacionCargos;
     }
 
     public Proyecto getProyecto() {
@@ -92,23 +92,15 @@ public class Estimacion {
         this.fecha = fecha;
     }
 
-    public BigDecimal getPrecioTotal() {
-        return precioTotal;
-    }
-
-    public void setPrecioTotal(BigDecimal precioTotal) {
-        this.precioTotal = precioTotal;
-    }
 
     @Override
     public String toString() {
         return "Estimacion{" +
                 "id=" + id +
                 ", proyecto=" + proyecto.getCodigo() +
-                ", precioTotal=" + precioTotal +
                 ", descripcion='" + descripcion + '\'' +
                 ", fecha=" + fecha +
-                ", estimacionDetalleList=" + estimacionDetalleList +
+                ", estimacionCargos=" + estimacionCargos +
                 '}';
     }
 }

@@ -69,9 +69,11 @@ public class EstimacionService {
             estimacion = estimacionDao.save(estimacion);
             return Response.status(Response.Status.CREATED).entity(estimacion).build();
         } catch (MagnesiumBdAlredyExistsException exists) {
+            exists.printStackTrace();
             logger.warning(exists.getMessage());
             return Response.status(Response.Status.CONFLICT).entity(exists.getMessage()).build();
         } catch (Exception e) {
+            e.printStackTrace();
             logger.severe(e.getMessage());
             return Response.serverError().entity(e.getMessage()).build();
         }

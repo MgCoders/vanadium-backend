@@ -61,28 +61,30 @@ public class EstimacionDao extends AbstractDao<Estimacion, Long> {
     public Map<Cargo, EstimacionProyectoTipoTareaXCargo> findEstimacionProyectoTipoTareaXCargo(Proyecto proyecto, TipoTarea tipoTarea) {
         Map<Cargo, EstimacionProyectoTipoTareaXCargo> estimacionesXCargo = new HashMap<>();
         estimacionDao.findAllByProyecto(proyecto)
-                .forEach(estimacion -> estimacion.getEstimacionDetalleList().forEach(estimacionDetalle -> {
-                    if (estimacionDetalle.getTipoTarea().getId().equals(tipoTarea.getId())) {
-                        estimacionesXCargo.computeIfPresent(estimacionDetalle.getCargo(), (cargo, estimacionProyectoTipoTareaXCargo) -> {
-                            estimacionProyectoTipoTareaXCargo.cantidadHoras = estimacionProyectoTipoTareaXCargo.cantidadHoras.add(TimeUtils.durationToBigDecimal(estimacionDetalle.getDuracion()));
+                .forEach(estimacion -> estimacion.getEstimacionCargos().forEach(estimacionCargo ->
+                        estimacionCargo.getEstimacionTipoTareas().forEach(estimacionTipoTarea -> {
+                            if (estimacionTipoTarea.getTipoTarea().getId().equals(tipoTarea.getId())) {
+                                estimacionesXCargo.computeIfPresent(estimacionCargo.getCargo(), (cargo, estimacionProyectoTipoTareaXCargo) -> {
+                                    estimacionProyectoTipoTareaXCargo.cantidadHoras = estimacionProyectoTipoTareaXCargo.cantidadHoras.add(TimeUtils.durationToBigDecimal(estimacionTipoTarea.getDuracion()));
                             return estimacionProyectoTipoTareaXCargo;
                         });
-                        estimacionesXCargo.computeIfAbsent(estimacionDetalle.getCargo(), cargo -> new EstimacionProyectoTipoTareaXCargo(estimacion.getProyecto(), estimacionDetalle.getTipoTarea(), estimacionDetalle.getCargo(), estimacion.getPrecioTotal(), TimeUtils.durationToBigDecimal(estimacionDetalle.getDuracion())));
+                                estimacionesXCargo.computeIfAbsent(estimacionCargo.getCargo(), cargo -> new EstimacionProyectoTipoTareaXCargo(estimacion.getProyecto(), estimacionTipoTarea.getTipoTarea(), estimacionCargo.getCargo(), estimacionCargo.getPrecioTotal(), TimeUtils.durationToBigDecimal(estimacionTipoTarea.getDuracion())));
                     }
-                }));
+                        })));
         return estimacionesXCargo;
     }
 
     public Map<Cargo, EstimacionProyectoTipoTareaXCargo> findEstimacionProyectoXCargo(Proyecto proyecto) {
         Map<Cargo, EstimacionProyectoTipoTareaXCargo> estimacionesXCargo = new HashMap<>();
         estimacionDao.findAllByProyecto(proyecto)
-                .forEach(estimacion -> estimacion.getEstimacionDetalleList().forEach(estimacionDetalle -> {
-                        estimacionesXCargo.computeIfPresent(estimacionDetalle.getCargo(), (cargo, estimacionProyectoTipoTareaXCargo) -> {
-                            estimacionProyectoTipoTareaXCargo.cantidadHoras = estimacionProyectoTipoTareaXCargo.cantidadHoras.add(TimeUtils.durationToBigDecimal(estimacionDetalle.getDuracion()));
-                            return estimacionProyectoTipoTareaXCargo;
-                        });
-                        estimacionesXCargo.computeIfAbsent(estimacionDetalle.getCargo(), cargo -> new EstimacionProyectoTipoTareaXCargo(estimacion.getProyecto(), estimacionDetalle.getTipoTarea(), estimacionDetalle.getCargo(), estimacion.getPrecioTotal(), TimeUtils.durationToBigDecimal(estimacionDetalle.getDuracion())));
-                }));
+                .forEach(estimacion -> estimacion.getEstimacionCargos().forEach(estimacionCargo ->
+                        estimacionCargo.getEstimacionTipoTareas().forEach(estimacionTipoTarea -> {
+                            estimacionesXCargo.computeIfPresent(estimacionCargo.getCargo(), (cargo, estimacionProyectoTipoTareaXCargo) -> {
+                                estimacionProyectoTipoTareaXCargo.cantidadHoras = estimacionProyectoTipoTareaXCargo.cantidadHoras.add(TimeUtils.durationToBigDecimal(estimacionTipoTarea.getDuracion()));
+                                return estimacionProyectoTipoTareaXCargo;
+                            });
+                            estimacionesXCargo.computeIfAbsent(estimacionCargo.getCargo(), cargo -> new EstimacionProyectoTipoTareaXCargo(estimacion.getProyecto(), estimacionTipoTarea.getTipoTarea(), estimacionCargo.getCargo(), estimacionCargo.getPrecioTotal(), TimeUtils.durationToBigDecimal(estimacionTipoTarea.getDuracion())));
+                        })));
         return estimacionesXCargo;
     }
 
