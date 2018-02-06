@@ -46,6 +46,17 @@ public class EstimacionDao extends AbstractDao<Estimacion, Long> {
         return em;
     }
 
+    public Estimacion findById(Long id) {
+        CriteriaBuilder criteriaBuilder = this.getEntityManager().getCriteriaBuilder();
+        CriteriaQuery criteriaQuery = criteriaBuilder.createQuery();
+        Root entity = criteriaQuery.from(Estimacion.class);
+        criteriaQuery.select(entity).distinct(true);
+        criteriaQuery.where(criteriaBuilder.equal(entity.get("id"), criteriaBuilder.parameter(Long.class, "id")));
+        Query query = this.getEntityManager().createQuery(criteriaQuery);
+        query.setParameter("id", id);
+        return (Estimacion) query.getSingleResult();
+    }
+
     public List<Estimacion> findAllByProyecto(Proyecto proyecto) {
         CriteriaBuilder criteriaBuilder = this.getEntityManager().getCriteriaBuilder();
         CriteriaQuery criteriaQuery = criteriaBuilder.createQuery();
