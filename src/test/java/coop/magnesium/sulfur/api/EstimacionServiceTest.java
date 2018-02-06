@@ -98,7 +98,7 @@ public class EstimacionServiceTest {
         Estimacion estimacion = new Estimacion(this.proyecto, null, LocalDate.now());
         EstimacionCargo estimacionCargo = new EstimacionCargo(this.cargo, new BigDecimal(150));
         estimacion.getEstimacionCargos().add(estimacionCargo);
-        EstimacionTipoTarea estimacionTipoTarea = new EstimacionTipoTarea(this.tipoTarea,Duration.ofMinutes(23));
+        EstimacionTipoTarea estimacionTipoTarea = new EstimacionTipoTarea(this.tipoTarea, Duration.ofMinutes(15));
         estimacionCargo.getEstimacionTipoTareas().add(estimacionTipoTarea);
         final Response response = webTarget
                 .path("/estimaciones")
@@ -133,7 +133,7 @@ public class EstimacionServiceTest {
     public void consulta1() {
         estimacionDao.findEstimacionProyectoTipoTareaXCargo(this.proyecto, this.tipoTarea).forEach((key, value) -> {
             assertEquals(this.cargo.getId(),value.cargo.getId());
-            assertEquals(new BigDecimal(9).setScale(2),value.cantidadHoras);
+            assertEquals(new BigDecimal(9.25).setScale(2), value.cantidadHoras);
             assertEquals(new BigDecimal(160).setScale(2),value.precioTotal);
         });
 

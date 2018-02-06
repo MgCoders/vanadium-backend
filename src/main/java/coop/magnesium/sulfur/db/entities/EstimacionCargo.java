@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiModel;
 import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +28,7 @@ public class EstimacionCargo {
     private BigDecimal precioTotal;
 
     @Valid
-    @Size(min = 1, message = "La lista de Estimaciones por tarea no puede ser vacia")
+    //@Size(min = 1, message = "La lista de Estimaciones por tarea no puede ser vacia")
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "estimacion_cargo_id")
     private List<EstimacionTipoTarea> estimacionTipoTareas = new ArrayList<>();

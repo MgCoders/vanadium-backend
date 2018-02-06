@@ -12,7 +12,6 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,8 +40,8 @@ public class Estimacion {
     private LocalDate fecha;
 
     @Valid
-    @NotNull
-    @Size(min = 1, message = "La lista de Estimaciones por cargo no puede ser vacia")
+    //@NotNull
+    //@Size(min = 1, message = "La lista de Estimaciones por cargo no puede ser vacia")
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "estimacion_id")
     private List<EstimacionCargo> estimacionCargos = new ArrayList<>();
