@@ -1,0 +1,32 @@
+version: '3.3'
+
+services:
+
+  jee_REPLACE_PROJECT_NAME:
+    image: REPLACE_IMAGE_NAME
+    networks:
+      - traefik_proxy
+    environment:
+       DB_HOST: 
+       DB_NAME: REPLACE_PROJECT_NAME
+       DB_USER: 
+       DB_PASS: 
+       LOGSTASH_HOST: 
+       ZOHO_MAIL_FROM: 
+       ZOHO_MAIL_PASS: 
+       ROOT_PASSWORD: 
+    deploy:
+      labels:
+        - "traefik.port=8080"
+        - "traefik.backend=jee_REPLACE_PROJECT_NAME"
+        - "traefik.frontend.rule=Host:REPLACE_URL_PROD"
+        - "traefik.enable=true"
+        - "traefik.docker.network=traefik_proxy"
+        - "traefik.backend.loadbalancer.sticky=true"
+        - "traefik.frontend.passHostHeader=true"
+      restart_policy:
+        condition: on-failure
+ 
+networks:
+  traefik_proxy:
+    external: true

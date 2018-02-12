@@ -3,7 +3,7 @@ os: linux
 
 files:
  - source: /
-   destination: /home/ubuntu/sulfur-backend-deploy
+   destination: /home/ubuntu/jee-REPLACE_PROJECT_NAME-deploy
 
 permissions:
  - object: /
