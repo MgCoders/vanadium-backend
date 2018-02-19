@@ -3,6 +3,10 @@ version: 0.2
 env:
   variables:
     IMAGE_TAG: "no_version"
+    IMAGE_TAG: "no_version"
+    PROJECT_NAME: "no_name"
+    PROJECT_URL_TEST: "no_url"
+    PROJECT_URL_PROD: "no_url"
 
 phases:
     pre_build:
@@ -10,12 +14,11 @@ phases:
         - echo Logging in to Amazon ECR...
         - $(aws ecr get-login --region $AWS_DEFAULT_REGION)
         - export IMAGE_TAG=$(xmllint --xpath "//*[local-name()='project']/*[local-name()='version']/text()" pom.xml)
-	- export PROJECT_NAME=$(xmllint --xpath "//*[local-name()='project']/*[local-name()='artifactId']/text()" pom.xml)
+	    - export PROJECT_NAME=$(xmllint --xpath "//*[local-name()='project']/*[local-name()='artifactId']/text()" pom.xml)
         - export PROJECT_URL_TEST=$(xmllint --xpath "//*[local-name()='project']/*[local-name()='properties']/*[local-name()='url.testing']/text()" pom.xml)
         - export PROJECT_URL_PROD=$(xmllint --xpath "//*[local-name()='project']/*[local-name()='properties']/*[local-name()='url.prod']/text()" pom.xml)
         - sed -i "s/REPLACE_PROJECT_NAME/$PROJECT_NAME/g" stop_server.sh
         - sed -i "s/REPLACE_PROJECT_NAME/$PROJECT_NAME/g" start_server.sh
-        - sed -i "s/REPLACE_PROJECT_NAME/$PROJECT_NAME/g" check_service.sh
         - sed -i "s/REPLACE_PROJECT_NAME/$PROJECT_NAME/g" appspec.yml
         - sed -i "s/REPLACE_PROJECT_NAME/$PROJECT_NAME/g" docker-compose.testing.yml
         - sed -i "s/REPLACE_PROJECT_NAME/$PROJECT_NAME/g" docker-compose.swarm.yml
@@ -44,7 +47,6 @@ artifacts:
   files:
     - 'stop_server.sh'
     - 'start_server.sh'
-    - 'check_service.sh'
     - 'appspec.yml'
-    - 'docker-compose.production.yml'
+    - 'docker-compose.testing.yml'
     - 'docker-compose.swarm.yml'
