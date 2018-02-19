@@ -22,6 +22,7 @@ public class Proyecto {
     private String codigo;
     @NotNull
     private String nombre;
+    private Integer prioridad = 1;
 
     public Proyecto() {
     }
@@ -55,12 +56,21 @@ public class Proyecto {
         this.nombre = nombre;
     }
 
+    public Integer getPrioridad() {
+        return prioridad;
+    }
+
+    public void setPrioridad(Integer prioridad) {
+        this.prioridad = prioridad;
+    }
+
     @Override
     public String toString() {
         return "Proyecto{" +
                 "id=" + id +
                 ", codigo='" + codigo + '\'' +
                 ", nombre='" + nombre + '\'' +
+                ", prioridad=" + prioridad +
                 '}';
     }
 }

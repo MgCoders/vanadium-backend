@@ -72,7 +72,9 @@ public class HoraService {
 
             hora.setColaborador(colaborador);
 
-            if (!((SulfurUser) securityContext.getUserPrincipal()).getColaboradorId().equals(colaborador.getId()))
+            SulfurUser usuarioLogueado = (SulfurUser) securityContext.getUserPrincipal();
+            Role rolUsuarioLogueado = Role.valueOf(usuarioLogueado.getRole());
+            if (!rolUsuarioLogueado.equals(Role.ADMIN) && !usuarioLogueado.getColaboradorId().equals(colaborador.getId()))
                 throw new MagnesiumSecurityException("Colaborador no coincide");
 
 
@@ -105,12 +107,24 @@ public class HoraService {
 
 
     @GET
+    @Path("{fecha_ini}/{fecha_fin}")
     @JWTTokenNeeded
     @RoleNeeded({Role.ADMIN})
-    @ApiOperation(value = "Get horas", response = Hora.class, responseContainer = "List")
-    public Response findAll() {
-        List<Hora> horaList = horaDao.findAll();
-        return Response.ok(horaList).build();
+    @ApiOperation(value = "Get horas por rango de fecha", response = Hora.class, responseContainer = "List")
+    public Response findAll(@PathParam("fecha_ini") String fechaIniString,
+                            @PathParam("fecha_fin") String fechaFinString) {
+        try {
+
+            LocalDate fechaIni = LocalDate.parse(fechaIniString, formatter);
+            LocalDate fechaFin = LocalDate.parse(fechaFinString, formatter);
+
+            List<Hora> horaList = horaDao.findAllByFechas(fechaIni, fechaFin);
+
+            return Response.ok(horaList).build();
+        } catch (Exception e) {
+            logger.warning(e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        }
     }
 
     @GET
@@ -129,9 +143,10 @@ public class HoraService {
             Colaborador colaborador = colaboradorDao.findById(id);
             if (colaborador == null) throw new MagnesiumNotFoundException("Colaborador no encontrado");
 
-            if (!((SulfurUser) securityContext.getUserPrincipal()).getColaboradorId().equals(colaborador.getId())) {
+            SulfurUser usuarioLogueado = (SulfurUser) securityContext.getUserPrincipal();
+            Role rolUsuarioLogueado = Role.valueOf(usuarioLogueado.getRole());
+            if (!rolUsuarioLogueado.equals(Role.ADMIN) && !usuarioLogueado.getColaboradorId().equals(colaborador.getId()))
                 throw new MagnesiumSecurityException("Colaborador no coincide");
-            }
 
             LocalDate fechaIni = LocalDate.parse(fechaIniString, formatter);
             LocalDate fechaFin = LocalDate.parse(fechaFinString, formatter);
@@ -175,9 +190,10 @@ public class HoraService {
             if (colaborador == null) throw new MagnesiumNotFoundException("Colaborador no encontrado");
             hora.setColaborador(colaborador);
 
-            if (!((SulfurUser) securityContext.getUserPrincipal()).getColaboradorId().equals(colaborador.getId())) {
+            SulfurUser usuarioLogueado = (SulfurUser) securityContext.getUserPrincipal();
+            Role rolUsuarioLogueado = Role.valueOf(usuarioLogueado.getRole());
+            if (!rolUsuarioLogueado.equals(Role.ADMIN) && !usuarioLogueado.getColaboradorId().equals(colaborador.getId()))
                 throw new MagnesiumSecurityException("Colaborador no coincide");
-            }
 
             if (horaDao.findById(id) == null) throw new MagnesiumNotFoundException("Hora no encontrada");
             hora.setId(id);

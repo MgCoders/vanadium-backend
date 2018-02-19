@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import coop.magnesium.sulfur.api.dto.HorasProyectoXCargo;
+import coop.magnesium.sulfur.db.dao.CargoDao;
 import coop.magnesium.sulfur.db.dao.ColaboradorDao;
+import coop.magnesium.sulfur.db.entities.Cargo;
 import coop.magnesium.sulfur.db.entities.Colaborador;
 import coop.magnesium.sulfur.system.MailEvent;
 import coop.magnesium.sulfur.system.StartupBean;
@@ -28,9 +30,12 @@ import org.junit.runner.RunWith;
 import javax.inject.Inject;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
@@ -45,9 +50,11 @@ public class ColaboradorServiceTest {
      * Acá en arquillian hay que hacerlo a mano.
      */
     final ObjectMapper objectMapper = new ObjectMapper();
-
+    final Cargo cargo = new Cargo("CC", "CC", new BigDecimal(32.2));
     @Inject
     ColaboradorDao colaboradorDao;
+    @Inject
+    CargoDao cargoDao;
     @Inject
     Logger logger;
 
@@ -81,7 +88,9 @@ public class ColaboradorServiceTest {
     @Test
     @InSequence(1)
     public void inicializarBd() {
-        logger.info(colaboradorDao.save(new Colaborador("bu", "bu", null, PasswordUtils.digestPassword("bu"), "ADMIN")).toString());
+        Cargo cargo = cargoDao.save(this.cargo);
+        logger.info(cargo.toString());
+        logger.info(colaboradorDao.save(new Colaborador("bu", "bu", cargo, PasswordUtils.digestPassword("bu"), "ADMIN")).toString());
     }
 
 
@@ -102,6 +111,24 @@ public class ColaboradorServiceTest {
         assertEquals(null, returned.getPassword());
         assertEquals(colaborador.getNombre(), returned.getNombre());
         assertEquals(1L, (long) returned.getId());
+    }
+
+    @Test
+    @InSequence(3)
+    @RunAsClient
+    public void findByCargo(@ArquillianResteasyResource final WebTarget webTarget) {
+
+        this.cargo.setId(1L);
+
+        final Response response = webTarget
+                .path("/colaboradores/cargo")
+                .request(MediaType.APPLICATION_JSON)
+                .post(Entity.json(this.cargo));
+        List<Colaborador> colaboradorList = response.readEntity(new GenericType<List<Colaborador>>() {
+        });
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        assertEquals(1L, colaboradorList.size());
+        assertEquals(this.cargo.getId(), colaboradorList.get(0).getCargo().getId());
     }
 
 

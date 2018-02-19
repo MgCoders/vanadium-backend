@@ -154,7 +154,7 @@ public class HoraServiceTest {
         final Response response = webTarget
                 .path("/horas")
                 .request(MediaType.APPLICATION_JSON)
-                .header("AUTHORIZATION", "USER:2")
+                .header("AUTHORIZATION", "ADMIN:1")
                 .post(Entity.json(objectMapper.writeValueAsString(hora)));
 
         assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
@@ -210,7 +210,7 @@ public class HoraServiceTest {
 
 
         final Response response = webTarget
-                .path("/horas")
+                .path("/horas/01-01-2011/01-01-2018")
                 .request(MediaType.APPLICATION_JSON)
                 .header("AUTHORIZATION", "ADMIN:1")
                 .get();
@@ -228,7 +228,7 @@ public class HoraServiceTest {
 
 
         final Response response = webTarget
-                .path("/horas")
+                .path("/horas/01-01-2011/01-01-2018")
                 .request(MediaType.APPLICATION_JSON)
                 .header("AUTHORIZATION", "USER:1")
                 .get();
@@ -272,6 +272,24 @@ public class HoraServiceTest {
     @Test
     @InSequence(10)
     @RunAsClient
+    public void getHorasUserBien2(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
+
+
+        final Response response = webTarget
+                .path("/horas/user/2/01-01-2011/01-01-2018")
+                .request(MediaType.APPLICATION_JSON)
+                .header("AUTHORIZATION", "ADMIN:1")
+                .get();
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        List<Hora> horaList = response.readEntity(new GenericType<List<Hora>>() {
+        });
+        assertEquals(1, horaList.size());
+    }
+
+    @Test
+    @InSequence(11)
+    @RunAsClient
     public void editHoraUser(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
         Hora hora = new Hora(LocalDate.of(2017, 12, 24), LocalTime.MIN, LocalTime.MAX, this.colaborador_user);
         hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, Duration.ofHours(20)));
@@ -285,7 +303,7 @@ public class HoraServiceTest {
         final Response response = webTarget
                 .path("/horas/1")
                 .request(MediaType.APPLICATION_JSON)
-                .header("AUTHORIZATION", "USER:2")
+                .header("AUTHORIZATION", "ADMIN:1")
                 .put(Entity.json(objectMapper.writeValueAsString(hora)));
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -299,7 +317,7 @@ public class HoraServiceTest {
     }
 
     @Test
-    @InSequence(10)
+    @InSequence(12)
     @RunAsClient
     public void editHoraUserIncompleta(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
         Hora hora = new Hora(LocalDate.of(2017, 12, 24), LocalTime.MIN, LocalTime.MAX, this.colaborador_user);

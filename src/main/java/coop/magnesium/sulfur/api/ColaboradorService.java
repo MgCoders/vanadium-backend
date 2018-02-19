@@ -96,6 +96,27 @@ public class ColaboradorService {
         return Response.ok(allSulfurUsers).build();
     }
 
+    @POST
+    @Path("/cargo")
+    @Logged
+    @JWTTokenNeeded
+    @RoleNeeded({Role.ADMIN})
+    @ApiOperation(value = "Get colaboradores por cargo", response = Colaborador.class, responseContainer = "List")
+    public Response findByCargo(@Valid Cargo cargo) {
+        try {
+            Cargo cargoExiste = cargoDao.findById(cargo.getId());
+            if (cargoExiste == null) throw new MagnesiumNotFoundException("Cargo no existe");
+            List<Colaborador> allSulfurUsers = colaboradorDao.findAllByCargo(cargoExiste);
+            return Response.ok(allSulfurUsers).build();
+        } catch (MagnesiumNotFoundException e) {
+            logger.warning(e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST).entity("Cargo no existe").build();
+        } catch (Exception e) {
+            logger.severe(e.getMessage());
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+
     @GET
     @Path("{id}")
     @JWTTokenNeeded

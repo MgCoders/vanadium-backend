@@ -60,6 +60,20 @@ public class HoraDao extends AbstractDao<Hora, Long> {
         return (List<Hora>) query.getResultList();
     }
 
+    public List<Hora> findAllByFechas(LocalDate ini, LocalDate fin) {
+        CriteriaBuilder criteriaBuilder = this.getEntityManager().getCriteriaBuilder();
+        CriteriaQuery criteriaQuery = criteriaBuilder.createQuery();
+        Root entity = criteriaQuery.from(Hora.class);
+        criteriaQuery.select(entity);
+        Predicate diaEntreFechas = criteriaBuilder.between(entity.get("dia"), criteriaBuilder.parameter(LocalDate.class, "ini"), criteriaBuilder.parameter(LocalDate.class, "fin"));
+        criteriaQuery.where(diaEntreFechas);
+        criteriaQuery.orderBy(criteriaBuilder.asc(entity.get("dia")));
+        Query query = this.getEntityManager().createQuery(criteriaQuery);
+        query.setParameter("ini", ini);
+        query.setParameter("fin", fin);
+        return (List<Hora>) query.getResultList();
+    }
+
     public Hora findByColaboradorFecha(Colaborador colaborador, LocalDate dia) throws MagnesiumBdMultipleResultsException {
         CriteriaBuilder criteriaBuilder = this.getEntityManager().getCriteriaBuilder();
         CriteriaQuery criteriaQuery = criteriaBuilder.createQuery();

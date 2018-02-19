@@ -73,7 +73,7 @@ public class ProyectoService {
     @RoleNeeded({Role.USER, Role.ADMIN})
     @ApiOperation(value = "Get proyectos", response = Proyecto.class, responseContainer = "List")
     public Response findAll() {
-        List<Proyecto> proyectoList = proyectoDao.findAll();
+        List<Proyecto> proyectoList = proyectoDao.findAllByPrioridad();
         return Response.ok(proyectoList).build();
     }
 
