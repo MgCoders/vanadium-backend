@@ -11,6 +11,7 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -69,6 +70,7 @@ public class ReportesDao {
                         r1.precioTotal.add(r2.precioTotal),
                         r1.proyecto, r1.tipoTarea, r1.cargo)).ifPresent(result::add));
 
+        result.sort(Comparator.comparing(reporteHoras1 -> reporteHoras1.cargo.getPrecioHora(LocalDate.now()).get().getPrecioHora()));
 
         ReporteHoras1 filaTotal = new ReporteHoras1(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, proyecto, tipoTarea, null);
         result.stream().reduce((r1, r2) -> new ReporteHoras1(
