@@ -14,7 +14,7 @@ phases:
         - echo Logging in to Amazon ECR...
         - $(aws ecr get-login --region $AWS_DEFAULT_REGION)
         - export IMAGE_TAG=$(xmllint --xpath "//*[local-name()='project']/*[local-name()='version']/text()" pom.xml)
-	    - export PROJECT_NAME=$(xmllint --xpath "//*[local-name()='project']/*[local-name()='artifactId']/text()" pom.xml)
+        - export PROJECT_NAME=$(xmllint --xpath "//*[local-name()='project']/*[local-name()='artifactId']/text()" pom.xml)
         - export PROJECT_URL_TEST=$(xmllint --xpath "//*[local-name()='project']/*[local-name()='properties']/*[local-name()='url.testing']/text()" pom.xml)
         - export PROJECT_URL_PROD=$(xmllint --xpath "//*[local-name()='project']/*[local-name()='properties']/*[local-name()='url.prod']/text()" pom.xml)
         - sed -i "s/REPLACE_PROJECT_NAME/$PROJECT_NAME/g" stop_server.sh
