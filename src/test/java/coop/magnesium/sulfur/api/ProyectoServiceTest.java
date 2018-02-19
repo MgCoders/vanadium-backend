@@ -2,7 +2,6 @@ package coop.magnesium.sulfur.api;
 
 import coop.magnesium.sulfur.api.dto.HorasProyectoXCargo;
 import coop.magnesium.sulfur.db.dao.ProyectoDao;
-import coop.magnesium.sulfur.db.entities.Cargo;
 import coop.magnesium.sulfur.db.entities.Proyecto;
 import coop.magnesium.sulfur.utils.Logged;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -130,7 +129,7 @@ public class ProyectoServiceTest {
                 .path("/proyectos/1")
                 .request(MediaType.APPLICATION_JSON)
                 .put(Entity.json(proyecto));
-        Cargo returned = response.readEntity(Cargo.class);
+        Proyecto returned = response.readEntity(Proyecto.class);
         assertEquals(proyecto.getCodigo(), returned.getCodigo());
         assertEquals(proyecto.getNombre(), returned.getNombre());
     }
