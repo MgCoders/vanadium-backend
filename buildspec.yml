@@ -10,20 +10,35 @@ phases:
         - echo Logging in to Amazon ECR...
         - $(aws ecr get-login --region $AWS_DEFAULT_REGION)
         - export IMAGE_TAG=$(xmllint --xpath "//*[local-name()='project']/*[local-name()='version']/text()" pom.xml)
+	- export PROJECT_NAME=$(xmllint --xpath "//*[local-name()='project']/*[local-name()='artifactId']/text()" pom.xml)
+        - export PROJECT_URL_TEST=$(xmllint --xpath "//*[local-name()='project']/*[local-name()='properties']/*[local-name()='url.testing']/text()" pom.xml)
+        - export PROJECT_URL_PROD=$(xmllint --xpath "//*[local-name()='project']/*[local-name()='properties']/*[local-name()='url.prod']/text()" pom.xml)
+        - sed -i "s/REPLACE_PROJECT_NAME/$PROJECT_NAME/g" stop_server.sh
+        - sed -i "s/REPLACE_PROJECT_NAME/$PROJECT_NAME/g" start_server.sh
+        - sed -i "s/REPLACE_PROJECT_NAME/$PROJECT_NAME/g" check_service.sh
+        - sed -i "s/REPLACE_PROJECT_NAME/$PROJECT_NAME/g" appspec.yml
+        - sed -i "s/REPLACE_PROJECT_NAME/$PROJECT_NAME/g" docker-compose.testing.yml
+        - sed -i "s/REPLACE_PROJECT_NAME/$PROJECT_NAME/g" docker-compose.swarm.yml
+        - sed -i "s/REPLACE_PROJECT_NAME/$PROJECT_NAME/g" Dockerfile
+        - sed -i "s/REPLACE_URL_TEST/$PROJECT_URL_TEST/g" docker-compose.testing.yml
+        - sed -i "s/REPLACE_URL_PROD/$PROJECT_URL_PROD/g" docker-compose.swarm.yml
+        - export IMAGE_NAME=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$PROJECT_NAME:$IMAGE_TAG
+        - sed -i "s#REPLACE_IMAGE_NAME#$IMAGE_NAME#g" docker-compose.swarm.yml
+        - sed -i "s#REPLACE_IMAGE_NAME#$IMAGE_NAME#g" docker-compose.testing.yml
     build:
       commands:
         - echo Build started on `date`
         - echo building artifact with maven
         - docker run --rm -v "$(pwd)":/usr/src/mymaven -w /usr/src/mymaven maven:3.3-jdk-8 mvn clean package -P produccion -P arq-wildfly-managed
         - echo Building the Docker image version $IMAGE_TAG ...
-        - docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/sulfur-backend:latest .
-        - docker tag $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/sulfur-backend:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/sulfur-backend:$IMAGE_TAG
+        - docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$PROJECT_NAME:latest .
+        - docker tag $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$PROJECT_NAME:latest $IMAGE_NAME
     post_build:
       commands:
         - echo Build completed on `date`
         - echo Pushing the Docker image...
-        - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/sulfur-backend:$IMAGE_TAG
-        - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/sulfur-backend:latest
+        - docker push $IMAGE_NAME
+        - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$PROJECT_NAME:latest
 
 artifacts:
   files:
@@ -32,3 +47,4 @@ artifacts:
     - 'check_service.sh'
     - 'appspec.yml'
     - 'docker-compose.production.yml'
+    - 'docker-compose.swarm.yml'

@@ -106,6 +106,8 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <version.jacoco>0.7.8</version.jacoco>
         <version.arquillian_jacoco>1.0.0.Alpha9</version.arquillian_jacoco>
+        <url.testing>sulfur.magnesium.coop</url.testing>
+	<url.prod>sulfur.magnesium.link</url.prod>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -154,12 +156,23 @@
             </activation>
         </profile>
         <profile>
-            <id>produccion</id>
+            <id>testing</id>
             <properties>
-                <jboss.host>https://sulfur.magnesium.coop</jboss.host>
+                <jboss.host>https://${url.testing}</jboss.host>
                 <jboss.port>80</jboss.port>
                 <rest.base.path>api</rest.base.path>
-                <rest.base.host>sulfur.magnesium.coop</rest.base.host>
+                <rest.base.host>${url.testing}</rest.base.host>
+                <frontend.host>https://marq.magnesium.coop</frontend.host>
+                <frontend.path>/#/extra/new-password?token=</frontend.path>
+            </properties>
+        </profile>
+        <profile>
+            <id>produccion</id>
+            <properties>
+                <jboss.host>https://${url.prod}</jboss.host>
+                <jboss.port>80</jboss.port>
+                <rest.base.path>api</rest.base.path>
+                <rest.base.host>${url.prod}</rest.base.host>
                 <frontend.host>https://marq.magnesium.coop</frontend.host>
                 <frontend.path>/#/extra/new-password?token=</frontend.path>
             </properties>
