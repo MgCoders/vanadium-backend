@@ -107,12 +107,24 @@ public class HoraService {
 
 
     @GET
+    @Path("{fecha_ini}/{fecha_fin}")
     @JWTTokenNeeded
     @RoleNeeded({Role.ADMIN})
-    @ApiOperation(value = "Get horas", response = Hora.class, responseContainer = "List")
-    public Response findAll() {
-        List<Hora> horaList = horaDao.findAll();
-        return Response.ok(horaList).build();
+    @ApiOperation(value = "Get horas por rango de fecha", response = Hora.class, responseContainer = "List")
+    public Response findAll(@PathParam("fecha_ini") String fechaIniString,
+                            @PathParam("fecha_fin") String fechaFinString) {
+        try {
+
+            LocalDate fechaIni = LocalDate.parse(fechaIniString, formatter);
+            LocalDate fechaFin = LocalDate.parse(fechaFinString, formatter);
+
+            List<Hora> horaList = horaDao.findAllByFechas(fechaIni, fechaFin);
+
+            return Response.ok(horaList).build();
+        } catch (Exception e) {
+            logger.warning(e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        }
     }
 
     @GET

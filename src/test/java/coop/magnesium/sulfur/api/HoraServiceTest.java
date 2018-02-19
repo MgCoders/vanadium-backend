@@ -210,7 +210,7 @@ public class HoraServiceTest {
 
 
         final Response response = webTarget
-                .path("/horas")
+                .path("/horas/01-01-2011/01-01-2018")
                 .request(MediaType.APPLICATION_JSON)
                 .header("AUTHORIZATION", "ADMIN:1")
                 .get();
@@ -228,7 +228,7 @@ public class HoraServiceTest {
 
 
         final Response response = webTarget
-                .path("/horas")
+                .path("/horas/01-01-2011/01-01-2018")
                 .request(MediaType.APPLICATION_JSON)
                 .header("AUTHORIZATION", "USER:1")
                 .get();
