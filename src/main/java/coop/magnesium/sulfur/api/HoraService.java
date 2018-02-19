@@ -72,7 +72,9 @@ public class HoraService {
 
             hora.setColaborador(colaborador);
 
-            if (!((SulfurUser) securityContext.getUserPrincipal()).getColaboradorId().equals(colaborador.getId()))
+            SulfurUser usuarioLogueado = (SulfurUser) securityContext.getUserPrincipal();
+            Role rolUsuarioLogueado = Role.valueOf(usuarioLogueado.getRole());
+            if (!rolUsuarioLogueado.equals(Role.ADMIN) && !usuarioLogueado.getColaboradorId().equals(colaborador.getId()))
                 throw new MagnesiumSecurityException("Colaborador no coincide");
 
 
@@ -129,9 +131,10 @@ public class HoraService {
             Colaborador colaborador = colaboradorDao.findById(id);
             if (colaborador == null) throw new MagnesiumNotFoundException("Colaborador no encontrado");
 
-            if (!((SulfurUser) securityContext.getUserPrincipal()).getColaboradorId().equals(colaborador.getId())) {
+            SulfurUser usuarioLogueado = (SulfurUser) securityContext.getUserPrincipal();
+            Role rolUsuarioLogueado = Role.valueOf(usuarioLogueado.getRole());
+            if (!rolUsuarioLogueado.equals(Role.ADMIN) && !usuarioLogueado.getColaboradorId().equals(colaborador.getId()))
                 throw new MagnesiumSecurityException("Colaborador no coincide");
-            }
 
             LocalDate fechaIni = LocalDate.parse(fechaIniString, formatter);
             LocalDate fechaFin = LocalDate.parse(fechaFinString, formatter);
@@ -175,9 +178,10 @@ public class HoraService {
             if (colaborador == null) throw new MagnesiumNotFoundException("Colaborador no encontrado");
             hora.setColaborador(colaborador);
 
-            if (!((SulfurUser) securityContext.getUserPrincipal()).getColaboradorId().equals(colaborador.getId())) {
+            SulfurUser usuarioLogueado = (SulfurUser) securityContext.getUserPrincipal();
+            Role rolUsuarioLogueado = Role.valueOf(usuarioLogueado.getRole());
+            if (!rolUsuarioLogueado.equals(Role.ADMIN) && !usuarioLogueado.getColaboradorId().equals(colaborador.getId()))
                 throw new MagnesiumSecurityException("Colaborador no coincide");
-            }
 
             if (horaDao.findById(id) == null) throw new MagnesiumNotFoundException("Hora no encontrada");
             hora.setId(id);
