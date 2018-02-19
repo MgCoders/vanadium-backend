@@ -72,6 +72,7 @@ public class ReportesDao {
 
         result.sort(Comparator.comparing(reporteHoras1 -> reporteHoras1.cargo.getPrecioHora(LocalDate.now()).get().getPrecioHora()));
 
+
         ReporteHoras1 filaTotal = new ReporteHoras1(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, proyecto, tipoTarea, null);
         result.stream().reduce((r1, r2) -> new ReporteHoras1(
                 r1.cantidadHoras.add(r2.cantidadHoras),
