@@ -330,7 +330,7 @@ public class HoraServiceTest {
         final Response response = webTarget
                 .path("/horas/1")
                 .request(MediaType.APPLICATION_JSON)
-                .header("AUTHORIZATION", "USER:2")
+                .header("AUTHORIZATION", "ADMIN:2")
                 .put(Entity.json(objectMapper.writeValueAsString(hora)));
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
