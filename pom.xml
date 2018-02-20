@@ -107,7 +107,7 @@
         <version.jacoco>0.7.8</version.jacoco>
         <version.arquillian_jacoco>1.0.0.Alpha9</version.arquillian_jacoco>
         <url.testing>sulfur.magnesium.coop</url.testing>
-	<url.prod>sulfur.magnesium.link</url.prod>
+        <url.prod>sulfur.magnesium.link</url.prod>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -145,6 +145,7 @@
             <id>desarrollo</id>
             <properties>
                 <jboss.host>127.0.0.1</jboss.host>
+                <hibernate.hbm2ddl.option>update</hibernate.hbm2ddl.option>
                 <jboss.port>8080</jboss.port>
                 <rest.base.path>api</rest.base.path>
                 <rest.base.host>localhost:8080</rest.base.host>
@@ -159,6 +160,7 @@
             <id>testing</id>
             <properties>
                 <jboss.host>https://${url.testing}</jboss.host>
+                <hibernate.hbm2ddl.option>create-drop</hibernate.hbm2ddl.option>
                 <jboss.port>80</jboss.port>
                 <rest.base.path>api</rest.base.path>
                 <rest.base.host>${url.testing}</rest.base.host>
@@ -170,6 +172,7 @@
             <id>produccion</id>
             <properties>
                 <jboss.host>https://${url.prod}</jboss.host>
+                <hibernate.hbm2ddl.option>update</hibernate.hbm2ddl.option>
                 <jboss.port>80</jboss.port>
                 <rest.base.path>api</rest.base.path>
                 <rest.base.host>${url.prod}</rest.base.host>

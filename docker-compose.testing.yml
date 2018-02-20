@@ -14,7 +14,7 @@ services:
        LOGSTASH_HOST:
        ZOHO_MAIL_FROM: testing@magnesium.coop
        ZOHO_MAIL_PASS: testing
-       ZOHO_MAIL_HOST: mailhog
+       ZOHO_MAIL_HOST: mails_mailhog
        ZOHO_MAIL_PORT: 1025
        ROOT_PASSWORD: root
     deploy:
