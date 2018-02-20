@@ -8,13 +8,15 @@ services:
       - traefik_proxy
     environment:
        DB_HOST: postgres
-       DB_NAME: REPLACE_PROJECT_NAME
+       DB_NAME: postgres
        DB_USER: postgres
-       DB_PASS: nosemeocurre
+       DB_PASS: postgres
        LOGSTASH_HOST:
-       ZOHO_MAIL_FROM:
-       ZOHO_MAIL_PASS:
-       ROOT_PASSWORD:
+       ZOHO_MAIL_FROM: testing@magnesium.coop
+       ZOHO_MAIL_PASS: testing
+       ZOHO_MAIL_HOST: mailhog
+       ZOHO_MAIL_PORT: 1025
+       ROOT_PASSWORD: root
     deploy:
       labels:
         - "traefik.port=8080"
@@ -26,6 +28,13 @@ services:
         - "traefik.frontend.passHostHeader=true"
       restart_policy:
         condition: on-failure
+
+  postgres:
+    image: postgres
+      environment:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
+        POSTGRES_DB: postgres
 
 networks:
   traefik_proxy:
