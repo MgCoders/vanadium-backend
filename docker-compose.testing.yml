@@ -31,6 +31,8 @@ services:
 
   postgres:
     image: postgres
+    networks:
+      - traefik_proxy
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
