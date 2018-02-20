@@ -13,7 +13,9 @@ services:
        DB_PASS: 
        LOGSTASH_HOST: 
        ZOHO_MAIL_FROM: 
-       ZOHO_MAIL_PASS: 
+       ZOHO_MAIL_PASS:
+       ZOHO_MAIL_HOST:
+       ZOHO_MAIL_PORT:
        ROOT_PASSWORD: 
     deploy:
       labels:
