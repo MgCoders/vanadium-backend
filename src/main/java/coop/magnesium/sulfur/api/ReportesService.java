@@ -3,6 +3,7 @@ package coop.magnesium.sulfur.api;
 
 import coop.magnesium.sulfur.api.dto.EstimacionProyectoTipoTareaXCargo;
 import coop.magnesium.sulfur.api.dto.ReporteHoras1;
+import coop.magnesium.sulfur.api.dto.ReporteHoras2;
 import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
 import coop.magnesium.sulfur.api.utils.RoleNeeded;
 import coop.magnesium.sulfur.db.dao.*;
@@ -17,6 +18,8 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -31,6 +34,8 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 @Transactional
 @Api(description = "Reportes service", tags = "reportes")
 public class ReportesService {
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     @Inject
     private Logger logger;
@@ -108,6 +113,48 @@ public class ReportesService {
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
+
+    @GET
+    @Path("horas/fechas/{fecha_ini}/{fecha_fin}/colaborador/{colaborador_id}/proyecto/{proyecto_id}")
+    @JWTTokenNeeded
+    @RoleNeeded({Role.ADMIN})
+    @Logged
+    @ApiOperation(value = "Reporte de horas cargadas desglozado por cargo / tarea con filtros", response = ReporteHoras2.class, responseContainer = "List")
+    public Response reporte2(@PathParam("fecha_ini") String fechaIniString,
+                             @PathParam("fecha_fin") String fechaFinString,
+                             @PathParam("colaborador_id") Long colaborador_id,
+                             @PathParam("proyecto_id") Long proyecto_id) {
+        try {
+
+            LocalDate fechaIni = LocalDate.parse(fechaIniString, formatter);
+            LocalDate fechaFin = LocalDate.parse(fechaFinString, formatter);
+
+            if (colaborador_id == null && proyecto_id == null) {
+                List<ReporteHoras2> reporteHoras2List = reportesDao.reporteHoras2Fechas(fechaIni, fechaFin);
+                reporteHoras2List.forEach(reporteHoras1 -> logger.info(reporteHoras1.toString()));
+                return Response.ok(reporteHoras2List).build();
+            } else if (colaborador_id == null) {
+                Proyecto proyecto = proyectoDao.findById(proyecto_id);
+                if (proyecto == null)
+                    throw new MagnesiumNotFoundException("Proyecto no encontrado");
+                return Response.ok(null).build(); //TODO:
+            } else {
+                Proyecto proyecto = proyectoDao.findById(proyecto_id);
+                if (proyecto == null)
+                    throw new MagnesiumNotFoundException("Proyecto no encontrado");
+                Colaborador colaborador = colaboradorDao.findById(colaborador_id);
+                if (colaborador == null)
+                    throw new MagnesiumNotFoundException("Colaborador no encontrado");
+                return Response.ok(null).build(); //TODO:
+            }
+
+        } catch (MagnesiumNotFoundException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        } catch (Exception e) {
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+
 
     @GET
     @Path("horas/proyecto/{proyecto_id}")

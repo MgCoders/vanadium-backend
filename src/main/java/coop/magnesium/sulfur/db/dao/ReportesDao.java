@@ -2,6 +2,7 @@ package coop.magnesium.sulfur.db.dao;
 
 import coop.magnesium.sulfur.api.dto.EstimacionProyectoTipoTareaXCargo;
 import coop.magnesium.sulfur.api.dto.ReporteHoras1;
+import coop.magnesium.sulfur.api.dto.ReporteHoras2;
 import coop.magnesium.sulfur.db.entities.Cargo;
 import coop.magnesium.sulfur.db.entities.Proyecto;
 import coop.magnesium.sulfur.db.entities.TipoTarea;
@@ -137,6 +138,60 @@ public class ReportesDao {
                 r1.precioEstimado.add(r2.precioEstimado),
                 r1.precioTotal.add(r2.precioTotal),
                 r1.proyecto, r1.tipoTarea, r1.cargo)).ifPresent(reporteHoras1 -> {
+            filaTotal.precioTotal = reporteHoras1.precioTotal;
+            filaTotal.cantidadHorasEstimadas = reporteHoras1.cantidadHorasEstimadas;
+            filaTotal.precioEstimado = reporteHoras1.precioEstimado;
+            filaTotal.cantidadHoras = reporteHoras1.cantidadHoras;
+        });
+
+        result.add(filaTotal);
+        return result;
+    }
+
+    /**
+     * Reporte de horas por fechas
+     */
+    public List<ReporteHoras2> reporteHoras2Fechas(LocalDate ini, LocalDate fin) {
+        //Busco las estimaciones
+        Map<Cargo, EstimacionProyectoTipoTareaXCargo> estimacionesXCargo = estimacionDao.findEstimacionFechasTipoTareaXCargo(ini, fin);
+
+
+        //Aca va el resultado
+        Map<Cargo, Set<ReporteHoras2>> reporteXCargo = new HashMap<>();
+        //Junto todas las horas Detalle separadas por cargo.
+        horaDao.findAllByFechas(ini, fin).forEach(hora -> {
+            Cargo cargo = hora.getColaborador().getCargo();
+            reporteXCargo.computeIfAbsent(cargo, k -> new HashSet<>());
+            hora.getHoraDetalleList().forEach(horaDetalle -> {
+                BigDecimal costoXHora = cargo.getPrecioHora(hora.getDia()).get().getPrecioHora();
+                BigDecimal cantHoras = TimeUtils.durationToBigDecimal(horaDetalle.getDuracion());
+                BigDecimal costoHoras = costoXHora.multiply(cantHoras);
+                BigDecimal estimacionHoras = estimacionesXCargo.get(cargo) != null ? estimacionesXCargo.get(cargo).cantidadHoras : BigDecimal.ZERO;
+                BigDecimal estimacionPrecio = estimacionesXCargo.get(cargo) != null ? estimacionesXCargo.get(cargo).precioTotal : BigDecimal.ZERO;
+                reporteXCargo.get(cargo).add(new ReporteHoras2(cantHoras, estimacionHoras, estimacionPrecio, costoHoras, horaDetalle.getProyecto(), horaDetalle.getTipoTarea(), cargo));
+            });
+        });
+
+        //Resultados
+        List<ReporteHoras2> result = new ArrayList<>();
+        reporteXCargo.keySet().forEach(cargo ->
+                reporteXCargo.get(cargo).stream().reduce((r1, r2) -> new ReporteHoras2(
+                        r1.cantidadHoras.add(r2.cantidadHoras),
+                        r1.cantidadHorasEstimadas.add(r2.cantidadHorasEstimadas),
+                        r1.precioEstimado.add(r2.precioEstimado),
+                        r1.precioTotal.add(r2.precioTotal),
+                        r1.proyecto, r1.tipoTarea, r1.cargo)).ifPresent(result::add));
+
+        result.sort(Comparator.comparing(reporteHoras1 -> reporteHoras1.cargo.getPrecioHora(LocalDate.now()).get().getPrecioHora()));
+
+
+        ReporteHoras2 filaTotal = new ReporteHoras2(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, null, null, null);
+        result.stream().reduce((r1, r2) -> new ReporteHoras2(
+                r1.cantidadHoras.add(r2.cantidadHoras),
+                r1.cantidadHorasEstimadas.add(r2.cantidadHorasEstimadas),
+                r1.precioEstimado.add(r2.precioEstimado),
+                r1.precioTotal.add(r2.precioTotal),
+                null, null, null)).ifPresent(reporteHoras1 -> {
             filaTotal.precioTotal = reporteHoras1.precioTotal;
             filaTotal.cantidadHorasEstimadas = reporteHoras1.cantidadHorasEstimadas;
             filaTotal.precioEstimado = reporteHoras1.precioEstimado;

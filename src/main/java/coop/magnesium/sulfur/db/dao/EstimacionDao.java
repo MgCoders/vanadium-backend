@@ -15,7 +15,9 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +59,20 @@ public class EstimacionDao extends AbstractDao<Estimacion, Long> {
         return (Estimacion) query.getSingleResult();
     }
 
+    public List<Estimacion> findAllByFechas(LocalDate ini, LocalDate fin) {
+        CriteriaBuilder criteriaBuilder = this.getEntityManager().getCriteriaBuilder();
+        CriteriaQuery criteriaQuery = criteriaBuilder.createQuery();
+        Root entity = criteriaQuery.from(Estimacion.class);
+        criteriaQuery.select(entity).distinct(true);
+        Predicate diaEntreFechas = criteriaBuilder.between(entity.get("fecha"), criteriaBuilder.parameter(LocalDate.class, "ini"), criteriaBuilder.parameter(LocalDate.class, "fin"));
+        criteriaQuery.where(diaEntreFechas);
+        criteriaQuery.orderBy(criteriaBuilder.asc(entity.get("dia")));
+        Query query = this.getEntityManager().createQuery(criteriaQuery);
+        query.setParameter("ini", ini);
+        query.setParameter("fin", fin);
+        return (List<Estimacion>) query.getResultList();
+    }
+
     public List<Estimacion> findAllByProyecto(Proyecto proyecto) {
         CriteriaBuilder criteriaBuilder = this.getEntityManager().getCriteriaBuilder();
         CriteriaQuery criteriaQuery = criteriaBuilder.createQuery();
@@ -81,6 +97,21 @@ public class EstimacionDao extends AbstractDao<Estimacion, Long> {
                         });
                                 estimacionesXCargo.computeIfAbsent(estimacionCargo.getCargo(), cargo -> new EstimacionProyectoTipoTareaXCargo(estimacion.getProyecto(), estimacionTipoTarea.getTipoTarea(), estimacionCargo.getCargo(), estimacionCargo.getPrecioTotal(), TimeUtils.durationToBigDecimal(estimacionTipoTarea.getDuracion())));
                     }
+                        })));
+        return estimacionesXCargo;
+    }
+
+    @Logged
+    public Map<Cargo, EstimacionProyectoTipoTareaXCargo> findEstimacionFechasTipoTareaXCargo(LocalDate ini, LocalDate fin) {
+        Map<Cargo, EstimacionProyectoTipoTareaXCargo> estimacionesXCargo = new HashMap<>();
+        estimacionDao.findAllByFechas(ini, fin)
+                .forEach(estimacion -> estimacion.getEstimacionCargos().forEach(estimacionCargo ->
+                        estimacionCargo.getEstimacionTipoTareas().forEach(estimacionTipoTarea -> {
+                            estimacionesXCargo.computeIfPresent(estimacionCargo.getCargo(), (cargo, estimacionProyectoTipoTareaXCargo) -> {
+                                estimacionProyectoTipoTareaXCargo.cantidadHoras = estimacionProyectoTipoTareaXCargo.cantidadHoras.add(TimeUtils.durationToBigDecimal(estimacionTipoTarea.getDuracion()));
+                                return estimacionProyectoTipoTareaXCargo;
+                            });
+                            estimacionesXCargo.computeIfAbsent(estimacionCargo.getCargo(), cargo -> new EstimacionProyectoTipoTareaXCargo(estimacion.getProyecto(), estimacionTipoTarea.getTipoTarea(), estimacionCargo.getCargo(), estimacionCargo.getPrecioTotal(), TimeUtils.durationToBigDecimal(estimacionTipoTarea.getDuracion())));
                         })));
         return estimacionesXCargo;
     }
