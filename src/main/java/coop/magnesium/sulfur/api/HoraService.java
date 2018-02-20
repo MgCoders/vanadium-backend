@@ -43,6 +43,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 public class HoraService {
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
     @Inject
     Event<Notificacion> notificacionEvent;
     @Inject
@@ -86,6 +87,11 @@ public class HoraService {
             LocalDate hoy = LocalDate.now();
             if (hora.getDia().isAfter(hoy))
                 throw new MagnesiumException("Está intentando cargar horas futuras");
+
+            //horas pasadas
+            if (!rolUsuarioLogueado.equals(Role.ADMIN) && hora.getDia().isBefore(hoy))
+                throw new MagnesiumException("Está intentando cargar horas futuras");
+
 
             hora.cacularSubtotalDetalle();
             Hora horaCreada = horaDao.save(hora);
@@ -194,6 +200,15 @@ public class HoraService {
             Role rolUsuarioLogueado = Role.valueOf(usuarioLogueado.getRole());
             if (!rolUsuarioLogueado.equals(Role.ADMIN) && !usuarioLogueado.getColaboradorId().equals(colaborador.getId()))
                 throw new MagnesiumSecurityException("Colaborador no coincide");
+
+            //horas futuras
+            LocalDate hoy = LocalDate.now();
+            if (hora.getDia().isAfter(hoy))
+                throw new MagnesiumException("Está intentando cargar horas futuras");
+
+            //horas pasadas
+            if (!rolUsuarioLogueado.equals(Role.ADMIN) && hora.getDia().isBefore(hoy))
+                throw new MagnesiumException("Está intentando cargar horas futuras");
 
             if (horaDao.findById(id) == null) throw new MagnesiumNotFoundException("Hora no encontrada");
             hora.setId(id);
