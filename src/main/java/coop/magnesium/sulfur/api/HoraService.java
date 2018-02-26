@@ -86,11 +86,11 @@ public class HoraService {
             //horas futuras
             LocalDate hoy = LocalDate.now();
             if (hora.getDia().isAfter(hoy))
-                throw new MagnesiumException("Está intentando cargar horas futuras");
+                throw new MagnesiumException("Está intentando cargar horas futuras.");
 
             //horas pasadas
             if (!rolUsuarioLogueado.equals(Role.ADMIN) && hora.getDia().isBefore(hoy))
-                throw new MagnesiumException("Está intentando cargar horas futuras");
+                throw new MagnesiumException("Está intentando cargar horas de dias pasados, esta acción solo la puede realizar un administrador del sistema.");
 
 
             hora.cacularSubtotalDetalle();
@@ -204,11 +204,11 @@ public class HoraService {
             //horas futuras
             LocalDate hoy = LocalDate.now();
             if (hora.getDia().isAfter(hoy))
-                throw new MagnesiumException("Está intentando cargar horas futuras");
+                throw new MagnesiumException("Está intentando cargar horas futuras.");
 
             //horas pasadas
             if (!rolUsuarioLogueado.equals(Role.ADMIN) && hora.getDia().isBefore(hoy))
-                throw new MagnesiumException("Está intentando cargar horas futuras");
+                throw new MagnesiumException("Está intentando cargar horas de dias pasados, esta acción solo la puede realizar un administrador del sistema.");
 
             if (horaDao.findById(id) == null) throw new MagnesiumNotFoundException("Hora no encontrada");
             hora.setId(id);
@@ -218,10 +218,16 @@ public class HoraService {
             notificacionEvent.fire(new Notificacion(TipoNotificacion.EDICION_HORA, hora.getColaborador(), "Edición de horas", hora));
 
             return Response.ok(hora).build();
+
+        } catch (MagnesiumNotFoundException e) {
+            logger.warning(e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        } catch (MagnesiumSecurityException e) {
+            logger.warning(e.getMessage());
+            return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
         } catch (Exception e) {
-            return Response.notModified().entity(e.getMessage()).build();
+            logger.severe(e.getMessage());
+            return Response.serverError().entity(e.getMessage()).build();
         }
     }
-
-
 }
