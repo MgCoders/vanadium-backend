@@ -13,7 +13,7 @@ services:
        DB_PASS: postgres
        LOGSTASH_HOST:
        ZOHO_MAIL_FROM: no-reply@magnesium.coop
-       ZOHO_MAIL_PASS: no-reply@magnesium
+       ZOHO_MAIL_PASS: no-reply-magnesium
        ZOHO_MAIL_HOST: smtp.zoho.com
        ZOHO_MAIL_PORT: 465
        ROOT_PASSWORD: root
