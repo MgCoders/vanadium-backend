@@ -160,7 +160,7 @@
             <id>testing</id>
             <properties>
                 <jboss.host>https://${url.testing}</jboss.host>
-                <hibernate.hbm2ddl.option>create-drop</hibernate.hbm2ddl.option>
+                <hibernate.hbm2ddl.option>update</hibernate.hbm2ddl.option>
                 <jboss.port>80</jboss.port>
                 <rest.base.path>api</rest.base.path>
                 <rest.base.host>${url.testing}</rest.base.host>
