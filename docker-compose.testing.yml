@@ -33,6 +33,8 @@ services:
     image: postgres
     networks:
       - traefik_proxy
+    volumes:
+      - REPLACE_PROJECT_NAME_pg_vol:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -41,3 +43,6 @@ services:
 networks:
   traefik_proxy:
     external: true
+
+volumes:
+   REPLACE_PROJECT_NAME_pg_vol:
