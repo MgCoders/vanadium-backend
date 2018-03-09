@@ -37,7 +37,7 @@ public class ExtraTests {
         Hora hora = new Hora();
         hora.setHoraIn(LocalTime.MIN);
         hora.setHoraOut(hora.getHoraIn().plusHours(3L).plusMinutes(5L));
-        hora.getHoraDetalleList().add(new HoraDetalle(null, null, Duration.ofHours(22)));
+        hora.getHoraDetalleList().add(new HoraDetalle(null, null, Duration.ofHours(22), null));
         hora.calcularSubtotal();
         assertEquals(Duration.ofHours(3).plus(Duration.ofMinutes(5)), hora.getSubtotal());
         assertEquals(Duration.ofHours(22), hora.getSubtotalDetalles());
@@ -49,8 +49,8 @@ public class ExtraTests {
         Hora hora = new Hora();
         hora.setHoraIn(LocalTime.MIN);
         hora.setHoraOut(hora.getHoraIn().plusHours(23L).plusMinutes(5L));
-        hora.getHoraDetalleList().add(new HoraDetalle(null, null, Duration.ofHours(22)));
-        hora.getHoraDetalleList().add(new HoraDetalle(null, null, Duration.ofHours(1).plusMinutes(5)));
+        hora.getHoraDetalleList().add(new HoraDetalle(null, null, Duration.ofHours(22), null));
+        hora.getHoraDetalleList().add(new HoraDetalle(null, null, Duration.ofHours(1).plusMinutes(5), null));
         hora.calcularSubtotal();
         assertEquals(Duration.ofHours(23).plus(Duration.ofMinutes(5)), hora.getSubtotal());
         assertEquals(Duration.ofHours(23).plus(Duration.ofMinutes(5)), hora.getSubtotalDetalles());

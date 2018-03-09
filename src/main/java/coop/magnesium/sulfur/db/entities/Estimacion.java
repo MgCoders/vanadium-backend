@@ -6,12 +6,14 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import coop.magnesium.sulfur.api.dto.EstimacionProyecto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +24,14 @@ import java.util.List;
 @Entity
 @JsonAutoDetect
 @ApiModel
+@SqlResultSetMapping(name = "EstimacionProyecto", classes = {
+        @ConstructorResult(targetClass = EstimacionProyecto.class,
+                columns = {@ColumnResult(name = "proyecto_id", type = Long.class),
+                        @ColumnResult(name = "tipotarea_id", type = Long.class),
+                        @ColumnResult(name = "cargo_id", type = Long.class),
+                        @ColumnResult(name = "precioTotal", type = BigDecimal.class),
+                        @ColumnResult(name = "duracion", type = Long.class)})
+})
 public class Estimacion {
 
     @Id

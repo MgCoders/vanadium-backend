@@ -47,15 +47,15 @@ public class ReportesDao {
         Map<Cargo, Set<ReporteHoras1>> reporteXCargo = new HashMap<>();
         //Junto todas las horas Detalle separadas por cargo.
         horaDao.findAll().forEach(hora -> {
-            Cargo cargo = hora.getColaborador().getCargo();
-            reporteXCargo.computeIfAbsent(cargo, k -> new HashSet<>());
             hora.getHoraDetalleList().forEach(horaDetalle -> {
                 if (horaDetalle.getProyecto().equals(proyecto) && horaDetalle.getTipoTarea().equals(tipoTarea)) {
+                    Cargo cargo = horaDetalle.getCargo();
                     BigDecimal costoXHora = cargo.getPrecioHora(hora.getDia()).get().getPrecioHora();
                     BigDecimal cantHoras = TimeUtils.durationToBigDecimal(horaDetalle.getDuracion());
                     BigDecimal costoHoras = costoXHora.multiply(cantHoras);
                     BigDecimal estimacionHoras = estimacionesXCargo.get(cargo) != null ? estimacionesXCargo.get(cargo).cantidadHoras : BigDecimal.ZERO;
                     BigDecimal estimacionPrecio = estimacionesXCargo.get(cargo) != null ? estimacionesXCargo.get(cargo).precioTotal : BigDecimal.ZERO;
+                    reporteXCargo.computeIfAbsent(cargo, k -> new HashSet<>());
                     reporteXCargo.get(cargo).add(new ReporteHoras1(cantHoras, estimacionHoras, estimacionPrecio, costoHoras, horaDetalle.getProyecto(), horaDetalle.getTipoTarea(), cargo));
                 }
             });
@@ -106,15 +106,15 @@ public class ReportesDao {
         Map<Cargo, Set<ReporteHoras1>> reporteXCargo = new HashMap<>();
         //Junto todas las horas Detalle separadas por cargo.
         horaDao.findAll().forEach(hora -> {
-            Cargo cargo = hora.getColaborador().getCargo();
-            reporteXCargo.computeIfAbsent(cargo, k -> new HashSet<>());
             hora.getHoraDetalleList().forEach(horaDetalle -> {
                 if (horaDetalle.getProyecto().equals(proyecto)) {
+                    Cargo cargo = horaDetalle.getCargo();
                     BigDecimal costoXHora = cargo.getPrecioHora(hora.getDia()).get().getPrecioHora();
                     BigDecimal cantHoras = TimeUtils.durationToBigDecimal(horaDetalle.getDuracion());
                     BigDecimal costoHoras = costoXHora.multiply(cantHoras);
                     BigDecimal estimacionHoras = estimacionesXCargo.get(cargo) != null ? estimacionesXCargo.get(cargo).cantidadHoras : BigDecimal.ZERO;
                     BigDecimal estimacionPrecio = estimacionesXCargo.get(cargo) != null ? estimacionesXCargo.get(cargo).precioTotal : BigDecimal.ZERO;
+                    reporteXCargo.computeIfAbsent(cargo, k -> new HashSet<>());
                     reporteXCargo.get(cargo).add(new ReporteHoras1(cantHoras, estimacionHoras, estimacionPrecio, costoHoras, horaDetalle.getProyecto(), horaDetalle.getTipoTarea(), cargo));
                 }
             });
@@ -160,14 +160,14 @@ public class ReportesDao {
         Map<Cargo, Set<ReporteHoras2>> reporteXCargo = new HashMap<>();
         //Junto todas las horas Detalle separadas por cargo.
         horaDao.findAllByFechas(ini, fin).forEach(hora -> {
-            Cargo cargo = hora.getColaborador().getCargo();
-            reporteXCargo.computeIfAbsent(cargo, k -> new HashSet<>());
             hora.getHoraDetalleList().forEach(horaDetalle -> {
+                Cargo cargo = horaDetalle.getCargo();
                 BigDecimal costoXHora = cargo.getPrecioHora(hora.getDia()).get().getPrecioHora();
                 BigDecimal cantHoras = TimeUtils.durationToBigDecimal(horaDetalle.getDuracion());
                 BigDecimal costoHoras = costoXHora.multiply(cantHoras);
                 BigDecimal estimacionHoras = estimacionesXCargo.get(cargo) != null ? estimacionesXCargo.get(cargo).cantidadHoras : BigDecimal.ZERO;
                 BigDecimal estimacionPrecio = estimacionesXCargo.get(cargo) != null ? estimacionesXCargo.get(cargo).precioTotal : BigDecimal.ZERO;
+                reporteXCargo.computeIfAbsent(cargo, k -> new HashSet<>());
                 reporteXCargo.get(cargo).add(new ReporteHoras2(cantHoras, estimacionHoras, estimacionPrecio, costoHoras, horaDetalle.getProyecto(), horaDetalle.getTipoTarea(), cargo));
             });
         });

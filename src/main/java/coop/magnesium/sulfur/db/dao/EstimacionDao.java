@@ -1,5 +1,6 @@
 package coop.magnesium.sulfur.db.dao;
 
+import coop.magnesium.sulfur.api.dto.EstimacionProyecto;
 import coop.magnesium.sulfur.api.dto.EstimacionProyectoTipoTareaXCargo;
 import coop.magnesium.sulfur.db.entities.Cargo;
 import coop.magnesium.sulfur.db.entities.Estimacion;
@@ -31,6 +32,9 @@ public class EstimacionDao extends AbstractDao<Estimacion, Long> {
 
     @Inject
     EstimacionDao estimacionDao;
+
+    @Inject
+    CargoDao cargoDao;
 
     @Inject
     Logger logger;
@@ -84,6 +88,23 @@ public class EstimacionDao extends AbstractDao<Estimacion, Long> {
         return (List<Estimacion>) query.getResultList();
     }
 
+    public List<EstimacionProyecto> findEstimacionProyectoTipoTarea(Proyecto proyecto, TipoTarea tipoTarea) {
+        Query query = em.createNativeQuery("SELECT\n" +
+                "  e.proyecto_id, ett.tipotarea_id, ec.cargo_id, ec.preciototal, sum(ett.duracion) duracion\n" +
+                "  FROM estimacion e, estimacioncargo ec, estimaciontipotarea ett\n" +
+                "WHERE ec.estimacion_id = e.id\n" +
+                "  AND e.proyecto_id = :proyecto\n" +
+                "  AND ett.tipotarea_id = :tipotarea\n" +
+                "and ett.estimacion_cargo_id = ec.id\n" +
+                "  GROUP BY e.proyecto_id, ett.tipotarea_id, ec.cargo_id, ec.preciototal\n" +
+                "ORDER BY e.proyecto_id,e.fecha;", "EstimacionProyecto");
+        query.setParameter("proyecto", proyecto.getId());
+        query.setParameter("tipotarea", tipoTarea.getId());
+        @SuppressWarnings("unchecked")
+        List<EstimacionProyecto> resultList = query.getResultList();
+        return resultList;
+    }
+
     @Logged
     public Map<Cargo, EstimacionProyectoTipoTareaXCargo> findEstimacionProyectoTipoTareaXCargo(Proyecto proyecto, TipoTarea tipoTarea) {
         Map<Cargo, EstimacionProyectoTipoTareaXCargo> estimacionesXCargo = new HashMap<>();
@@ -98,7 +119,19 @@ public class EstimacionDao extends AbstractDao<Estimacion, Long> {
                                 estimacionesXCargo.computeIfAbsent(estimacionCargo.getCargo(), cargo -> new EstimacionProyectoTipoTareaXCargo(estimacion.getProyecto(), estimacionTipoTarea.getTipoTarea(), estimacionCargo.getCargo(), estimacionCargo.getPrecioTotal(), TimeUtils.durationToBigDecimal(estimacionTipoTarea.getDuracion())));
                     }
                         })));
-        return estimacionesXCargo;
+
+        estimacionesXCargo.entrySet().forEach(cargoEstimacionProyectoTipoTareaXCargoEntry -> logger.info(cargoEstimacionProyectoTipoTareaXCargoEntry.toString()));
+
+        Map<Cargo, EstimacionProyectoTipoTareaXCargo> estimacionesXCargoNative = new HashMap<>();
+        estimacionDao.findEstimacionProyectoTipoTarea(proyecto, tipoTarea).forEach(estimacionProyecto -> {
+            Cargo cargo = cargoDao.findById(estimacionProyecto.cargo_id);
+            estimacionesXCargoNative.put(cargo, new EstimacionProyectoTipoTareaXCargo(proyecto, tipoTarea, cargo, estimacionProyecto.precioTotal, estimacionProyecto.duracion));
+        });
+
+        estimacionesXCargoNative.entrySet().forEach(cargoEstimacionProyectoTipoTareaXCargoEntry -> logger.info(cargoEstimacionProyectoTipoTareaXCargoEntry.toString()));
+
+
+        return estimacionesXCargoNative;
     }
 
     @Logged

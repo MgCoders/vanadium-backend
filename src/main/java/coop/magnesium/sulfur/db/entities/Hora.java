@@ -81,8 +81,13 @@ public class Hora {
         this.completa = (this.subtotal != null && this.subtotalDetalles != null) && (this.subtotal.compareTo(this.subtotalDetalles) == 0);
     }
 
+    /**
+     * Campos calculados
+     * Debe ejecutarse antes de guardar o editar.
+     */
     public void cacularSubtotalDetalle() {
         this.subtotalDetalles = Duration.ofMillis(this.getHoraDetalleList().stream().map(HoraDetalle::getDuracion).mapToLong(Duration::toMillis).sum());
+        this.getHoraDetalleList().forEach(horaDetalle -> horaDetalle.setCargo(this.colaborador.getCargo()));
     }
 
 
