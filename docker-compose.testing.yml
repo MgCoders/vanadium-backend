@@ -31,6 +31,8 @@ services:
 
   pg_REPLACE_PROJECT_NAME:
     image: postgres
+    ports:
+      - 5432
     networks:
       - traefik_proxy
     volumes:
