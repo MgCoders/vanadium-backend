@@ -125,7 +125,7 @@ public class HoraServiceTest {
     @RunAsClient
     public void createHoraAdmin(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
         Hora hora = new Hora(LocalDate.of(2017, 12, 24), LocalTime.MIN, LocalTime.MAX, this.colaborador_admin);
-        hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, Duration.ofHours(23)));
+        hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, Duration.ofHours(23), null));
 
         System.out.println(objectMapper.writeValueAsString(hora));
 
@@ -147,7 +147,7 @@ public class HoraServiceTest {
     @RunAsClient
     public void createHoraUserBien(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
         Hora hora = new Hora(LocalDate.of(2017, 12, 24), LocalTime.MIN, LocalTime.MAX, this.colaborador_user);
-        hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, Duration.ofHours(23)));
+        hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, Duration.ofHours(23), null));
 
         System.out.println(objectMapper.writeValueAsString(hora) + " " + hora.getHoraDetalleList().size());
 
@@ -171,7 +171,7 @@ public class HoraServiceTest {
     @RunAsClient
     public void createHoraUserMal(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
         Hora hora = new Hora(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, this.colaborador_user);
-        hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, Duration.ofHours(23)));
+        hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, Duration.ofHours(23), null));
 
         System.out.println(objectMapper.writeValueAsString(hora));
 
@@ -189,7 +189,7 @@ public class HoraServiceTest {
     @RunAsClient
     public void createHoraUserMal2(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
         Hora hora = new Hora(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, this.colaborador_user);
-        hora.getHoraDetalleList().add(new HoraDetalle(new Proyecto("EE", "No existe"), this.tipoTarea, Duration.ofHours(23)));
+        hora.getHoraDetalleList().add(new HoraDetalle(new Proyecto("EE", "No existe"), this.tipoTarea, Duration.ofHours(23), null));
 
         System.out.println(objectMapper.writeValueAsString(hora));
 
@@ -292,9 +292,9 @@ public class HoraServiceTest {
     @RunAsClient
     public void editHoraUser(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
         Hora hora = new Hora(LocalDate.of(2017, 12, 24), LocalTime.MIN, LocalTime.MAX, this.colaborador_user);
-        hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, Duration.ofHours(20)));
-        hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, Duration.ofHours(3)));
-        hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, Duration.ofMinutes(59)));
+        hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, Duration.ofHours(20), null));
+        hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, Duration.ofHours(3), null));
+        hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, Duration.ofMinutes(59), null));
 
 
 
@@ -321,8 +321,8 @@ public class HoraServiceTest {
     @RunAsClient
     public void editHoraUserIncompleta(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
         Hora hora = new Hora(LocalDate.of(2017, 12, 24), LocalTime.MIN, LocalTime.MAX, this.colaborador_user);
-        hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, Duration.ofHours(20)));
-        hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, Duration.ofHours(2)));
+        hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, Duration.ofHours(20), null));
+        hora.getHoraDetalleList().add(new HoraDetalle(this.proyecto, this.tipoTarea, Duration.ofHours(2), null));
 
 
         System.out.println(objectMapper.writeValueAsString(hora));

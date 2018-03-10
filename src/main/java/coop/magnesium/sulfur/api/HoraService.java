@@ -3,6 +3,7 @@ package coop.magnesium.sulfur.api;
 
 import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
 import coop.magnesium.sulfur.api.utils.RoleNeeded;
+import coop.magnesium.sulfur.db.dao.CargoDao;
 import coop.magnesium.sulfur.db.dao.ColaboradorDao;
 import coop.magnesium.sulfur.db.dao.HoraDao;
 import coop.magnesium.sulfur.db.dao.ProyectoDao;
@@ -54,6 +55,8 @@ public class HoraService {
     private ProyectoDao proyectoDao;
     @EJB
     private ColaboradorDao colaboradorDao;
+    @Inject
+    private CargoDao cargoDao;
 
     @POST
     @Logged
@@ -72,6 +75,11 @@ public class HoraService {
                 throw new MagnesiumNotFoundException("Colaborador no encontrado");
 
             hora.setColaborador(colaborador);
+
+            //Seteo el cargo del colaborador a la hora de cargar horas.
+            Cargo cargo = cargoDao.findById(hora.getColaborador().getCargo().getId());
+            hora.getHoraDetalleList().forEach(horaDetalle -> horaDetalle.setCargo(cargo));
+
 
             SulfurUser usuarioLogueado = (SulfurUser) securityContext.getUserPrincipal();
             Role rolUsuarioLogueado = Role.valueOf(usuarioLogueado.getRole());
@@ -195,6 +203,10 @@ public class HoraService {
             Colaborador colaborador = colaboradorDao.findById(hora.getColaborador().getId());
             if (colaborador == null) throw new MagnesiumNotFoundException("Colaborador no encontrado");
             hora.setColaborador(colaborador);
+
+            //Seteo el cargo del colaborador a la hora de cargar horas.
+            Cargo cargo = cargoDao.findById(hora.getColaborador().getCargo().getId());
+            hora.getHoraDetalleList().forEach(horaDetalle -> horaDetalle.setCargo(cargo));
 
             SulfurUser usuarioLogueado = (SulfurUser) securityContext.getUserPrincipal();
             Role rolUsuarioLogueado = Role.valueOf(usuarioLogueado.getRole());

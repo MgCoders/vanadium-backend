@@ -36,14 +36,20 @@ public class HoraDetalle {
     @JsonSerialize(using = DurationSerializer.class)
     @Column(nullable = false)
     private Duration duracion;
+    @NotNull
+    @ManyToOne
+    private Cargo cargo;
+
+
 
     public HoraDetalle() {
     }
 
-    public HoraDetalle(Proyecto proyecto, TipoTarea tipoTarea, Duration duracion) {
+    public HoraDetalle(Proyecto proyecto, TipoTarea tipoTarea, Duration duracion, Cargo cargo) {
         this.proyecto = proyecto;
         this.tipoTarea = tipoTarea;
         this.duracion = duracion;
+        this.cargo = cargo;
     }
 
     public Proyecto getProyecto() {
@@ -78,6 +84,14 @@ public class HoraDetalle {
         this.id = id;
     }
 
+    public Cargo getCargo() {
+        return cargo;
+    }
+
+    public void setCargo(Cargo cargo) {
+        this.cargo = cargo;
+    }
+
     @Override
     public String toString() {
         return "HoraDetalle{" +
@@ -85,6 +99,7 @@ public class HoraDetalle {
                 ", proyecto=" + proyecto.getCodigo() +
                 ", tipoTarea=" + tipoTarea.getCodigo() +
                 ", duracion=" + duracion +
+                ", cargo=" + (cargo != null ? cargo.getCodigo() : "") +
                 '}';
     }
 }

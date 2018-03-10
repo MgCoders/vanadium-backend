@@ -95,7 +95,7 @@ public class EstimacionServiceTest {
     @InSequence(2)
     @RunAsClient
     public void createEstmacion(@ArquillianResteasyResource final WebTarget webTarget) {
-        Estimacion estimacion = new Estimacion(this.proyecto, null, LocalDate.now());
+        Estimacion estimacion = new Estimacion(this.proyecto, null, LocalDate.of(2018, 12, 12));
         EstimacionCargo estimacionCargo = new EstimacionCargo(this.cargo, new BigDecimal(150));
         estimacion.getEstimacionCargos().add(estimacionCargo);
         EstimacionTipoTarea estimacionTipoTarea = new EstimacionTipoTarea(this.tipoTarea, Duration.ofMinutes(15));
@@ -113,7 +113,7 @@ public class EstimacionServiceTest {
     @InSequence(3)
     @RunAsClient
     public void createEstmacion2(@ArquillianResteasyResource final WebTarget webTarget) {
-        Estimacion estimacion = new Estimacion(this.proyecto, null, LocalDate.now());
+        Estimacion estimacion = new Estimacion(this.proyecto, null, LocalDate.of(2018, 12, 13));
         EstimacionCargo estimacionCargo = new EstimacionCargo(this.cargo, new BigDecimal(160));
         estimacionCargo.getEstimacionTipoTareas().add(new EstimacionTipoTarea(this.tipoTarea, Duration.ofHours(6)));
         estimacion.getEstimacionCargos().add(estimacionCargo);
@@ -134,7 +134,7 @@ public class EstimacionServiceTest {
         estimacionDao.findEstimacionProyectoTipoTareaXCargo(this.proyecto, this.tipoTarea).forEach((key, value) -> {
             assertEquals(this.cargo.getId(),value.cargo.getId());
             assertEquals(new BigDecimal(9.25).setScale(2), value.cantidadHoras);
-            assertEquals(new BigDecimal(160).setScale(2),value.precioTotal);
+            assertEquals(new BigDecimal(310).setScale(2), value.precioTotal);
         });
 
     }
@@ -151,6 +151,28 @@ public class EstimacionServiceTest {
         List<Estimacion> list = response.readEntity(new GenericType<List<Estimacion>>() {
         });
         assertEquals(2, list.size());
+    }
+
+    @Test
+    @InSequence(6)
+    public void consulta3() {
+        estimacionDao.findEstimacionProyectoXCargo(this.proyecto).forEach((key, value) -> {
+            assertEquals(this.cargo.getId(), value.cargo.getId());
+            assertEquals(new BigDecimal(9.25).setScale(2), value.cantidadHoras);
+            assertEquals(new BigDecimal(310).setScale(2), value.precioTotal);
+        });
+
+    }
+
+    @Test
+    @InSequence(7)
+    public void consulta4() {
+        estimacionDao.findEstimacionFechasTipoTareaXCargo(LocalDate.of(2018, 1, 1), LocalDate.now()).forEach((key, value) -> {
+            assertEquals(this.cargo.getId(), value.cargo.getId());
+            assertEquals(new BigDecimal(9.25).setScale(2), value.cantidadHoras);
+            assertEquals(new BigDecimal(310).setScale(2), value.precioTotal);
+        });
+
     }
 
 

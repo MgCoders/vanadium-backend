@@ -12,6 +12,7 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.logging.Logger;
@@ -22,6 +23,12 @@ import java.util.logging.Logger;
 @Stateless
 public class ReportesDao {
 
+    @Inject
+    CargoDao cargoDao;
+    @Inject
+    ProyectoDao proyectoDao;
+    @Inject
+    TipoTareaDao tipoTareaDao;
     @EJB
     private EstimacionDao estimacionDao;
     @EJB
@@ -44,24 +51,23 @@ public class ReportesDao {
 
 
         //Aca va el resultado
+        //Aca voy a buscar el precio hora, no pude con sql. Pueden quedar filas de distintos dias mismo proyecto y tipo de tarea para sumar.
         Map<Cargo, Set<ReporteHoras1>> reporteXCargo = new HashMap<>();
-        //Junto todas las horas Detalle separadas por cargo.
-        horaDao.findAll().forEach(hora -> {
-            Cargo cargo = hora.getColaborador().getCargo();
+        horaDao.findHorasProyectoTipoTareaXCargo(proyecto, tipoTarea).forEach(horaCompleta -> {
+            Cargo cargo = cargoDao.findById(horaCompleta.cargo_id);
+            BigDecimal costoXHora = horaDao.findPrecioHoraCargo(cargo, horaCompleta.dia);
+            BigDecimal cantHoras = TimeUtils.durationToBigDecimal(Duration.ofNanos(horaCompleta.duracion));
+            BigDecimal costoHoras = costoXHora.multiply(cantHoras);
+            BigDecimal estimacionHoras = estimacionesXCargo.get(cargo) != null ? estimacionesXCargo.get(cargo).cantidadHoras : BigDecimal.ZERO;
+            BigDecimal estimacionPrecio = estimacionesXCargo.get(cargo) != null ? estimacionesXCargo.get(cargo).precioTotal : BigDecimal.ZERO;
             reporteXCargo.computeIfAbsent(cargo, k -> new HashSet<>());
-            hora.getHoraDetalleList().forEach(horaDetalle -> {
-                if (horaDetalle.getProyecto().equals(proyecto) && horaDetalle.getTipoTarea().equals(tipoTarea)) {
-                    BigDecimal costoXHora = cargo.getPrecioHora(hora.getDia()).get().getPrecioHora();
-                    BigDecimal cantHoras = TimeUtils.durationToBigDecimal(horaDetalle.getDuracion());
-                    BigDecimal costoHoras = costoXHora.multiply(cantHoras);
-                    BigDecimal estimacionHoras = estimacionesXCargo.get(cargo) != null ? estimacionesXCargo.get(cargo).cantidadHoras : BigDecimal.ZERO;
-                    BigDecimal estimacionPrecio = estimacionesXCargo.get(cargo) != null ? estimacionesXCargo.get(cargo).precioTotal : BigDecimal.ZERO;
-                    reporteXCargo.get(cargo).add(new ReporteHoras1(cantHoras, estimacionHoras, estimacionPrecio, costoHoras, horaDetalle.getProyecto(), horaDetalle.getTipoTarea(), cargo));
-                }
-            });
+            reporteXCargo.get(cargo).add(new ReporteHoras1(cantHoras, estimacionHoras, estimacionPrecio, costoHoras, proyecto, tipoTarea, cargo));
+
         });
 
+
         //Resultados
+        //Aca tengo que sumar las de arriba
         List<ReporteHoras1> result = new ArrayList<>();
         reporteXCargo.keySet().forEach(cargo ->
                 reporteXCargo.get(cargo).stream().reduce((r1, r2) -> new ReporteHoras1(
@@ -71,7 +77,7 @@ public class ReportesDao {
                         r1.precioTotal.add(r2.precioTotal),
                         r1.proyecto, r1.tipoTarea, r1.cargo)).ifPresent(result::add));
 
-        result.sort(Comparator.comparing(reporteHoras1 -> reporteHoras1.cargo.getPrecioHora(LocalDate.now()).get().getPrecioHora()));
+        //result.sort(Comparator.comparing(reporteHoras1 -> reporteHoras1.cargo.getPrecioHora(LocalDate.now()).get().getPrecioHora()));
 
 
         ReporteHoras1 filaTotal = new ReporteHoras1(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, proyecto, tipoTarea, null);
@@ -103,21 +109,19 @@ public class ReportesDao {
 
 
         //Aca va el resultado
+        //Aca voy a buscar el precio hora, no pude con sql. Pueden quedar filas de distintos dias mismo proyecto y tipo de tarea para sumar.
         Map<Cargo, Set<ReporteHoras1>> reporteXCargo = new HashMap<>();
-        //Junto todas las horas Detalle separadas por cargo.
-        horaDao.findAll().forEach(hora -> {
-            Cargo cargo = hora.getColaborador().getCargo();
+        horaDao.findHorasProyectoXCargo(proyecto).forEach(horaCompleta -> {
+            Cargo cargo = cargoDao.findById(horaCompleta.cargo_id);
+            TipoTarea tipoTarea = tipoTareaDao.findById(horaCompleta.tipoTarea_id);
+            BigDecimal costoXHora = horaDao.findPrecioHoraCargo(cargo, horaCompleta.dia);
+            BigDecimal cantHoras = TimeUtils.durationToBigDecimal(Duration.ofNanos(horaCompleta.duracion));
+            BigDecimal costoHoras = costoXHora.multiply(cantHoras);
+            BigDecimal estimacionHoras = estimacionesXCargo.get(cargo) != null ? estimacionesXCargo.get(cargo).cantidadHoras : BigDecimal.ZERO;
+            BigDecimal estimacionPrecio = estimacionesXCargo.get(cargo) != null ? estimacionesXCargo.get(cargo).precioTotal : BigDecimal.ZERO;
             reporteXCargo.computeIfAbsent(cargo, k -> new HashSet<>());
-            hora.getHoraDetalleList().forEach(horaDetalle -> {
-                if (horaDetalle.getProyecto().equals(proyecto)) {
-                    BigDecimal costoXHora = cargo.getPrecioHora(hora.getDia()).get().getPrecioHora();
-                    BigDecimal cantHoras = TimeUtils.durationToBigDecimal(horaDetalle.getDuracion());
-                    BigDecimal costoHoras = costoXHora.multiply(cantHoras);
-                    BigDecimal estimacionHoras = estimacionesXCargo.get(cargo) != null ? estimacionesXCargo.get(cargo).cantidadHoras : BigDecimal.ZERO;
-                    BigDecimal estimacionPrecio = estimacionesXCargo.get(cargo) != null ? estimacionesXCargo.get(cargo).precioTotal : BigDecimal.ZERO;
-                    reporteXCargo.get(cargo).add(new ReporteHoras1(cantHoras, estimacionHoras, estimacionPrecio, costoHoras, horaDetalle.getProyecto(), horaDetalle.getTipoTarea(), cargo));
-                }
-            });
+            reporteXCargo.get(cargo).add(new ReporteHoras1(cantHoras, estimacionHoras, estimacionPrecio, costoHoras, proyecto, tipoTarea, cargo));
+
         });
 
         //Resultados
@@ -160,14 +164,14 @@ public class ReportesDao {
         Map<Cargo, Set<ReporteHoras2>> reporteXCargo = new HashMap<>();
         //Junto todas las horas Detalle separadas por cargo.
         horaDao.findAllByFechas(ini, fin).forEach(hora -> {
-            Cargo cargo = hora.getColaborador().getCargo();
-            reporteXCargo.computeIfAbsent(cargo, k -> new HashSet<>());
             hora.getHoraDetalleList().forEach(horaDetalle -> {
-                BigDecimal costoXHora = cargo.getPrecioHora(hora.getDia()).get().getPrecioHora();
+                Cargo cargo = horaDetalle.getCargo();
+                BigDecimal costoXHora = horaDao.findPrecioHoraCargo(cargo, hora.getDia());
                 BigDecimal cantHoras = TimeUtils.durationToBigDecimal(horaDetalle.getDuracion());
                 BigDecimal costoHoras = costoXHora.multiply(cantHoras);
                 BigDecimal estimacionHoras = estimacionesXCargo.get(cargo) != null ? estimacionesXCargo.get(cargo).cantidadHoras : BigDecimal.ZERO;
                 BigDecimal estimacionPrecio = estimacionesXCargo.get(cargo) != null ? estimacionesXCargo.get(cargo).precioTotal : BigDecimal.ZERO;
+                reporteXCargo.computeIfAbsent(cargo, k -> new HashSet<>());
                 reporteXCargo.get(cargo).add(new ReporteHoras2(cantHoras, estimacionHoras, estimacionPrecio, costoHoras, horaDetalle.getProyecto(), horaDetalle.getTipoTarea(), cargo));
             });
         });
@@ -182,7 +186,7 @@ public class ReportesDao {
                         r1.precioTotal.add(r2.precioTotal),
                         r1.proyecto, r1.tipoTarea, r1.cargo)).ifPresent(result::add));
 
-        result.sort(Comparator.comparing(reporteHoras1 -> reporteHoras1.cargo.getPrecioHora(LocalDate.now()).get().getPrecioHora()));
+        //result.sort(Comparator.comparing(reporteHoras1 -> reporteHoras1.cargo.getPrecioHora(LocalDate.now()).get().getPrecioHora()));
 
 
         ReporteHoras2 filaTotal = new ReporteHoras2(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, null, null, null);
