@@ -13,6 +13,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.DurationSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
+import coop.magnesium.sulfur.api.dto.HoraCompletaReporte1;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -30,6 +31,16 @@ import java.util.Set;
 @Entity
 @JsonAutoDetect
 @ApiModel
+@SqlResultSetMapping(name = "HoraCompletaReporte1", classes = {
+        @ConstructorResult(targetClass = HoraCompletaReporte1.class,
+                columns = {@ColumnResult(name = "proyecto_id", type = Long.class),
+                        @ColumnResult(name = "tipotarea_id", type = Long.class),
+                        @ColumnResult(name = "colaborador_id", type = Long.class),
+                        @ColumnResult(name = "cargo_id", type = Long.class),
+                        @ColumnResult(name = "duracion", type = Long.class),
+                        @ColumnResult(name = "dia", type = LocalDate.class)})
+
+})
 public class Hora {
 
     @Id

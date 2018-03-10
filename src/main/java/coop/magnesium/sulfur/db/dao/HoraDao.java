@@ -1,8 +1,6 @@
 package coop.magnesium.sulfur.db.dao;
 
-import coop.magnesium.sulfur.api.dto.HoraCompleta;
-import coop.magnesium.sulfur.api.dto.HorasProyectoTipoTareaCargoXColaborador;
-import coop.magnesium.sulfur.api.dto.HorasProyectoXCargo;
+import coop.magnesium.sulfur.api.dto.HoraCompletaReporte1;
 import coop.magnesium.sulfur.db.entities.*;
 import coop.magnesium.sulfur.utils.ex.MagnesiumBdMultipleResultsException;
 
@@ -14,6 +12,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -106,66 +105,80 @@ public class HoraDao extends AbstractDao<Hora, Long> {
         return result.size() > 0;
     }
 
-    public List<HorasProyectoTipoTareaCargoXColaborador> findHorasProyectoTipoTareaCargoXColaborador(Proyecto proyecto, TipoTarea tipoTarea, Cargo cargo) {
-        Query query = em.createQuery("" +
-                "select new coop.magnesium.sulfur.api.dto.HorasProyectoTipoTareaCargoXColaborador(sum(hd.duracion),hd.proyecto,hd.tipoTarea,h.colaborador.cargo,h.colaborador) " +
-                "from Hora h JOIN h.horaDetalleList hd " +
-                "where hd.proyecto = :proyecto and hd.tipoTarea = :tipoTarea and h.colaborador.cargo = :cargo " +
-                "group by hd.proyecto,hd.tipoTarea,h.colaborador.cargo,h.colaborador");
-        query.setParameter("proyecto", proyecto);
-        query.setParameter("tipoTarea", tipoTarea);
-        query.setParameter("cargo", cargo);
-        return query.getResultList();
-    }
 
-    public List<Hora> findHdProyectoTipoTarea(Proyecto proyecto, TipoTarea tipoTarea) {
-        Query query = em.createQuery("" +
-                "select h " +
-                "from Hora h ");
-        //query.setParameter("proyecto", proyecto);
-        //query.setParameter("tipoTarea", tipoTarea);
-        return query.getResultList();
-    }
-
-    public List<Hora> findHorasProyectoTipoTarea(Proyecto proyecto, TipoTarea tipoTarea) {
-        Query query = em.createQuery("" +
-                "select distinct h " +
-                "from Hora h join h.horaDetalleList hd " +
-                "where hd.proyecto = :proyecto and hd.tipoTarea = :tipoTarea ");
-        query.setParameter("proyecto", proyecto);
-        query.setParameter("tipoTarea", tipoTarea);
-        return query.getResultList();
-    }
-
-    public List<HoraCompleta> findHorasProyectoTipoTareaXCargoDia(Proyecto proyecto, TipoTarea tipoTarea) {
-        Query query = em.createNativeQuery("" +
-                "select hd.proyecto,hd.tipoTarea_id,sum(hd.duracion) duracion,h.dia,h.colaborador_id,ca.cargo_id) " +
-                "from hora as h, horaDetalle as hd, Cargo as ca, Colaborador as co " +
-                "where hd.proyecto_id = :proyecto and hd.tipoTarea_id = :tipoTarea and hd.hora_id = h.id and ca.id = h.colaborador_id and co.id = ca.cargo_id" +
-                "group by hd.proyecto,hd.tipoTarea,h.dia,h.colaborador,h.colaborador.cargo");
+    public List<HoraCompletaReporte1> findHorasProyectoTipoTareaXCargo(Proyecto proyecto, TipoTarea tipoTarea) {
+        Query query = em.createNativeQuery(
+                "SELECT\n" +
+                        "  p.id             proyecto_id,\n" +
+                        "  ta.id            tipotarea_id,\n" +
+                        "  co.id            colaborador_id,\n" +
+                        "  ca.id            cargo_id,\n" +
+                        "  sum(hd.duracion) duracion,\n" +
+                        "  h.dia            dia\n" +
+                        "FROM horaDetalle hd, Colaborador co, Proyecto p, TipoTarea ta, hora h, Cargo ca\n" +
+                        "WHERE hd.hora_id = h.id\n" +
+                        "      AND ta.id = :tipo_tarea\n" +
+                        "      AND p.id = :proyecto\n" +
+                        "      AND co.id = h.colaborador_id\n" +
+                        "      AND hd.tipoTarea_id = ta.id\n" +
+                        "      AND hd.proyecto_id = p.id\n" +
+                        "      AND ca.id = hd.cargo_id --esto cambia en nuevo modelo\n" +
+                        "GROUP BY\n" +
+                        "  p.id,\n" +
+                        "  ta.id,\n" +
+                        "  co.id,\n" +
+                        "  ca.id,\n" +
+                        "  h.dia\n" +
+                        "ORDER BY co.cargo_id;", "HoraCompletaReporte1");
         query.setParameter("proyecto", proyecto.getId());
-        query.setParameter("tipoTarea", tipoTarea.getId());
+        query.setParameter("tipo_tarea", tipoTarea.getId());
         return query.getResultList();
     }
 
-    public List<HoraDetalle> prueba(Proyecto proyecto, TipoTarea tipoTarea) {
-        Query query = em.createQuery("" +
-                "select new coop.magnesium.sulfur.db.entities.HoraDetalle(hd.proyecto,hd.tipoTarea,hd.duracion) " +
-                "from Hora h JOIN h.horaDetalleList hd " +
-                "where hd.proyecto = :proyecto and hd.tipoTarea = :tipoTarea ");
-        query.setParameter("proyecto", proyecto);
-        query.setParameter("tipoTarea", tipoTarea);
+    public List<HoraCompletaReporte1> findHorasProyectoXCargo(Proyecto proyecto) {
+        Query query = em.createNativeQuery(
+                "SELECT\n" +
+                        "  p.id             proyecto_id,\n" +
+                        "  ta.id            tipotarea_id,\n" +
+                        "  co.id            colaborador_id,\n" +
+                        "  ca.id            cargo_id,\n" +
+                        "  sum(hd.duracion) duracion,\n" +
+                        "  h.dia            dia\n" +
+                        "FROM horaDetalle hd, Colaborador co, Proyecto p, TipoTarea ta, hora h, Cargo ca\n" +
+                        "WHERE hd.hora_id = h.id\n" +
+                        "      AND p.id = :proyecto\n" +
+                        "      AND co.id = h.colaborador_id\n" +
+                        "      AND hd.tipoTarea_id = ta.id\n" +
+                        "      AND hd.proyecto_id = p.id\n" +
+                        "      AND ca.id = hd.cargo_id --esto cambia en nuevo modelo\n" +
+                        "GROUP BY\n" +
+                        "  p.id,\n" +
+                        "  ta.id,\n" +
+                        "  co.id,\n" +
+                        "  ca.id,\n" +
+                        "  h.dia\n" +
+                        "ORDER BY co.cargo_id;", "HoraCompletaReporte1");
+        query.setParameter("proyecto", proyecto.getId());
         return query.getResultList();
     }
 
-    public List<HorasProyectoXCargo> findHorasProyectoXCargo(Proyecto proyecto) {
-        Query query = em.createQuery("" +
-                "select new coop.magnesium.sulfur.api.dto.HorasProyectoXCargo(sum(hd.duracion),hd.proyecto,h.colaborador.cargo) " +
-                "from Hora h JOIN h.horaDetalleList hd " +
-                "where hd.proyecto = :proyecto " +
-                "group by hd.proyecto,h.colaborador.cargo");
-        query.setParameter("proyecto", proyecto);
-        return query.getResultList();
+    public BigDecimal findPrecioHoraCargo(Cargo cargo, LocalDate dia) {
+        Query query = em.createNativeQuery(
+                "SELECT\n" +
+                        "  ph.preciohora\n" +
+                        "FROM preciohora ph\n" +
+                        "  JOIN (SELECT\n" +
+                        "          cargo_id,\n" +
+                        "          max(vigenciadesde) max_vigenciadesde\n" +
+                        "        FROM preciohora\n" +
+                        "        WHERE vigenciadesde <= :dia AND cargo_id = :cargo\n" +
+                        "        GROUP BY cargo_id\n" +
+                        "       ) ph2\n" +
+                        "    ON (ph.vigenciadesde = ph2.max_vigenciadesde and ph.cargo_id = ph2.cargo_id);");
+        query.setParameter("dia", dia);
+        query.setParameter("cargo", cargo.getId());
+        Number singleResult = ((Number) query.getSingleResult());
+        return new BigDecimal(singleResult.toString());
     }
 
 

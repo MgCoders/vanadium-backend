@@ -129,6 +129,7 @@ public class EstimacionDao extends AbstractDao<Estimacion, Long> {
                 "                     WHERE ett.tipotarea_id = :tipotarea\n" +
                 "                           AND ett.estimacion_cargo_id = ec.id\n" +
                 "                     GROUP BY\n" +
+                "                       ec.estimacion_id,\n" +
                 "                       ett.tipotarea_id,\n" +
                 "                       ec.cargo_id,\n" +
                 "                       ec.preciototal\n" +
@@ -162,6 +163,7 @@ public class EstimacionDao extends AbstractDao<Estimacion, Long> {
                 "                     FROM estimacioncargo ec, estimaciontipotarea ett\n" +
                 "                     WHERE ett.estimacion_cargo_id = ec.id\n" +
                 "                     GROUP BY\n" +
+                "                       ec.estimacion_id,\n" +
                 "                       ett.tipotarea_id,\n" +
                 "                       ec.cargo_id,\n" +
                 "                       ec.preciototal\n" +

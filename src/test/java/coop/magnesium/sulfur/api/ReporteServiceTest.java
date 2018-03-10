@@ -3,6 +3,7 @@ package coop.magnesium.sulfur.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import coop.magnesium.sulfur.api.dto.HoraCompletaReporte1;
 import coop.magnesium.sulfur.api.dto.HorasProyectoXCargo;
 import coop.magnesium.sulfur.api.dto.ReporteHoras1;
 import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
@@ -139,27 +140,27 @@ public class ReporteServiceTest {
         estimacionDao.save(estimacion2);
 
         Hora hora = new Hora(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, colaborador1);
-        hora.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea1, Duration.ofHours(20), null));
+        hora.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea1, Duration.ofHours(20), colaborador1.getCargo()));
         horaDao.save(hora);
 
         Hora hora2 = new Hora(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, colaborador2);
-        hora2.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea1, Duration.ofHours(15), null));
+        hora2.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea1, Duration.ofHours(15), colaborador2.getCargo()));
         horaDao.save(hora2);
 
         Hora hora3 = new Hora(LocalDate.now().plusDays(1), LocalTime.MIN, LocalTime.MAX, colaborador2);
-        hora3.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea1, Duration.ofHours(10), null));
+        hora3.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea1, Duration.ofHours(10), colaborador2.getCargo()));
         horaDao.save(hora3);
 
         Hora hora4 = new Hora(LocalDate.now().plusDays(1), LocalTime.MIN, LocalTime.MAX, colaborador1);
-        hora4.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea1, Duration.ofHours(5), null));
+        hora4.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea1, Duration.ofHours(5), colaborador1.getCargo()));
         horaDao.save(hora4);
 
         Hora hora5 = new Hora(LocalDate.now().plusDays(1), LocalTime.MIN, LocalTime.MAX, colaborador1);
-        hora5.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea2, Duration.ofHours(20), null));
+        hora5.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea2, Duration.ofHours(20), colaborador1.getCargo()));
         horaDao.save(hora5);
 
         Hora hora6 = new Hora(LocalDate.now().plusDays(1), LocalTime.MIN, LocalTime.MAX, colaborador2);
-        hora6.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea2, Duration.ofHours(10).plusMinutes(10), null));
+        hora6.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea2, Duration.ofHours(10).plusMinutes(10), colaborador2.getCargo()));
         horaDao.save(hora6);
 
         //Cargo 1, P1, T1, 40h
@@ -171,11 +172,16 @@ public class ReporteServiceTest {
         //Cargo 1 45h
         //Cargo 2 45:10h
 
-        List<HoraDetalle> lt = horaDao.prueba(proyecto1, tipoTarea1);
     }
 
 
+    @Test
+    @InSequence(7)
+    public void horasCompletas() {
+        List<HoraCompletaReporte1> horaCompletaReporte1s = horaDao.findHorasProyectoTipoTareaXCargo(proyecto1, tipoTarea1);
+        horaCompletaReporte1s.forEach(horaCompletaReporte1 -> logger.info(horaCompletaReporte1.toString()));
 
+    }
 
 
     @Test
