@@ -99,7 +99,7 @@ public class HoraDetalle {
                 ", proyecto=" + proyecto.getCodigo() +
                 ", tipoTarea=" + tipoTarea.getCodigo() +
                 ", duracion=" + duracion +
-                ", cargo=" + cargo.getCodigo() +
+                ", cargo=" + (cargo != null ? cargo.getCodigo() : "") +
                 '}';
     }
 }

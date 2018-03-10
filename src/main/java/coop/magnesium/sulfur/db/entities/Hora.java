@@ -98,7 +98,6 @@ public class Hora {
      */
     public void cacularSubtotalDetalle() {
         this.subtotalDetalles = Duration.ofMillis(this.getHoraDetalleList().stream().map(HoraDetalle::getDuracion).mapToLong(Duration::toMillis).sum());
-        this.getHoraDetalleList().forEach(horaDetalle -> horaDetalle.setCargo(this.colaborador.getCargo()));
     }
 
 
