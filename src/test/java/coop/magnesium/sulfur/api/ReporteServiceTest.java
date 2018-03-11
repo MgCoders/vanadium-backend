@@ -133,13 +133,14 @@ public class ReporteServiceTest {
         Estimacion estimacion = new Estimacion(proyecto1, null, LocalDate.now());
         estimacion.getEstimacionCargos().add(estimacionCargo);
         estimacionCargo.getEstimacionTipoTareas().add(new EstimacionTipoTarea(tipoTarea1, Duration.ofHours(3)));
-        estimacionCargo.getEstimacionTipoTareas().add(new EstimacionTipoTarea(tipoTarea1, Duration.ofHours(6)));
+        estimacionCargo.getEstimacionTipoTareas().add(new EstimacionTipoTarea(tipoTarea2, Duration.ofHours(6)));
         estimacionDao.save(estimacion);
 
         EstimacionCargo estimacionCargo2 = new EstimacionCargo(cargo1, new BigDecimal(150));
         Estimacion estimacion2 = new Estimacion(proyecto1, null, LocalDate.now().plusDays(1));
         estimacion2.getEstimacionCargos().add(estimacionCargo2);
-        estimacionCargo2.getEstimacionTipoTareas().add(new EstimacionTipoTarea(tipoTarea1, Duration.ofHours(3)));
+        estimacionCargo2.getEstimacionTipoTareas().add(new EstimacionTipoTarea(tipoTarea1, Duration.ofHours(1).plusMinutes(30)));
+        estimacionCargo2.getEstimacionTipoTareas().add(new EstimacionTipoTarea(tipoTarea2, Duration.ofHours(1).plusMinutes(30)));
         estimacionDao.save(estimacion2);
 
         Hora hora = new Hora(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, colaborador1);
