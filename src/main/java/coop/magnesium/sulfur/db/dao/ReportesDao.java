@@ -17,6 +17,9 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.logging.Logger;
 
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.reverseOrder;
+
 /**
  * Created by rsperoni on 28/10/17.
  */
@@ -51,35 +54,37 @@ public class ReportesDao {
 
 
         //Aca va el resultado
-        //Aca voy a buscar el precio hora, no pude con sql. Pueden quedar filas de distintos dias mismo proyecto y tipo de tarea para sumar.
-        Map<Cargo, Set<ReporteHoras1>> reporteXCargo = new HashMap<>();
+        Map<Cargo, ReporteHoras1> reporteXCargo = new HashMap<>();
+        //En principio cada reporte/cargo con Zero.
+        cargoDao.findAll().forEach(cargo -> reporteXCargo.put(cargo, new ReporteHoras1(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, proyecto, tipoTarea, cargo)));
+
+        //Aca voy a buscar el precio hora e ir consolidando las diferentes filas con mismo cargo.
         horaDao.findHorasProyectoTipoTareaXCargo(proyecto, tipoTarea).forEach(horaCompleta -> {
+            //logger.info(horaCompleta.toString());
             Cargo cargo = cargoDao.findById(horaCompleta.cargo_id);
             BigDecimal costoXHora = horaDao.findPrecioHoraCargo(cargo, horaCompleta.dia);
             BigDecimal cantHoras = TimeUtils.durationToBigDecimal(Duration.ofNanos(horaCompleta.duracion));
             BigDecimal costoHoras = costoXHora.multiply(cantHoras);
             BigDecimal estimacionHoras = estimacionesXCargo.get(cargo) != null ? estimacionesXCargo.get(cargo).cantidadHoras : BigDecimal.ZERO;
             BigDecimal estimacionPrecio = estimacionesXCargo.get(cargo) != null ? estimacionesXCargo.get(cargo).precioTotal : BigDecimal.ZERO;
-            reporteXCargo.computeIfAbsent(cargo, k -> new HashSet<>());
-            reporteXCargo.get(cargo).add(new ReporteHoras1(cantHoras, estimacionHoras, estimacionPrecio, costoHoras, proyecto, tipoTarea, cargo));
-
+            reporteXCargo.get(cargo).cantidadHoras = reporteXCargo.get(cargo).cantidadHoras.add(cantHoras);
+            reporteXCargo.get(cargo).cantidadHorasEstimadas = reporteXCargo.get(cargo).cantidadHorasEstimadas.add(estimacionHoras);
+            reporteXCargo.get(cargo).precioEstimado = reporteXCargo.get(cargo).precioEstimado.add(estimacionPrecio);
+            reporteXCargo.get(cargo).precioTotal = reporteXCargo.get(cargo).precioTotal.add(costoHoras);
         });
 
+        //reporteXCargo.entrySet().forEach(cargoReporteHoras1Entry -> logger.info(cargoReporteHoras1Entry.toString()));
 
-        //Resultados
-        //Aca tengo que sumar las de arriba
+        //Resultados en lista
         List<ReporteHoras1> result = new ArrayList<>();
         reporteXCargo.keySet().forEach(cargo ->
-                reporteXCargo.get(cargo).stream().reduce((r1, r2) -> new ReporteHoras1(
-                        r1.cantidadHoras.add(r2.cantidadHoras),
-                        r1.cantidadHorasEstimadas.add(r2.cantidadHorasEstimadas),
-                        r1.precioEstimado.add(r2.precioEstimado),
-                        r1.precioTotal.add(r2.precioTotal),
-                        r1.proyecto, r1.tipoTarea, r1.cargo)).ifPresent(result::add));
+                result.add(reporteXCargo.get(cargo)));
 
-        //result.sort(Comparator.comparing(reporteHoras1 -> reporteHoras1.cargo.getPrecioHora(LocalDate.now()).get().getPrecioHora()));
+        //Ordeno lista por precio hora de cargo al dia de hoy
+        result.sort(comparing(reporteHoras1 -> horaDao.findPrecioHoraCargo(reporteHoras1.cargo, LocalDate.now()), reverseOrder()));
 
 
+        //Armo la fila de totales
         ReporteHoras1 filaTotal = new ReporteHoras1(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, proyecto, tipoTarea, null);
         result.stream().reduce((r1, r2) -> new ReporteHoras1(
                 r1.cantidadHoras.add(r2.cantidadHoras),
@@ -104,44 +109,49 @@ public class ReportesDao {
      * @return
      */
     public List<ReporteHoras1> reporteHoras1Totales(Proyecto proyecto) {
-//Busco las estimaciones
+        //Busco las estimaciones
         Map<Cargo, EstimacionProyectoTipoTareaXCargo> estimacionesXCargo = estimacionDao.findEstimacionProyectoXCargo(proyecto);
 
 
         //Aca va el resultado
-        //Aca voy a buscar el precio hora, no pude con sql. Pueden quedar filas de distintos dias mismo proyecto y tipo de tarea para sumar.
-        Map<Cargo, Set<ReporteHoras1>> reporteXCargo = new HashMap<>();
+        Map<Cargo, ReporteHoras1> reporteXCargo = new HashMap<>();
+        //En principio cada reporte/cargo con Zero.
+        cargoDao.findAll().forEach(cargo -> reporteXCargo.put(cargo, new ReporteHoras1(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, proyecto, null, cargo)));
+
+        //Aca voy a buscar el precio hora e ir consolidando las diferentes filas con mismo cargo.
         horaDao.findHorasProyectoXCargo(proyecto).forEach(horaCompleta -> {
+            //logger.info(horaCompleta.toString());
             Cargo cargo = cargoDao.findById(horaCompleta.cargo_id);
-            TipoTarea tipoTarea = tipoTareaDao.findById(horaCompleta.tipoTarea_id);
             BigDecimal costoXHora = horaDao.findPrecioHoraCargo(cargo, horaCompleta.dia);
             BigDecimal cantHoras = TimeUtils.durationToBigDecimal(Duration.ofNanos(horaCompleta.duracion));
             BigDecimal costoHoras = costoXHora.multiply(cantHoras);
             BigDecimal estimacionHoras = estimacionesXCargo.get(cargo) != null ? estimacionesXCargo.get(cargo).cantidadHoras : BigDecimal.ZERO;
             BigDecimal estimacionPrecio = estimacionesXCargo.get(cargo) != null ? estimacionesXCargo.get(cargo).precioTotal : BigDecimal.ZERO;
-            reporteXCargo.computeIfAbsent(cargo, k -> new HashSet<>());
-            reporteXCargo.get(cargo).add(new ReporteHoras1(cantHoras, estimacionHoras, estimacionPrecio, costoHoras, proyecto, tipoTarea, cargo));
-
+            reporteXCargo.get(cargo).cantidadHoras = reporteXCargo.get(cargo).cantidadHoras.add(cantHoras);
+            reporteXCargo.get(cargo).cantidadHorasEstimadas = reporteXCargo.get(cargo).cantidadHorasEstimadas.add(estimacionHoras);
+            reporteXCargo.get(cargo).precioEstimado = reporteXCargo.get(cargo).precioEstimado.add(estimacionPrecio);
+            reporteXCargo.get(cargo).precioTotal = reporteXCargo.get(cargo).precioTotal.add(costoHoras);
         });
 
-        //Resultados
+        //reporteXCargo.entrySet().forEach(cargoReporteHoras1Entry -> logger.info(cargoReporteHoras1Entry.toString()));
+
+        //Resultados en lista
         List<ReporteHoras1> result = new ArrayList<>();
         reporteXCargo.keySet().forEach(cargo ->
-                reporteXCargo.get(cargo).stream().reduce((r1, r2) -> new ReporteHoras1(
-                        r1.cantidadHoras.add(r2.cantidadHoras),
-                        r1.cantidadHorasEstimadas.add(r2.cantidadHorasEstimadas),
-                        r1.precioEstimado.add(r2.precioEstimado),
-                        r1.precioTotal.add(r2.precioTotal),
-                        r1.proyecto, null, r1.cargo)).ifPresent(result::add));
+                result.add(reporteXCargo.get(cargo)));
+
+        //Ordeno lista por precio hora de cargo al dia de hoy
+        result.sort(comparing(reporteHoras1 -> horaDao.findPrecioHoraCargo(reporteHoras1.cargo, LocalDate.now()), reverseOrder()));
 
 
+        //Armo la fila de totales
         ReporteHoras1 filaTotal = new ReporteHoras1(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, proyecto, null, null);
         result.stream().reduce((r1, r2) -> new ReporteHoras1(
                 r1.cantidadHoras.add(r2.cantidadHoras),
                 r1.cantidadHorasEstimadas.add(r2.cantidadHorasEstimadas),
                 r1.precioEstimado.add(r2.precioEstimado),
                 r1.precioTotal.add(r2.precioTotal),
-                r1.proyecto, r1.tipoTarea, r1.cargo)).ifPresent(reporteHoras1 -> {
+                r1.proyecto, null, r1.cargo)).ifPresent(reporteHoras1 -> {
             filaTotal.precioTotal = reporteHoras1.precioTotal;
             filaTotal.cantidadHorasEstimadas = reporteHoras1.cantidadHorasEstimadas;
             filaTotal.precioEstimado = reporteHoras1.precioEstimado;
@@ -186,7 +196,8 @@ public class ReportesDao {
                         r1.precioTotal.add(r2.precioTotal),
                         r1.proyecto, r1.tipoTarea, r1.cargo)).ifPresent(result::add));
 
-        //result.sort(Comparator.comparing(reporteHoras1 -> reporteHoras1.cargo.getPrecioHora(LocalDate.now()).get().getPrecioHora()));
+        //Ordeno lista por precio hora de cargo al dia de hoy
+        result.sort(comparing(reporteHoras1 -> horaDao.findPrecioHoraCargo(reporteHoras1.cargo, LocalDate.now()), reverseOrder()));
 
 
         ReporteHoras2 filaTotal = new ReporteHoras2(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, null, null, null);

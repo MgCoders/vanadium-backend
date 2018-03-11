@@ -104,7 +104,6 @@ public class ReportesService {
                 throw new MagnesiumNotFoundException("Tarea no encontrada");
 
             List<ReporteHoras1> reporteHoras1List = reportesDao.reporteHoras1(proyecto, tipoTarea);
-            reporteHoras1List.forEach(reporteHoras1 -> logger.info(reporteHoras1.toString()));
             return Response.ok(reporteHoras1List).build();
 
         } catch (MagnesiumNotFoundException e) {
@@ -131,7 +130,6 @@ public class ReportesService {
 
             if (colaborador_id == null && proyecto_id == null) {
                 List<ReporteHoras2> reporteHoras2List = reportesDao.reporteHoras2Fechas(fechaIni, fechaFin);
-                reporteHoras2List.forEach(reporteHoras1 -> logger.info(reporteHoras1.toString()));
                 return Response.ok(reporteHoras2List).build();
             } else if (colaborador_id == null) {
                 Proyecto proyecto = proyectoDao.findById(proyecto_id);

@@ -115,14 +115,19 @@ public class HoraDao extends AbstractDao<Hora, Long> {
                         "  ca.id            cargo_id,\n" +
                         "  sum(hd.duracion) duracion,\n" +
                         "  h.dia            dia\n" +
-                        "FROM horaDetalle hd, Colaborador co, Proyecto p, TipoTarea ta, hora h, Cargo ca\n" +
+                        "FROM horaDetalle hd,\n" +
+                        "  Colaborador co,\n" +
+                        "  Proyecto p,\n" +
+                        "  TipoTarea ta,\n" +
+                        "  hora h,\n" +
+                        "  Cargo ca\n" +
                         "WHERE hd.hora_id = h.id\n" +
                         "      AND ta.id = :tipo_tarea\n" +
                         "      AND p.id = :proyecto\n" +
                         "      AND co.id = h.colaborador_id\n" +
                         "      AND hd.tipoTarea_id = ta.id\n" +
                         "      AND hd.proyecto_id = p.id\n" +
-                        "      AND ca.id = hd.cargo_id --esto cambia en nuevo modelo\n" +
+                        "      AND ca.id = hd.cargo_id\n" +
                         "GROUP BY\n" +
                         "  p.id,\n" +
                         "  ta.id,\n" +
@@ -144,13 +149,18 @@ public class HoraDao extends AbstractDao<Hora, Long> {
                         "  ca.id            cargo_id,\n" +
                         "  sum(hd.duracion) duracion,\n" +
                         "  h.dia            dia\n" +
-                        "FROM horaDetalle hd, Colaborador co, Proyecto p, TipoTarea ta, hora h, Cargo ca\n" +
+                        "FROM horaDetalle hd,\n" +
+                        "  Colaborador co,\n" +
+                        "  Proyecto p,\n" +
+                        "  TipoTarea ta,\n" +
+                        "  hora h,\n" +
+                        "  Cargo ca\n" +
                         "WHERE hd.hora_id = h.id\n" +
                         "      AND p.id = :proyecto\n" +
                         "      AND co.id = h.colaborador_id\n" +
                         "      AND hd.tipoTarea_id = ta.id\n" +
                         "      AND hd.proyecto_id = p.id\n" +
-                        "      AND ca.id = hd.cargo_id --esto cambia en nuevo modelo\n" +
+                        "      AND ca.id = hd.cargo_id\n" +
                         "GROUP BY\n" +
                         "  p.id,\n" +
                         "  ta.id,\n" +

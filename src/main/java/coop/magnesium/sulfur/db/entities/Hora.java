@@ -38,7 +38,8 @@ import java.util.Set;
                         @ColumnResult(name = "colaborador_id", type = Long.class),
                         @ColumnResult(name = "cargo_id", type = Long.class),
                         @ColumnResult(name = "duracion", type = Long.class),
-                        @ColumnResult(name = "dia", type = LocalDate.class)})
+                        @ColumnResult(name = "dia", type = LocalDate.class)
+                })
 
 })
 public class Hora {
