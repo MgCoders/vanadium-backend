@@ -2,7 +2,6 @@ package coop.magnesium.sulfur.api;
 
 import coop.magnesium.sulfur.api.dto.HorasProyectoXCargo;
 import coop.magnesium.sulfur.db.dao.TipoTareaDao;
-import coop.magnesium.sulfur.db.entities.Cargo;
 import coop.magnesium.sulfur.db.entities.TipoTarea;
 import coop.magnesium.sulfur.utils.Logged;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -129,7 +128,7 @@ public class TareaServiceTest {
                 .path("/tareas/1")
                 .request(MediaType.APPLICATION_JSON)
                 .put(Entity.json(tarea));
-        Cargo returned = response.readEntity(Cargo.class);
+        TipoTarea returned = response.readEntity(TipoTarea.class);
         assertEquals(tarea.getCodigo(), returned.getCodigo());
         assertEquals(tarea.getNombre(), returned.getNombre());
     }

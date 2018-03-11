@@ -22,6 +22,7 @@ public class TipoTarea {
     private String codigo;
     @NotNull
     private String nombre;
+    private Integer prioridad = 1;
 
     public TipoTarea() {
     }
@@ -55,12 +56,21 @@ public class TipoTarea {
         this.nombre = nombre;
     }
 
+    public Integer getPrioridad() {
+        return prioridad;
+    }
+
+    public void setPrioridad(Integer prioridad) {
+        this.prioridad = prioridad;
+    }
+
     @Override
     public String toString() {
         return "TipoTarea{" +
                 "id=" + id +
                 ", codigo='" + codigo + '\'' +
                 ", nombre='" + nombre + '\'' +
+                ", prioridad=" + prioridad +
                 '}';
     }
 }
