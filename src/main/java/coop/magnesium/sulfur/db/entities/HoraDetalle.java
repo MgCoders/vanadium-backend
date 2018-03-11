@@ -36,7 +36,7 @@ public class HoraDetalle {
     @JsonSerialize(using = DurationSerializer.class)
     @Column(nullable = false)
     private Duration duracion;
-    //@NotNull
+    @NotNull
     @ManyToOne
     private Cargo cargo;
 
