@@ -84,6 +84,7 @@ public class EstimacionDao extends AbstractDao<Estimacion, Long> {
                 "                     FROM estimacioncargo ec, estimaciontipotarea ett\n" +
                 "                     WHERE ett.estimacion_cargo_id = ec.id\n" +
                 "                     GROUP BY\n" +
+                "                       ec.estimacion_id,\n" +
                 "                       ett.tipotarea_id,\n" +
                 "                       ec.cargo_id,\n" +
                 "                       ec.preciototal\n" +
@@ -95,6 +96,41 @@ public class EstimacionDao extends AbstractDao<Estimacion, Long> {
                 "  su.cargo_id;", "EstimacionProyecto");
         query.setParameter("fecha_ini", ini);
         query.setParameter("fecha_fin", fin);
+        @SuppressWarnings("unchecked")
+        List<EstimacionProyecto> resultList = query.getResultList();
+        return resultList;
+    }
+
+    public List<EstimacionProyecto> findAllByFechasProyecto(LocalDate ini, LocalDate fin, Proyecto proyecto) {
+        Query query = em.createNativeQuery("SELECT\n" +
+                "  c.proyecto_id,\n" +
+                "  su.tipotarea_id,\n" +
+                "  su.cargo_id,\n" +
+                "  sum(su.preciototal) preciototal,\n" +
+                "  sum(su.duracion)    duracion\n" +
+                "FROM Estimacion c, (\n" +
+                "                     SELECT\n" +
+                "                       ec.estimacion_id,\n" +
+                "                       ett.tipotarea_id,\n" +
+                "                       ec.cargo_id,\n" +
+                "                       ec.preciototal,\n" +
+                "                       sum(ett.duracion) duracion\n" +
+                "                     FROM estimacioncargo ec, estimaciontipotarea ett\n" +
+                "                     WHERE ett.estimacion_cargo_id = ec.id\n" +
+                "                     GROUP BY\n" +
+                "                       ec.estimacion_id,\n" +
+                "                       ett.tipotarea_id,\n" +
+                "                       ec.cargo_id,\n" +
+                "                       ec.preciototal\n" +
+                "                   ) su\n" +
+                "WHERE c.id = su.estimacion_id AND c.fecha >= :fecha_ini AND c.fecha <= :fecha_fin AND c.proyecto_id = :proyecto\n" +
+                "GROUP BY\n" +
+                "  c.proyecto_id,\n" +
+                "  su.tipotarea_id,\n" +
+                "  su.cargo_id;", "EstimacionProyecto");
+        query.setParameter("fecha_ini", ini);
+        query.setParameter("fecha_fin", fin);
+        query.setParameter("proyecto", proyecto.getId());
         @SuppressWarnings("unchecked")
         List<EstimacionProyecto> resultList = query.getResultList();
         return resultList;
@@ -190,12 +226,23 @@ public class EstimacionDao extends AbstractDao<Estimacion, Long> {
     }
 
     @Logged
-    public Map<Cargo, EstimacionProyectoTipoTareaXCargo> findEstimacionFechasTipoTareaXCargo(LocalDate ini, LocalDate fin) {
+    public Map<Cargo, EstimacionProyectoTipoTareaXCargo> findEstimacionFechasXCargo(LocalDate ini, LocalDate fin) {
         Map<Cargo, EstimacionProyectoTipoTareaXCargo> estimacionesXCargoNative = new HashMap<>();
         estimacionDao.findAllByFechas(ini, fin).forEach(estimacionProyecto -> {
             Cargo cargo = cargoDao.findById(estimacionProyecto.cargo_id);
             TipoTarea tipoTarea = tipoTareaDao.findById(estimacionProyecto.tipoTarea_id);
             Proyecto proyecto = proyectoDao.findById(estimacionProyecto.proyecto_id);
+            estimacionesXCargoNative.put(cargo, new EstimacionProyectoTipoTareaXCargo(proyecto, tipoTarea, cargo, estimacionProyecto.precioTotal, estimacionProyecto.duracion));
+        });
+        return estimacionesXCargoNative;
+    }
+
+    @Logged
+    public Map<Cargo, EstimacionProyectoTipoTareaXCargo> findEstimacionFechasProyectoXCargo(LocalDate ini, LocalDate fin, Proyecto proyecto) {
+        Map<Cargo, EstimacionProyectoTipoTareaXCargo> estimacionesXCargoNative = new HashMap<>();
+        estimacionDao.findAllByFechas(ini, fin).forEach(estimacionProyecto -> {
+            Cargo cargo = cargoDao.findById(estimacionProyecto.cargo_id);
+            TipoTarea tipoTarea = tipoTareaDao.findById(estimacionProyecto.tipoTarea_id);
             estimacionesXCargoNative.put(cargo, new EstimacionProyectoTipoTareaXCargo(proyecto, tipoTarea, cargo, estimacionProyecto.precioTotal, estimacionProyecto.duracion));
         });
         return estimacionesXCargoNative;

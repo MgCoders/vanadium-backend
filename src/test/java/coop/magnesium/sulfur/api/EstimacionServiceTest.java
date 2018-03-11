@@ -167,7 +167,7 @@ public class EstimacionServiceTest {
     @Test
     @InSequence(7)
     public void consulta4() {
-        estimacionDao.findEstimacionFechasTipoTareaXCargo(LocalDate.of(2018, 1, 1), LocalDate.now()).forEach((key, value) -> {
+        estimacionDao.findEstimacionFechasXCargo(LocalDate.of(2018, 1, 1), LocalDate.now()).forEach((key, value) -> {
             assertEquals(this.cargo.getId(), value.cargo.getId());
             assertEquals(new BigDecimal(9.25).setScale(2), value.cantidadHoras);
             assertEquals(new BigDecimal(310).setScale(2), value.precioTotal);

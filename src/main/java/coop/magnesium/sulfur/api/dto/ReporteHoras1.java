@@ -102,7 +102,7 @@ public class ReporteHoras1 {
                 ", precioTotal=" + precioTotal +
                 ", cantidadHorasEstimadas=" + cantidadHorasEstimadas +
                 ", precioEstimado=" + precioEstimado +
-                ", proyecto=" + proyecto.getCodigo() +
+                ", proyecto=" + ((proyecto != null) ? proyecto.getCodigo() : "-") +
                 ", tipoTarea=" + ((tipoTarea != null) ? tipoTarea.getCodigo() : "-") +
                 ", cargo=" + ((cargo != null) ? cargo.getCodigo() : "-") +
                 '}';

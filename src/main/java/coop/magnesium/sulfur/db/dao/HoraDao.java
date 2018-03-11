@@ -105,6 +105,75 @@ public class HoraDao extends AbstractDao<Hora, Long> {
         return result.size() > 0;
     }
 
+    public List<HoraCompletaReporte1> findHorasByFechasXCargo(LocalDate ini, LocalDate fin) {
+        Query query = em.createNativeQuery(
+                "SELECT\n" +
+                        "  p.id             proyecto_id,\n" +
+                        "  ta.id            tipotarea_id,\n" +
+                        "  co.id            colaborador_id,\n" +
+                        "  ca.id            cargo_id,\n" +
+                        "  sum(hd.duracion) duracion,\n" +
+                        "  h.dia            dia\n" +
+                        "FROM horaDetalle hd,\n" +
+                        "  Colaborador co,\n" +
+                        "  Proyecto p,\n" +
+                        "  TipoTarea ta,\n" +
+                        "  hora h,\n" +
+                        "  Cargo ca\n" +
+                        "WHERE hd.hora_id = h.id\n" +
+                        "      --AND p.id = :proyecto\n" +
+                        "      AND co.id = h.colaborador_id\n" +
+                        "      AND hd.tipoTarea_id = ta.id\n" +
+                        "      AND hd.proyecto_id = p.id\n" +
+                        "      AND ca.id = hd.cargo_id\n" +
+                        "      AND h.dia >= :ini AND h.dia <= :fin\n" +
+                        "GROUP BY\n" +
+                        "  p.id,\n" +
+                        "  ta.id,\n" +
+                        "  co.id,\n" +
+                        "  ca.id,\n" +
+                        "  h.dia\n" +
+                        "ORDER BY co.cargo_id;", "HoraCompletaReporte1");
+        query.setParameter("ini", ini);
+        query.setParameter("fin", fin);
+        return query.getResultList();
+    }
+
+
+    public List<HoraCompletaReporte1> findHorasByFechasProyectoXCargo(LocalDate ini, LocalDate fin, Proyecto proyecto) {
+        Query query = em.createNativeQuery(
+                "SELECT\n" +
+                        "  p.id             proyecto_id,\n" +
+                        "  ta.id            tipotarea_id,\n" +
+                        "  co.id            colaborador_id,\n" +
+                        "  ca.id            cargo_id,\n" +
+                        "  sum(hd.duracion) duracion,\n" +
+                        "  h.dia            dia\n" +
+                        "FROM horaDetalle hd,\n" +
+                        "  Colaborador co,\n" +
+                        "  Proyecto p,\n" +
+                        "  TipoTarea ta,\n" +
+                        "  hora h,\n" +
+                        "  Cargo ca\n" +
+                        "WHERE hd.hora_id = h.id\n" +
+                        "      --AND p.id = :proyecto\n" +
+                        "      AND co.id = h.colaborador_id\n" +
+                        "      AND hd.tipoTarea_id = ta.id\n" +
+                        "      AND hd.proyecto_id = p.id\n" +
+                        "      AND ca.id = hd.cargo_id\n" +
+                        "      AND h.dia >= :ini AND h.dia <= :fin AND p.id = :proyecto\n" +
+                        "GROUP BY\n" +
+                        "  p.id,\n" +
+                        "  ta.id,\n" +
+                        "  co.id,\n" +
+                        "  ca.id,\n" +
+                        "  h.dia\n" +
+                        "ORDER BY co.cargo_id;", "HoraCompletaReporte1");
+        query.setParameter("ini", ini);
+        query.setParameter("fin", fin);
+        query.setParameter("proyecto", proyecto.getId());
+        return query.getResultList();
+    }
 
     public List<HoraCompletaReporte1> findHorasProyectoTipoTareaXCargo(Proyecto proyecto, TipoTarea tipoTarea) {
         Query query = em.createNativeQuery(

@@ -3,7 +3,6 @@ package coop.magnesium.sulfur.api;
 
 import coop.magnesium.sulfur.api.dto.EstimacionProyectoTipoTareaXCargo;
 import coop.magnesium.sulfur.api.dto.ReporteHoras1;
-import coop.magnesium.sulfur.api.dto.ReporteHoras2;
 import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
 import coop.magnesium.sulfur.api.utils.RoleNeeded;
 import coop.magnesium.sulfur.db.dao.*;
@@ -114,37 +113,47 @@ public class ReportesService {
     }
 
     @GET
-    @Path("horas/fechas/{fecha_ini}/{fecha_fin}/colaborador/{colaborador_id}/proyecto/{proyecto_id}")
+    @Path("horas/fechas/{fecha_ini}/{fecha_fin}")
     @JWTTokenNeeded
     @RoleNeeded({Role.ADMIN})
     @Logged
-    @ApiOperation(value = "Reporte de horas cargadas desglozado por cargo / tarea con filtros", response = ReporteHoras2.class, responseContainer = "List")
-    public Response reporte2(@PathParam("fecha_ini") String fechaIniString,
-                             @PathParam("fecha_fin") String fechaFinString,
-                             @PathParam("colaborador_id") Long colaborador_id,
-                             @PathParam("proyecto_id") Long proyecto_id) {
+    @ApiOperation(value = "Reporte de horas cargadas por fechas", response = ReporteHoras1.class, responseContainer = "List")
+    public Response reporteFechas(@PathParam("fecha_ini") String fechaIniString,
+                                  @PathParam("fecha_fin") String fechaFinString) {
         try {
 
             LocalDate fechaIni = LocalDate.parse(fechaIniString, formatter);
             LocalDate fechaFin = LocalDate.parse(fechaFinString, formatter);
 
-            if (colaborador_id == null && proyecto_id == null) {
-                List<ReporteHoras2> reporteHoras2List = reportesDao.reporteHoras2Fechas(fechaIni, fechaFin);
-                return Response.ok(reporteHoras2List).build();
-            } else if (colaborador_id == null) {
-                Proyecto proyecto = proyectoDao.findById(proyecto_id);
-                if (proyecto == null)
-                    throw new MagnesiumNotFoundException("Proyecto no encontrado");
-                return Response.ok(null).build(); //TODO:
-            } else {
-                Proyecto proyecto = proyectoDao.findById(proyecto_id);
-                if (proyecto == null)
-                    throw new MagnesiumNotFoundException("Proyecto no encontrado");
-                Colaborador colaborador = colaboradorDao.findById(colaborador_id);
-                if (colaborador == null)
-                    throw new MagnesiumNotFoundException("Colaborador no encontrado");
-                return Response.ok(null).build(); //TODO:
-            }
+            List<ReporteHoras1> reporteHoras2List = reportesDao.reporteHoras2Fechas(fechaIni, fechaFin);
+            return Response.ok(reporteHoras2List).build();
+
+
+        } catch (Exception e) {
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+
+    @GET
+    @Path("horas/fechas/{fecha_ini}/{fecha_fin}/proyecto/{proyecto_id}")
+    @JWTTokenNeeded
+    @RoleNeeded({Role.ADMIN})
+    @Logged
+    @ApiOperation(value = "Reporte de horas cargadas por fechas y proyecto", response = ReporteHoras1.class, responseContainer = "List")
+    public Response reporteFechaProyecto(@PathParam("fecha_ini") String fechaIniString,
+                                         @PathParam("fecha_fin") String fechaFinString,
+                                         @PathParam("proyecto_id") Long proyecto_id) {
+        try {
+
+            LocalDate fechaIni = LocalDate.parse(fechaIniString, formatter);
+            LocalDate fechaFin = LocalDate.parse(fechaFinString, formatter);
+            Proyecto proyecto = proyectoDao.findById(proyecto_id);
+            if (proyecto == null)
+                throw new MagnesiumNotFoundException("Proyecto no encontrado");
+
+            List<ReporteHoras1> reporteHoras2List = reportesDao.reporteHoras2FechasProyecto(fechaIni, fechaFin, proyecto);
+            return Response.ok(reporteHoras2List).build();
+
 
         } catch (MagnesiumNotFoundException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();

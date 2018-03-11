@@ -167,6 +167,14 @@ public class ReporteServiceTest {
         hora6.getHoraDetalleList().add(new HoraDetalle(proyecto1, tipoTarea2, Duration.ofHours(10).plusMinutes(10), colaborador2.getCargo()));
         horaDao.save(hora6);
 
+        Hora hora7 = new Hora(LocalDate.now().plusDays(1), LocalTime.MIN, LocalTime.MAX, colaborador1);
+        hora7.getHoraDetalleList().add(new HoraDetalle(proyecto2, tipoTarea2, Duration.ofHours(20), colaborador1.getCargo()));
+        horaDao.save(hora7);
+
+        Hora hora8 = new Hora(LocalDate.now().plusDays(1), LocalTime.MIN, LocalTime.MAX, colaborador2);
+        hora8.getHoraDetalleList().add(new HoraDetalle(proyecto2, tipoTarea2, Duration.ofHours(10).plusMinutes(10), colaborador2.getCargo()));
+        horaDao.save(hora8);
+
         //Cargo 1, P1, T1, 40h
         //Cargo 2, P1, T1, 20h
 
@@ -182,8 +190,9 @@ public class ReporteServiceTest {
     @Test
     @InSequence(7)
     public void horasCompletas() {
-        List<HoraCompletaReporte1> horaCompletaReporte1s = horaDao.findHorasProyectoTipoTareaXCargo(proyecto1, tipoTarea1);
+        List<HoraCompletaReporte1> horaCompletaReporte1s = horaDao.findHorasByFechasXCargo(LocalDate.of(2018, 01, 01), LocalDate.of(2019, 01, 01));
         horaCompletaReporte1s.forEach(horaCompletaReporte1 -> logger.info(horaCompletaReporte1.toString()));
+
 
     }
 
@@ -240,6 +249,53 @@ public class ReporteServiceTest {
     public void getReporte1Totales(@ArquillianResteasyResource final WebTarget webTarget) {
         final Response response = webTarget
                 .path("/reportes/horas/proyecto/1")
+                .request(MediaType.APPLICATION_JSON)
+                .header("AUTHORIZATION", "ADMIN:2")
+                .get();
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        List<ReporteHoras1> horaList = response.readEntity(new GenericType<List<ReporteHoras1>>() {
+        });
+        assertEquals(4, horaList.size());
+        horaList.forEach(reporteHoras1 -> {
+            //Fila total
+            if (reporteHoras1.cargo == null) {
+                assertEquals(new BigDecimal(80.17).setScale(2, RoundingMode.HALF_DOWN), reporteHoras1.cantidadHoras);
+
+            }
+        });
+
+    }
+
+
+    @Test
+    @InSequence(10)
+    @RunAsClient
+    public void getReporteFechas(@ArquillianResteasyResource final WebTarget webTarget) {
+        final Response response = webTarget
+                .path("/reportes/horas/fechas/01-01-2018/01-01-2019/")
+                .request(MediaType.APPLICATION_JSON)
+                .header("AUTHORIZATION", "ADMIN:2")
+                .get();
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        List<ReporteHoras1> horaList = response.readEntity(new GenericType<List<ReporteHoras1>>() {
+        });
+        assertEquals(4, horaList.size());
+        horaList.forEach(reporteHoras1 -> {
+            //Fila total
+            if (reporteHoras1.cargo == null) {
+                assertEquals(new BigDecimal(110.34).setScale(2, RoundingMode.HALF_DOWN), reporteHoras1.cantidadHoras);
+
+            }
+        });
+
+    }
+
+    @Test
+    @InSequence(11)
+    @RunAsClient
+    public void getReporteFechasProyecto(@ArquillianResteasyResource final WebTarget webTarget) {
+        final Response response = webTarget
+                .path("/reportes/horas/fechas/01-01-2018/01-01-2019/proyecto/1")
                 .request(MediaType.APPLICATION_JSON)
                 .header("AUTHORIZATION", "ADMIN:2")
                 .get();
