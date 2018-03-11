@@ -57,8 +57,10 @@ public class ReporteServiceTest {
     final Proyecto proyecto2 = new Proyecto("P2", "P2");
     final TipoTarea tipoTarea1 = new TipoTarea("T1", "T1");
     final TipoTarea tipoTarea2 = new TipoTarea("T2", "T2");
-    final Cargo cargo1 = new Cargo("C1", "C1", new BigDecimal(32.2));
+    final Cargo cargo1 = new Cargo("C1", "C1", new BigDecimal(40));
     final Cargo cargo2 = new Cargo("C2", "C2", new BigDecimal(33.2));
+    final Cargo cargo3 = new Cargo("C3", "C3", new BigDecimal(50));
+
     final Colaborador colaborador_admin = new Colaborador("em", "nom", cargo1, "pwd", "ADMIN");
     final Colaborador colaborador_user = new Colaborador("em1", "nom", cargo2, "pwd", "USER");
 
@@ -121,6 +123,7 @@ public class ReporteServiceTest {
         TipoTarea tipoTarea2 = tipoTareaDao.save(this.tipoTarea2);
         Cargo cargo1 = cargoDao.save(this.cargo1);
         Cargo cargo2 = cargoDao.save(this.cargo2);
+        Cargo cargo3 = cargoDao.save(this.cargo3);
         this.colaborador_admin.setCargo(cargo1);
         this.colaborador_user.setCargo(cargo2);
         Colaborador colaborador1 = colaboradorDao.save(this.colaborador_admin);
@@ -196,7 +199,7 @@ public class ReporteServiceTest {
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
         List<ReporteHoras1> horaList = response.readEntity(new GenericType<List<ReporteHoras1>>() {
         });
-        assertEquals(3, horaList.size());
+        assertEquals(4, horaList.size());
         horaList.forEach(reporteHoras1 -> {
             //Fila total
             if (reporteHoras1.cargo == null) {
@@ -219,7 +222,7 @@ public class ReporteServiceTest {
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
         List<ReporteHoras1> horaList = response.readEntity(new GenericType<List<ReporteHoras1>>() {
         });
-        assertEquals(3, horaList.size());
+        assertEquals(4, horaList.size());
         horaList.forEach(reporteHoras1 -> {
             //Fila total
             if (reporteHoras1.cargo == null) {
@@ -242,7 +245,7 @@ public class ReporteServiceTest {
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
         List<ReporteHoras1> horaList = response.readEntity(new GenericType<List<ReporteHoras1>>() {
         });
-        assertEquals(3, horaList.size());
+        assertEquals(4, horaList.size());
         horaList.forEach(reporteHoras1 -> {
             //Fila total
             if (reporteHoras1.cargo == null) {
