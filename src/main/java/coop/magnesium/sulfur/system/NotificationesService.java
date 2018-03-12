@@ -1,6 +1,10 @@
 package coop.magnesium.sulfur.system;
 
+import coop.magnesium.sulfur.db.dao.CargoDao;
+import coop.magnesium.sulfur.db.dao.ColaboradorDao;
 import coop.magnesium.sulfur.db.dao.NotificacionDao;
+import coop.magnesium.sulfur.db.entities.Cargo;
+import coop.magnesium.sulfur.db.entities.Colaborador;
 import coop.magnesium.sulfur.db.entities.Notificacion;
 import coop.magnesium.sulfur.utils.Logged;
 
@@ -10,8 +14,10 @@ import javax.enterprise.event.Observes;
 import javax.enterprise.event.TransactionPhase;
 import javax.inject.Inject;
 import java.time.LocalDate;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Created by rsperoni on 22/01/18.
@@ -24,26 +30,35 @@ public class NotificationesService {
     @EJB
     NotificacionDao notificacionDao;
     @Inject
+    CargoDao cargoDao;
+    @Inject
+    ColaboradorDao colaboradorDao;
+    @Inject
     Event<MailEvent> mailEvent;
 
     @Logged
     @Asynchronous
     @Lock(LockType.READ)
     public void nuevaNotificacionHoras(@Observes(during = TransactionPhase.AFTER_SUCCESS) Notificacion notificacion) {
+        List<String> mailsAdmins = new ArrayList<>();
+        List<Cargo> admins = cargoDao.findByField("codigo", "ADMIN");
+        if (!admins.isEmpty()) {
+            mailsAdmins = colaboradorDao.findAllByCargo(admins.get(0)).stream().map(Colaborador::getEmail).collect(Collectors.toList());
+        }
         try {
             Notificacion notificacionSaved = notificacionDao.save(notificacion);
             switch (notificacionSaved.getTipo()) {
                 case NUEVA_HORA:
                     if (notificacion.getHora().getDia().isBefore(LocalDate.now().minusDays(2))) {
                         mailEvent.fire(
-                                new MailEvent(Arrays.asList("rsperoni@magnesium.coop,cbauza@magnesium.coop"),
+                                new MailEvent(mailsAdmins,
                                         MailService.generarEmailAviso(notificacion),
                                         "MARQ: Alerta, carga de hora antigua"));
                     }
                     break;
                 case FALTAN_HORAS:
                     mailEvent.fire(
-                            new MailEvent(Arrays.asList("rsperoni@magnesium.coop,cbauza@magnesium.coop"),
+                            new MailEvent(mailsAdmins,
                                     MailService.generarEmailAviso(notificacion),
                                     "MARQ: Alerta, faltan horas"));
                     break;

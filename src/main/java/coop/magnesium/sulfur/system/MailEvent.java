@@ -28,4 +28,13 @@ public class MailEvent {
     public String getSubject() {
         return subject;
     }
+
+    @Override
+    public String toString() {
+        return "MailEvent{" +
+                "to=" + to +
+                ", message='" + message + '\'' +
+                ", subject='" + subject + '\'' +
+                '}';
+    }
 }
