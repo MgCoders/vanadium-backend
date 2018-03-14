@@ -43,7 +43,9 @@ public class NotificationesService {
         List<String> mailsAdmins = new ArrayList<>();
         List<Cargo> admins = cargoDao.findByField("codigo", "ADMIN");
         if (!admins.isEmpty()) {
+            logger.info(admins.get(0).toString());
             mailsAdmins = colaboradorDao.findAllByCargo(admins.get(0)).stream().map(Colaborador::getEmail).collect(Collectors.toList());
+            logger.info("MAILS ADMINS"+mailsAdmins);
         }
         try {
             Notificacion notificacionSaved = notificacionDao.save(notificacion);

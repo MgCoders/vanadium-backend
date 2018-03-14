@@ -55,6 +55,7 @@ public class CargoServiceTest {
     final Proyecto proyecto = new Proyecto("PP", "PP");
     final TipoTarea tipoTarea = new TipoTarea("TT", "TT");
     final Cargo cargo = new Cargo("CC", "CC", new BigDecimal(32.2));
+    final Cargo admin = new Cargo("ADMIN", "CC", new BigDecimal(32.2));
     final BigDecimal cuarentaYcinco = new BigDecimal(49.5).setScale(1, 1);
 
     @Inject
@@ -99,6 +100,8 @@ public class CargoServiceTest {
         logger.info(proyectoDao.save(this.proyecto).toString());
         logger.info(tipoTareaDao.save(this.tipoTarea).toString());
         logger.info(cargoDao.save(this.cargo).toString());
+        //logger.info(cargoDao.save(this.admin).toString());
+        //cargoDao.findByField("codigo","ADMIN").forEach(cargo1 -> logger.info("ADMIN".concat(cargo1.toString())));
     }
 
 

@@ -12,10 +12,10 @@ services:
        DB_USER: postgres
        DB_PASS: postgres
        LOGSTASH_HOST:
-       ZOHO_MAIL_FROM: no-reply@magnesium.coop
-       ZOHO_MAIL_PASS:
-       ZOHO_MAIL_HOST: ip-172-31-6-242
-       ZOHO_MAIL_PORT: 1025
+       ZOHO_MAIL_FROM: ${ZOHO_MAIL_FROM}
+       ZOHO_MAIL_PASS: ${ZOHO_MAIL_PASS}
+       ZOHO_MAIL_HOST: ${ZOHO_MAIL_HOST}
+       ZOHO_MAIL_PORT: ${ZOHO_MAIL_PORT}
        ROOT_PASSWORD: root
     deploy:
       labels:
