@@ -7,6 +7,7 @@ import coop.magnesium.sulfur.db.entities.Cargo;
 import coop.magnesium.sulfur.db.entities.Colaborador;
 import coop.magnesium.sulfur.db.entities.Notificacion;
 import coop.magnesium.sulfur.utils.Logged;
+import coop.magnesium.sulfur.utils.ex.MagnesiumBdMultipleResultsException;
 
 import javax.ejb.*;
 import javax.enterprise.event.Event;
@@ -39,12 +40,12 @@ public class NotificationesService {
     @Logged
     @Asynchronous
     @Lock(LockType.READ)
-    public void nuevaNotificacionHoras(@Observes(during = TransactionPhase.AFTER_SUCCESS) Notificacion notificacion) {
+    public void nuevaNotificacionHoras(@Observes(during = TransactionPhase.AFTER_SUCCESS) Notificacion notificacion) throws MagnesiumBdMultipleResultsException {
         List<String> mailsAdmins = new ArrayList<>();
-        List<Cargo> admins = cargoDao.findByField("codigo", "ADMIN");
-        if (!admins.isEmpty()) {
-            logger.info(admins.get(0).toString());
-            mailsAdmins = colaboradorDao.findAllByCargo(admins.get(0)).stream().map(Colaborador::getEmail).collect(Collectors.toList());
+        Cargo admin = cargoDao.findByCodigo("ADMIN");
+        if (admin != null) {
+            logger.info(admin.toString());
+            mailsAdmins = colaboradorDao.findAllByCargo(admin).stream().map(Colaborador::getEmail).collect(Collectors.toList());
             logger.info("MAILS ADMINS"+mailsAdmins);
         }
         try {
