@@ -52,4 +52,10 @@ public class ColaboradorDao extends AbstractDao<Colaborador, Long> {
         query.setParameter("c", cargo);
         return (List<Colaborador>) query.getResultList();
     }
+
+    public List<Colaborador> findAllAdmins() {
+        Query query = getEntityManager().createQuery(
+                "select e from Colaborador e where e.role like 'ADMIN'");
+        return (List<Colaborador>) query.getResultList();
+    }
 }

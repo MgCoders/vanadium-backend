@@ -14,7 +14,7 @@ services:
        LOGSTASH_HOST:
        ZOHO_MAIL_FROM: no-reply@
        ZOHO_MAIL_PASS: no-reply...
-       ZOHO_MAIL_HOST: zoho.smtp.com
+       ZOHO_MAIL_HOST: smtp.zoho.com
        ZOHO_MAIL_PORT: 465
     deploy:
       labels:
