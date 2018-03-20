@@ -16,6 +16,7 @@ import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import java.time.*;
 import java.util.Date;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
@@ -44,8 +45,8 @@ public class StartupBean {
     public void init() {
         this.recuperacionPassword = new ConcurrentHashMap();
         try {
-            if (colaboradorDao.findByEmail("root@magnesium.coop") == null) {
-                colaboradorDao.save(new Colaborador("root@magnesium.coop", "root", null, PasswordUtils.digestPassword(System.getenv("ROOT_PASSWORD") != null ? System.getenv("ROOT_PASSWORD") : "bu"), "ADMIN"));
+            if (colaboradorDao.findByEmail("info@magnesium.coop") == null) {
+                colaboradorDao.save(new Colaborador("info@magnesium.coop", "root", null, PasswordUtils.digestPassword(UUID.randomUUID().toString()), "ADMIN"));
             }
         } catch (MagnesiumBdMultipleResultsException e) {
             logger.warning(e.getMessage());

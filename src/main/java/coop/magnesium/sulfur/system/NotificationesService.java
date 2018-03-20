@@ -15,10 +15,9 @@ import javax.enterprise.event.Observes;
 import javax.enterprise.event.TransactionPhase;
 import javax.inject.Inject;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 /**
  * Created by rsperoni on 22/01/18.
@@ -41,13 +40,13 @@ public class NotificationesService {
     @Asynchronous
     @Lock(LockType.READ)
     public void nuevaNotificacionHoras(@Observes(during = TransactionPhase.AFTER_SUCCESS) Notificacion notificacion) throws MagnesiumBdMultipleResultsException {
-        List<String> mailsAdmins = new ArrayList<>();
-        Cargo admin = cargoDao.findByCodigo("ADMIN");
-        if (admin != null) {
-            logger.info(admin.toString());
-            mailsAdmins = colaboradorDao.findAllByCargo(admin).stream().map(Colaborador::getEmail).collect(Collectors.toList());
-            logger.info("MAILS ADMINS"+mailsAdmins);
-        }
+        Cargo cargo = cargoDao.findByCodigo("ADMIN");
+        List<Colaborador> colaboradorList = colaboradorDao.findAllByCargo(cargo);
+        logger.info("AMDINS: " + colaboradorList.size());
+        List<String> mailsAdmins = Arrays.asList("rsperoni@magnesium.coop");
+        colaboradorList.forEach(colaborador -> mailsAdmins.add(colaborador.getEmail()));
+        //mailsAdmins = colaboradorDao.findAllByCargo(admin).stream().map(Colaborador::getEmail).collect(Collectors.toList());
+        logger.info("MAILS ADMINS" + mailsAdmins);
         try {
             Notificacion notificacionSaved = notificacionDao.save(notificacion);
             switch (notificacionSaved.getTipo()) {
