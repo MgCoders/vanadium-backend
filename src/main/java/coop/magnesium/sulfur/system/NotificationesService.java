@@ -14,7 +14,7 @@ import javax.enterprise.event.Observes;
 import javax.enterprise.event.TransactionPhase;
 import javax.inject.Inject;
 import java.time.LocalDate;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -41,9 +41,8 @@ public class NotificationesService {
     public void nuevaNotificacionHoras(@Observes(during = TransactionPhase.AFTER_SUCCESS) Notificacion notificacion) throws MagnesiumBdMultipleResultsException {
         List<Colaborador> colaboradorList = colaboradorDao.findAllAdmins();
         logger.info("AMDINS: " + colaboradorList.size());
-        List<String> mailsAdmins = Arrays.asList("rsperoni@magnesium.coop");
+        List<String> mailsAdmins = new ArrayList<>();
         colaboradorList.forEach(colaborador -> mailsAdmins.add(colaborador.getEmail()));
-        //mailsAdmins = colaboradorDao.findAllByCargo(admin).stream().map(Colaborador::getEmail).collect(Collectors.toList());
         logger.info("MAILS ADMINS" + mailsAdmins);
         try {
             Notificacion notificacionSaved = notificacionDao.save(notificacion);
