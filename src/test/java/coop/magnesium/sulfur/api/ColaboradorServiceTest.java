@@ -91,6 +91,7 @@ public class ColaboradorServiceTest {
         Cargo cargo = cargoDao.save(this.cargo);
         logger.info(cargo.toString());
         logger.info(colaboradorDao.save(new Colaborador("bu", "bu", cargo, PasswordUtils.digestPassword("bu"), "ADMIN")).toString());
+        colaboradorDao.findAllAdmins().forEach(colaborador -> logger.info("ADMIN " + colaborador.toString()));
     }
 
 

@@ -3,7 +3,6 @@ package coop.magnesium.sulfur.system;
 import coop.magnesium.sulfur.db.dao.CargoDao;
 import coop.magnesium.sulfur.db.dao.ColaboradorDao;
 import coop.magnesium.sulfur.db.dao.NotificacionDao;
-import coop.magnesium.sulfur.db.entities.Cargo;
 import coop.magnesium.sulfur.db.entities.Colaborador;
 import coop.magnesium.sulfur.db.entities.Notificacion;
 import coop.magnesium.sulfur.utils.Logged;
@@ -40,8 +39,7 @@ public class NotificationesService {
     @Asynchronous
     @Lock(LockType.READ)
     public void nuevaNotificacionHoras(@Observes(during = TransactionPhase.AFTER_SUCCESS) Notificacion notificacion) throws MagnesiumBdMultipleResultsException {
-        Cargo cargo = cargoDao.findByCodigo("ADMIN");
-        List<Colaborador> colaboradorList = colaboradorDao.findAllByCargo(cargo);
+        List<Colaborador> colaboradorList = colaboradorDao.findAllAdmins();
         logger.info("AMDINS: " + colaboradorList.size());
         List<String> mailsAdmins = Arrays.asList("rsperoni@magnesium.coop");
         colaboradorList.forEach(colaborador -> mailsAdmins.add(colaborador.getEmail()));
