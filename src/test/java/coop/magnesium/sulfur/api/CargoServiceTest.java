@@ -13,6 +13,7 @@ import coop.magnesium.sulfur.db.entities.PrecioHora;
 import coop.magnesium.sulfur.db.entities.Proyecto;
 import coop.magnesium.sulfur.db.entities.TipoTarea;
 import coop.magnesium.sulfur.utils.Logged;
+import coop.magnesium.sulfur.utils.ex.MagnesiumBdMultipleResultsException;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.extension.rest.client.ArquillianResteasyResource;
@@ -96,12 +97,12 @@ public class CargoServiceTest {
 
     @Test
     @InSequence(1)
-    public void inicializarBd() {
+    public void inicializarBd() throws MagnesiumBdMultipleResultsException {
         logger.info(proyectoDao.save(this.proyecto).toString());
         logger.info(tipoTareaDao.save(this.tipoTarea).toString());
         logger.info(cargoDao.save(this.cargo).toString());
         //logger.info(cargoDao.save(this.admin).toString());
-        //cargoDao.findByField("codigo","ADMIN").forEach(cargo1 -> logger.info("ADMIN".concat(cargo1.toString())));
+        //logger.info(cargoDao.findByCodigo("ADMIN").toString());
     }
 
 

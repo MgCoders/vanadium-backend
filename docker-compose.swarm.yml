@@ -16,7 +16,6 @@ services:
        ZOHO_MAIL_PASS:
        ZOHO_MAIL_HOST:
        ZOHO_MAIL_PORT:
-       ROOT_PASSWORD: 
     deploy:
       labels:
         - "traefik.port=8080"
