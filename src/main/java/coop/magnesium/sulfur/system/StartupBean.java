@@ -79,11 +79,15 @@ public class StartupBean {
     public void configuraciones() {
         List<Configuracion> emailOn = configuracionDao.findAllByClave(TipoConfiguracion.NOTIFICACION_MAIL_ACTIVADO);
         if (emailOn.isEmpty()) {
-            configuracionDao.save(new Configuracion(TipoConfiguracion.NOTIFICACION_MAIL_ACTIVADO, "1"));
+            configuracionDao.save(new Configuracion(TipoConfiguracion.NOTIFICACION_MAIL_ACTIVADO, "0"));
         }
         List<Configuracion> periodicidad = configuracionDao.findAllByClave(TipoConfiguracion.NOTIFICACION_PERIODICIDAD);
         if (periodicidad.isEmpty()) {
             configuracionDao.save(new Configuracion(TipoConfiguracion.NOTIFICACION_PERIODICIDAD, "48"));
+        }
+        List<Configuracion> destinatarios = configuracionDao.findAllByClave(TipoConfiguracion.NOTIFICACION_ADMIN_DESTINATARIO);
+        if (destinatarios.isEmpty()) {
+            configuracionDao.save(new Configuracion(TipoConfiguracion.NOTIFICACION_ADMIN_DESTINATARIO, "info@magnesium.coop"));
         }
     }
 

@@ -16,6 +16,9 @@ public class RecuperacionPassword implements Serializable {
     private String token;
     private LocalDateTime expirationDate;
 
+    public RecuperacionPassword() {
+    }
+
     public RecuperacionPassword(String email, String token, LocalDateTime expirationDate) {
         this.email = email;
         this.token = token;
