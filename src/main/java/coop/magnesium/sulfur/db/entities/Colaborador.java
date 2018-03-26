@@ -31,7 +31,7 @@ public class Colaborador {
     private String role = Role.USER.name();
     @Transient
     private String token;
-    boolean enabled = true;
+    private Boolean enabled = true;
 
     public Colaborador() {
     }

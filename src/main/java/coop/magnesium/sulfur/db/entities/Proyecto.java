@@ -23,7 +23,7 @@ public class Proyecto {
     @NotNull
     private String nombre;
     private Integer prioridad = 1;
-    private boolean enabled = true;
+    private Boolean enabled = true;
 
     public Proyecto() {
     }
