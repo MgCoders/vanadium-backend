@@ -31,6 +31,7 @@ public class Colaborador {
     private String role = Role.USER.name();
     @Transient
     private String token;
+    boolean enabled = true;
 
     public Colaborador() {
     }
@@ -41,6 +42,14 @@ public class Colaborador {
         this.cargo = cargo;
         this.password = password;
         this.role = role;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public String getToken() {
@@ -109,6 +118,7 @@ public class Colaborador {
                 ", nombre='" + nombre + '\'' +
                 ", cargo=" + cargo +
                 ", role='" + role + '\'' +
+                ", enabled=" + enabled +
                 '}';
     }
 }

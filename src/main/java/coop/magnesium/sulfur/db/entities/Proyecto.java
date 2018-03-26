@@ -23,6 +23,7 @@ public class Proyecto {
     @NotNull
     private String nombre;
     private Integer prioridad = 1;
+    private boolean enabled = true;
 
     public Proyecto() {
     }
@@ -64,6 +65,14 @@ public class Proyecto {
         this.prioridad = prioridad;
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
     @Override
     public String toString() {
         return "Proyecto{" +
@@ -71,6 +80,7 @@ public class Proyecto {
                 ", codigo='" + codigo + '\'' +
                 ", nombre='" + nombre + '\'' +
                 ", prioridad=" + prioridad +
+                ", enabled=" + enabled +
                 '}';
     }
 }
