@@ -328,6 +328,10 @@
             <mail-session name="default" jndi-name="java:jboss/mail/Default">
                 <smtp-server outbound-socket-binding-ref="mail-smtp"/>
             </mail-session>
+            <mail-session name="zoho" jndi-name="java:/zohoMail" from="${env.ZOHO_MAIL_FROM:none}">
+                <smtp-server outbound-socket-binding-ref="zoho-mail-smtp" ssl="true"
+                             username="${env.ZOHO_MAIL_FROM:none}" password="${env.ZOHO_MAIL_PASS:none}"/>
+            </mail-session>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:messaging-activemq:1.0">
             <server name="default">
@@ -482,6 +486,9 @@
         <socket-binding name="txn-status-manager" port="4713"/>
         <outbound-socket-binding name="mail-smtp">
             <remote-destination host="localhost" port="25"/>
+        </outbound-socket-binding>
+        <outbound-socket-binding name="zoho-mail-smtp">
+            <remote-destination host="${env.ZOHO_MAIL_HOST:none}" port="${env.ZOHO_MAIL_PORT:465}"/>
         </outbound-socket-binding>
     </socket-binding-group>
 </server>
