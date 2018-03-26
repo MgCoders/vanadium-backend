@@ -1,5 +1,6 @@
 package coop.magnesium.sulfur.system;
 
+import coop.magnesium.sulfur.db.dao.ConfiguracionDao;
 import coop.magnesium.sulfur.db.entities.Notificacion;
 import coop.magnesium.sulfur.utils.Logged;
 
@@ -29,6 +30,8 @@ public class MailService {
     Logger logger;
     @Resource(mappedName = "java:/zohoMail")
     private Session mailSession;
+    @Inject
+    ConfiguracionDao configuracionDao;
 
     public static String generarEmailRecuperacionClave(String token, String frontendHost, String frontendPath) {
         StringBuilder sb = new StringBuilder();
@@ -72,16 +75,18 @@ public class MailService {
     @Asynchronous
     @Lock(LockType.READ)
     public void sendMail(@Observes(during = TransactionPhase.AFTER_SUCCESS) MailEvent event) {
-        try {
-            MimeMessage m = new MimeMessage(mailSession);
-            Address[] to = event.getTo().stream().map(this::toAddress).toArray(InternetAddress[]::new);
-            m.setRecipients(Message.RecipientType.TO, to);
-            m.setSubject(event.getSubject(), "UTF-8");
-            m.setSentDate(new java.util.Date());
-            m.setText(event.getMessage(), "UTF-8");
-            Transport.send(m);
-        } catch (MessagingException e) {
-            logger.severe(e.getMessage());
+        if (configuracionDao.isEmailOn()) {
+            try {
+                MimeMessage m = new MimeMessage(mailSession);
+                Address[] to = event.getTo().stream().map(this::toAddress).toArray(InternetAddress[]::new);
+                m.setRecipients(Message.RecipientType.TO, to);
+                m.setSubject(event.getSubject(), "UTF-8");
+                m.setSentDate(new java.util.Date());
+                m.setText(event.getMessage(), "UTF-8");
+                Transport.send(m);
+            } catch (MessagingException e) {
+                logger.severe(e.getMessage());
+            }
         }
     }
 

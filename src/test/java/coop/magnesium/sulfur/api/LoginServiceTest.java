@@ -6,8 +6,10 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import coop.magnesium.sulfur.api.dto.HorasProyectoXCargo;
 import coop.magnesium.sulfur.db.dao.ColaboradorDao;
 import coop.magnesium.sulfur.db.entities.Colaborador;
+import coop.magnesium.sulfur.system.DataTimer;
 import coop.magnesium.sulfur.system.MailEvent;
 import coop.magnesium.sulfur.system.StartupBean;
+import coop.magnesium.sulfur.system.TimerType;
 import coop.magnesium.sulfur.utils.Logged;
 import coop.magnesium.sulfur.utils.PasswordUtils;
 import coop.magnesium.sulfur.utils.ex.MagnesiumSecurityException;
@@ -65,8 +67,10 @@ public class LoginServiceTest {
                         HorasProyectoXCargo.class.getPackage())
                 .addClass(JAXRSConfiguration.class)
                 .addClass(UserService.class)
-                .addClass(MailEvent.class)
                 .addClass(StartupBean.class)
+                .addClass(DataTimer.class)
+                .addClass(TimerType.class)
+                .addClass(MailEvent.class)
                 .addAsResource("META-INF/persistence.xml")
                 .addAsResource("endpoints.properties")
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")

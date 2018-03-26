@@ -4,11 +4,15 @@ package coop.magnesium.sulfur.api;
 import coop.magnesium.sulfur.db.dao.ColaboradorDao;
 import coop.magnesium.sulfur.db.entities.Colaborador;
 import coop.magnesium.sulfur.db.entities.Notificacion;
+import coop.magnesium.sulfur.db.entities.RecuperacionPassword;
 import coop.magnesium.sulfur.db.entities.TipoNotificacion;
 import coop.magnesium.sulfur.system.MailEvent;
 import coop.magnesium.sulfur.system.MailService;
 import coop.magnesium.sulfur.system.StartupBean;
-import coop.magnesium.sulfur.utils.*;
+import coop.magnesium.sulfur.utils.KeyGenerator;
+import coop.magnesium.sulfur.utils.Logged;
+import coop.magnesium.sulfur.utils.PasswordUtils;
+import coop.magnesium.sulfur.utils.PropertiesFromFile;
 import coop.magnesium.sulfur.utils.ex.MagnesiumBdMultipleResultsException;
 import coop.magnesium.sulfur.utils.ex.MagnesiumBdNotFoundException;
 import coop.magnesium.sulfur.utils.ex.MagnesiumSecurityException;
@@ -109,10 +113,10 @@ public class UserService {
     public Response recuperarPassword(@PathParam("email") String email) {
         try {
             if (colaboradorDao.findByEmail(email) == null) throw new ObjectNotFoundException("no existe colaborador");
-            DataRecuperacionPassword dataRecuperacionPassword = new DataRecuperacionPassword(email, UUID.randomUUID().toString(), LocalDateTime.now().plusHours(1));
-            startupBean.putRecuperacionPassword(dataRecuperacionPassword);
-            mailEvent.fire(new MailEvent(Arrays.asList(email), MailService.generarEmailRecuperacionClave(dataRecuperacionPassword.getToken(), endpointsProperties.getProperty("frontend.host"), endpointsProperties.getProperty("frontend.path")), "MARQ: Recuperación de Contraseña"));
-            logger.info(dataRecuperacionPassword.getToken());
+            RecuperacionPassword recuperacionPassword = new RecuperacionPassword(email, UUID.randomUUID().toString(), LocalDateTime.now().plusHours(1));
+            startupBean.putRecuperacionPassword(recuperacionPassword);
+            mailEvent.fire(new MailEvent(Arrays.asList(email), MailService.generarEmailRecuperacionClave(recuperacionPassword.getToken(), endpointsProperties.getProperty("frontend.host"), endpointsProperties.getProperty("frontend.path")), "MARQ: Recuperación de Contraseña"));
+            logger.info(recuperacionPassword.getToken());
             return Response.ok().build();
         } catch (ObjectNotFoundException e) {
             logger.warning(e.getMessage());
@@ -135,7 +139,7 @@ public class UserService {
     @Logged
     public Response recuperarEmail(@PathParam("token") String token) {
         try {
-            DataRecuperacionPassword dataRecuperacionPassword = startupBean.getRecuperacionInfo(token);
+            RecuperacionPassword dataRecuperacionPassword = startupBean.getRecuperacionInfo(token);
             if (dataRecuperacionPassword == null) throw new ObjectNotFoundException("no existe recuperación");
             return Response.ok(dataRecuperacionPassword).build();
         } catch (ObjectNotFoundException e) {
@@ -155,7 +159,7 @@ public class UserService {
     public Response cambiarPassword(@FormParam("token") String token,
                                     @FormParam("password") String password) {
         try {
-            DataRecuperacionPassword dataRecuperacionPassword = startupBean.getRecuperacionInfo(token);
+            RecuperacionPassword dataRecuperacionPassword = startupBean.getRecuperacionInfo(token);
             if (dataRecuperacionPassword == null) throw new MagnesiumBdNotFoundException("no existe recuperación");
             Colaborador colaborador = colaboradorDao.findByEmail(dataRecuperacionPassword.getEmail());
             if (colaborador == null) throw new MagnesiumBdNotFoundException("no existe colaborador");
@@ -172,7 +176,7 @@ public class UserService {
     }
 
 
-    private Colaborador authenticate(String email, String password) throws MagnesiumBdNotFoundException, MagnesiumBdMultipleResultsException, MagnesiumSecurityException {
+    private Colaborador authenticate(String email, String password) throws MagnesiumBdMultipleResultsException, MagnesiumSecurityException {
         Colaborador sulfurUser = colaboradorDao.findByEmail(email);
         if (!PasswordUtils.digestPassword(password).equals(sulfurUser.getPassword()))
             throw new MagnesiumSecurityException("Invalid sulfurUser/password");
