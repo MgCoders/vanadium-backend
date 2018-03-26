@@ -31,7 +31,7 @@ public class Cargo {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "cargo_id")
     private Set<PrecioHora> precioHoraHistoria = new HashSet<>();
-    boolean enabled = true;
+    private Boolean enabled = true;
 
     public Cargo() {
     }
