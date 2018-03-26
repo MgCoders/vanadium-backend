@@ -4,7 +4,10 @@ import coop.magnesium.sulfur.db.dao.ColaboradorDao;
 import coop.magnesium.sulfur.db.dao.ConfiguracionDao;
 import coop.magnesium.sulfur.db.dao.HoraDao;
 import coop.magnesium.sulfur.db.dao.RecuperacionPasswordDao;
-import coop.magnesium.sulfur.db.entities.*;
+import coop.magnesium.sulfur.db.entities.Colaborador;
+import coop.magnesium.sulfur.db.entities.Notificacion;
+import coop.magnesium.sulfur.db.entities.RecuperacionPassword;
+import coop.magnesium.sulfur.db.entities.TipoNotificacion;
 import coop.magnesium.sulfur.utils.PasswordUtils;
 import coop.magnesium.sulfur.utils.ex.MagnesiumBdMultipleResultsException;
 
@@ -16,7 +19,6 @@ import javax.inject.Inject;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -77,14 +79,9 @@ public class StartupBean {
     }
 
     public void configuraciones() {
-        List<Configuracion> emailOn = configuracionDao.findAllByClave(TipoConfiguracion.NOTIFICACION_MAIL_ACTIVADO);
-        if (emailOn.isEmpty()) {
-            configuracionDao.save(new Configuracion(TipoConfiguracion.NOTIFICACION_MAIL_ACTIVADO, "1"));
-        }
-        List<Configuracion> periodicidad = configuracionDao.findAllByClave(TipoConfiguracion.NOTIFICACION_PERIODICIDAD);
-        if (periodicidad.isEmpty()) {
-            configuracionDao.save(new Configuracion(TipoConfiguracion.NOTIFICACION_PERIODICIDAD, "48"));
-        }
+        configuracionDao.setMailOn(false);
+        configuracionDao.setPeriodicidadNotificaciones(48L);
+        configuracionDao.addDestinatarioNotificacionesAdmins("info@magnesium.coop");
     }
 
     @Timeout

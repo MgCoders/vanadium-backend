@@ -29,6 +29,9 @@ public class ConfiguracionDao extends AbstractDao<Configuracion, Long> {
     @Inject
     Logger logger;
 
+    @Inject
+    ConfiguracionDao configuracionDao;
+
     @Override
     public Class<Configuracion> getEntityClass() {
         return Configuracion.class;
@@ -57,8 +60,30 @@ public class ConfiguracionDao extends AbstractDao<Configuracion, Long> {
         return !configuracionList.isEmpty() && (Boolean.getBoolean(configuracionList.get(0).getValor()));
     }
 
+    public void setMailOn(boolean on) {
+        List<Configuracion> emailOn = configuracionDao.findAllByClave(TipoConfiguracion.NOTIFICACION_MAIL_ACTIVADO);
+        if (emailOn.isEmpty()) {
+            configuracionDao.save(new Configuracion(TipoConfiguracion.NOTIFICACION_MAIL_ACTIVADO, String.valueOf(on)));
+        } else {
+            emailOn.get(0).setValor(String.valueOf(on));
+        }
+
+    }
+
     public List<String> getDestinatariosNotificacionesAdmins() {
         return findAllByClave(TipoConfiguracion.NOTIFICACION_ADMIN_DESTINATARIO).stream().map(Configuracion::getValor).collect(Collectors.toList());
+    }
+
+    public void addDestinatarioNotificacionesAdmins(String email) {
+        configuracionDao.save(new Configuracion(TipoConfiguracion.NOTIFICACION_ADMIN_DESTINATARIO, email));
+    }
+
+    public void deleteDestinatarioNotificacionesAdmins(String email) {
+        findAllByClave(TipoConfiguracion.NOTIFICACION_ADMIN_DESTINATARIO).forEach(configuracion -> {
+            if (configuracion.getValor().equals(email)) {
+                configuracionDao.delete(configuracion);
+            }
+        });
     }
 
     public Long getPeriodicidadNotificaciones() {
@@ -69,6 +94,16 @@ public class ConfiguracionDao extends AbstractDao<Configuracion, Long> {
         } else {
             return 0L;
         }
+    }
+
+    public void setPeriodicidadNotificaciones(Long horas) {
+        List<Configuracion> periodicidad = configuracionDao.findAllByClave(TipoConfiguracion.NOTIFICACION_PERIODICIDAD);
+        if (periodicidad.isEmpty()) {
+            configuracionDao.save(new Configuracion(TipoConfiguracion.NOTIFICACION_PERIODICIDAD, String.valueOf(horas)));
+        } else {
+            periodicidad.get(0).setValor(String.valueOf(horas));
+        }
+
     }
 
     public String getNodoMaster() {
