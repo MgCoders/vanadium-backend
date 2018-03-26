@@ -96,7 +96,11 @@ public class StartupBean {
                     break;
                 case RECUPERACION_CONTRASENA:
                     logger.info("Timeout: " + RECUPERACION_CONTRASENA.name());
-                    recuperacionPasswordDao.delete((String) dataTimer.obj);
+                    recuperacionPasswordDao.findAll().forEach(recuperacionPassword -> {
+                        if (recuperacionPassword.getExpirationDate().isBefore(LocalDateTime.now())) {
+                            recuperacionPasswordDao.delete(recuperacionPassword);
+                        }
+                    });
                     break;
             }
         }

@@ -87,6 +87,8 @@ public class MailService {
             } catch (MessagingException e) {
                 logger.severe(e.getMessage());
             }
+        } else {
+            logger.info("MAIL OFF");
         }
     }
 

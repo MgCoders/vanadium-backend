@@ -31,6 +31,7 @@ public class Cargo {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "cargo_id")
     private Set<PrecioHora> precioHoraHistoria = new HashSet<>();
+    boolean enabled = true;
 
     public Cargo() {
     }
@@ -41,9 +42,12 @@ public class Cargo {
         this.precioHoraHistoria.add(new PrecioHora(precioHora, LocalDate.now()));
     }
 
-    @PostPersist
-    public void prePersist() {
-        System.out.println(this.toString());
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public String getCodigo() {
@@ -90,6 +94,7 @@ public class Cargo {
                 ", nombre='" + nombre + '\'' +
                 ", codigo='" + codigo + '\'' +
                 ", precioHoraHistoria=" + precioHoraHistoria +
+                ", enabled=" + enabled +
                 '}';
     }
 }
