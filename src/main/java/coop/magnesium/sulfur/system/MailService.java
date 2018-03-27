@@ -17,6 +17,7 @@ import javax.mail.*;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 /**
@@ -69,6 +70,23 @@ public class MailService {
 
     @PostConstruct
     public void init() {
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", configuracionDao.getMailHost());
+        props.put("mail.smtp.port", configuracionDao.getMailPort());
+
+        if (configuracionDao.getMailPass()!=null) {
+            mailSession = Session.getInstance(props,
+                    new javax.mail.Authenticator() {
+                        protected PasswordAuthentication getPasswordAuthentication() {
+                            return new PasswordAuthentication(configuracionDao.getMailFrom(), configuracionDao.getMailPass());
+                        }
+                    }
+            );
+        } else {
+            mailSession = Session.getInstance(props);
+        }
     }
 
     @Logged

@@ -12,10 +12,6 @@ services:
        DB_USER: postgres
        DB_PASS: postgres
        LOGSTASH_HOST:
-       ZOHO_MAIL_FROM: no-reply@
-       ZOHO_MAIL_PASS: no-reply...
-       ZOHO_MAIL_HOST: smtp.zoho.com
-       ZOHO_MAIL_PORT: 465
     deploy:
       labels:
         - "traefik.port=8080"

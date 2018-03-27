@@ -11,8 +11,6 @@ services:
         DB_USER: sulfur_user
         DB_PASS: sulfur_pass
         LOGSTASH_HOST: logstash
-        ZOHO_MAIL_FROM: prueba@magnesium.coop
-        ZOHO_MAIL_PASS: prueba
       ports:
         - 8080:8080
         - 9990:9990
