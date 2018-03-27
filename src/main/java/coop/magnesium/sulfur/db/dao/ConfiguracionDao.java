@@ -57,7 +57,7 @@ public class ConfiguracionDao extends AbstractDao<Configuracion, Long> {
 
     public boolean isEmailOn() {
         List<Configuracion> configuracionList = findAllByClave(TipoConfiguracion.NOTIFICACION_MAIL_ACTIVADO);
-        return !configuracionList.isEmpty() && (Boolean.getBoolean(configuracionList.get(0).getValor()));
+        return !configuracionList.isEmpty() && (Boolean.valueOf(configuracionList.get(0).getValor()));
     }
 
     public void setMailOn(boolean on) {
