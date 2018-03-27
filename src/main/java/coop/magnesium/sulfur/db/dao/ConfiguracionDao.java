@@ -106,6 +106,78 @@ public class ConfiguracionDao extends AbstractDao<Configuracion, Long> {
 
     }
 
+    public String getMailHost() {
+        List<Configuracion> configuracionList = findAllByClave(TipoConfiguracion.MAIL_HOST);
+        if (!configuracionList.isEmpty()) {
+            return configuracionList.get(0).getValor();
+        } else {
+            return null;
+        }
+    }
+
+    public void setMailHost(String mailHost) {
+        Optional<Configuracion> configuracion = findAllByClave(TipoConfiguracion.MAIL_HOST).stream().findFirst();
+        if (configuracion.isPresent()) {
+            configuracion.get().setValor(mailHost);
+        } else {
+            save(new Configuracion(TipoConfiguracion.MAIL_HOST, mailHost));
+        }
+    }
+
+    public String getMailPort() {
+        List<Configuracion> configuracionList = findAllByClave(TipoConfiguracion.MAIL_PORT);
+        if (!configuracionList.isEmpty()) {
+            return configuracionList.get(0).getValor();
+        } else {
+            return null;
+        }
+    }
+
+    public void setMailPort(String mailPort) {
+        Optional<Configuracion> configuracion = findAllByClave(TipoConfiguracion.MAIL_PORT).stream().findFirst();
+        if (configuracion.isPresent()) {
+            configuracion.get().setValor(mailPort);
+        } else {
+            save(new Configuracion(TipoConfiguracion.MAIL_PORT, mailPort));
+        }
+    }
+
+    public String getMailFrom() {
+        List<Configuracion> configuracionList = findAllByClave(TipoConfiguracion.MAIL_FROM);
+        if (!configuracionList.isEmpty()) {
+            return configuracionList.get(0).getValor();
+        } else {
+            return null;
+        }
+    }
+
+    public void setMailFrom(String mailFrom) {
+        Optional<Configuracion> configuracion = findAllByClave(TipoConfiguracion.MAIL_FROM).stream().findFirst();
+        if (configuracion.isPresent()) {
+            configuracion.get().setValor(mailFrom);
+        } else {
+            save(new Configuracion(TipoConfiguracion.MAIL_FROM, mailFrom));
+        }
+    }
+
+    public String getMailPass() {
+        List<Configuracion> configuracionList = findAllByClave(TipoConfiguracion.MAIL_PASS);
+        if (!configuracionList.isEmpty()) {
+            return configuracionList.get(0).getValor();
+        } else {
+            return null;
+        }
+    }
+
+    public void setMailPass(String mailPass) {
+        Optional<Configuracion> configuracion = findAllByClave(TipoConfiguracion.MAIL_PASS).stream().findFirst();
+        if (configuracion.isPresent()) {
+            configuracion.get().setValor(mailPass);
+        } else {
+            save(new Configuracion(TipoConfiguracion.MAIL_PASS, mailPass));
+        }
+    }
+
     public String getNodoMaster() {
         List<Configuracion> configuracionList = findAllByClave(TipoConfiguracion.NODO_MASTER);
         if (!configuracionList.isEmpty()) {

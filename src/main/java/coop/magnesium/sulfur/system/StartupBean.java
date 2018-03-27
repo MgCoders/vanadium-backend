@@ -82,6 +82,9 @@ public class StartupBean {
         configuracionDao.setMailOn(false);
         configuracionDao.setPeriodicidadNotificaciones(48L);
         configuracionDao.addDestinatarioNotificacionesAdmins("info@magnesium.coop");
+        configuracionDao.setMailFrom("no-reply@mm.com");
+        configuracionDao.setMailPort("1025");
+        configuracionDao.setMailHost("ip-172-31-6-242");
     }
 
     @Timeout
