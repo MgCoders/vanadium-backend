@@ -79,12 +79,24 @@ public class StartupBean {
     }
 
     public void configuraciones() {
-        configuracionDao.setMailOn(false);
-        configuracionDao.setPeriodicidadNotificaciones(48L);
-        configuracionDao.addDestinatarioNotificacionesAdmins("info@magnesium.coop");
-        configuracionDao.setMailFrom("no-reply@mm.com");
-        configuracionDao.setMailPort("1025");
-        configuracionDao.setMailHost("ip-172-31-6-242");
+        if (!configuracionDao.isEmailOn()) {
+            configuracionDao.setMailOn(false);
+        }
+        if (configuracionDao.getPeriodicidadNotificaciones().equals(0L)) {
+            configuracionDao.setPeriodicidadNotificaciones(48L);
+        }
+        if (configuracionDao.getDestinatariosNotificacionesAdmins().isEmpty()) {
+            configuracionDao.addDestinatarioNotificacionesAdmins("info@magnesium.coop");
+        }
+        if (configuracionDao.getMailFrom()==null) {
+            configuracionDao.setMailFrom("no-reply@mm.com");
+        }
+        if (configuracionDao.getMailHost()==null) {
+            configuracionDao.setMailPort("1025");
+        }
+        if (configuracionDao.getMailPort()==null) {
+            configuracionDao.setMailHost("ip-172-31-6-242");
+        }
     }
 
     @Timeout
