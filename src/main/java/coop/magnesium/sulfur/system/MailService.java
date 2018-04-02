@@ -75,15 +75,7 @@ public class MailService {
         props.put("mail.smtp.port", configuracionDao.getMailPort());
         props.setProperty("mail.smtp.startssl.enable", "true");
         props.setProperty("mail.smtps.auth", "true");
-
-
-        mailSession = Session.getInstance(props);/*,
-                new javax.mail.Authenticator() {
-                    protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication(configuracionDao.getMailFrom(), configuracionDao.getMailPass());
-                    }
-                }
-        );*/
+        mailSession = Session.getInstance(props);
     }
 
     @Logged
@@ -93,14 +85,13 @@ public class MailService {
         if (configuracionDao.isEmailOn()) {
             try {
                 MimeMessage m = new MimeMessage(mailSession);
+                m.setFrom(new InternetAddress(configuracionDao.getMailFrom()));
                 Address[] to = event.getTo().stream().map(this::toAddress).toArray(InternetAddress[]::new);
                 m.setRecipients(Message.RecipientType.TO, to);
                 m.setSubject(event.getSubject(), "UTF-8");
                 m.setSentDate(new java.util.Date());
                 m.setText(event.getMessage(), "UTF-8");
                 Transport transport = mailSession.getTransport("smtps");
-
-                // send the mail
                 transport.connect(configuracionDao.getMailHost(), configuracionDao.getMailFrom(), configuracionDao.getMailPass());
                 transport.sendMessage(m, m.getAllRecipients());
                 transport.close();
