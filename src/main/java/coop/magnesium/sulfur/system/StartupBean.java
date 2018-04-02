@@ -52,6 +52,8 @@ public class StartupBean {
 
     @PostConstruct
     public void init() {
+        System.setProperty("user.timezone", "America/Montevideo");
+        logger.warning("FECHA HORA DE JVM: " + LocalDateTime.now());
         try {
             if (colaboradorDao.findByEmail("info@magnesium.coop") == null) {
                 colaboradorDao.save(new Colaborador("info@magnesium.coop", "root", null, PasswordUtils.digestPassword(UUID.randomUUID().toString()), "ADMIN"));
