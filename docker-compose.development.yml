@@ -6,6 +6,7 @@ services:
       image: sulfur-backend
       build: .
       environment:
+        TZ: America/Montevideo
         DB_HOST: db
         DB_NAME: sulfur
         DB_USER: sulfur_user

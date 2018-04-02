@@ -7,6 +7,7 @@ services:
     networks:
       - traefik_proxy
     environment:
+       TZ: America/Montevideo
        DB_HOST: pg_REPLACE_PROJECT_NAME
        DB_NAME: postgres
        DB_USER: postgres

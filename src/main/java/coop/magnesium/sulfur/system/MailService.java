@@ -70,23 +70,20 @@ public class MailService {
 
     @PostConstruct
     public void init() {
-        Properties props = new Properties();
-        props.put("mail.smtp.auth", "true");
-        props.setProperty("mail.pop3.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-        props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-        props.setProperty("mail.smtp.socketFactory.fallback", "false");
-        props.setProperty("mail.smtp.socketFactory.port", configuracionDao.getMailPort());
-        props.put("mail.smtp.startssl.enable", "true");
+        Properties props = System.getProperties();
         props.put("mail.smtp.host", configuracionDao.getMailHost());
         props.put("mail.smtp.port", configuracionDao.getMailPort());
+        props.setProperty("mail.smtp.startssl.enable", "true");
+        props.setProperty("mail.smtps.auth", "true");
 
-        mailSession = Session.getInstance(props,
+
+        mailSession = Session.getInstance(props);/*,
                 new javax.mail.Authenticator() {
                     protected PasswordAuthentication getPasswordAuthentication() {
                         return new PasswordAuthentication(configuracionDao.getMailFrom(), configuracionDao.getMailPass());
                     }
                 }
-        );
+        );*/
     }
 
     @Logged
@@ -101,7 +98,12 @@ public class MailService {
                 m.setSubject(event.getSubject(), "UTF-8");
                 m.setSentDate(new java.util.Date());
                 m.setText(event.getMessage(), "UTF-8");
-                Transport.send(m);
+                Transport transport = mailSession.getTransport("smtps");
+
+                // send the mail
+                transport.connect(configuracionDao.getMailHost(), configuracionDao.getMailFrom(), configuracionDao.getMailPass());
+                transport.sendMessage(m, m.getAllRecipients());
+                transport.close();
             } catch (MessagingException e) {
                 logger.severe(e.getMessage());
             }
