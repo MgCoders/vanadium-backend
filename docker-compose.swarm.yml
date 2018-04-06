@@ -7,6 +7,7 @@ services:
     networks:
       - traefik_proxy
     environment:
+       TZ: America/Montevideo
        DB_HOST: 
        DB_NAME: REPLACE_PROJECT_NAME
        DB_USER: 

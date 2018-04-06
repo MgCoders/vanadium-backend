@@ -39,6 +39,7 @@ public class Notificacion {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime fechaHora;
+    private boolean enviado = false;
 
     public Notificacion() {
     }
@@ -106,6 +107,14 @@ public class Notificacion {
         this.fechaHora = fechaHora;
     }
 
+    public boolean isEnviado() {
+        return enviado;
+    }
+
+    public void setEnviado(boolean enviado) {
+        this.enviado = enviado;
+    }
+
     @Override
     public String toString() {
         return "Notificacion{" +
@@ -115,6 +124,7 @@ public class Notificacion {
                 ", texto='" + texto + '\'' +
                 ", colaborador=" + colaborador +
                 ", fechaHora=" + fechaHora +
+                ", enviado=" + enviado +
                 '}';
     }
 }

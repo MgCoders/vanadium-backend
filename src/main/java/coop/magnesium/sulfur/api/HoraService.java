@@ -3,10 +3,7 @@ package coop.magnesium.sulfur.api;
 
 import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
 import coop.magnesium.sulfur.api.utils.RoleNeeded;
-import coop.magnesium.sulfur.db.dao.CargoDao;
-import coop.magnesium.sulfur.db.dao.ColaboradorDao;
-import coop.magnesium.sulfur.db.dao.HoraDao;
-import coop.magnesium.sulfur.db.dao.ProyectoDao;
+import coop.magnesium.sulfur.db.dao.*;
 import coop.magnesium.sulfur.db.entities.*;
 import coop.magnesium.sulfur.utils.Logged;
 import coop.magnesium.sulfur.utils.ex.MagnesiumException;
@@ -51,8 +48,6 @@ public class HoraService {
     private Logger logger;
     @EJB
     private HoraDao horaDao;
-    @EJB
-    private ProyectoDao proyectoDao;
     @EJB
     private ColaboradorDao colaboradorDao;
     @Inject
@@ -103,7 +98,6 @@ public class HoraService {
 
             hora.cacularSubtotalDetalle();
             Hora horaCreada = horaDao.save(hora);
-            notificacionEvent.fire(new Notificacion(TipoNotificacion.NUEVA_HORA, horaCreada.getColaborador(), "Carga de horas.", horaCreada));
 
             return Response.status(Response.Status.CREATED).entity(horaCreada).build();
 

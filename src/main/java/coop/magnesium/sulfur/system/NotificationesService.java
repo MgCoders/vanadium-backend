@@ -25,41 +25,11 @@ public class NotificationesService {
     Logger logger;
     @EJB
     NotificacionDao notificacionDao;
-    @Inject
-    CargoDao cargoDao;
-    @Inject
-    ConfiguracionDao configuracionDao;
-    @Inject
-    Event<MailEvent> mailEvent;
 
     @Logged
     @Asynchronous
     @Lock(LockType.READ)
     public void nuevaNotificacionHoras(@Observes(during = TransactionPhase.AFTER_SUCCESS) Notificacion notificacion) {
-        List<String> mailsAdmins = configuracionDao.getDestinatariosNotificacionesAdmins();
-        logger.info("MAILS ADMINS: " + mailsAdmins);
-        try {
-            Notificacion notificacionSaved = notificacionDao.save(notificacion);
-            switch (notificacionSaved.getTipo()) {
-                case NUEVA_HORA:
-                    if (notificacion.getHora().getDia().isBefore(LocalDate.now().minusDays(2))) {
-                        mailEvent.fire(
-                                new MailEvent(mailsAdmins,
-                                        MailService.generarEmailAviso(notificacion),
-                                        "MARQ: Alerta, carga de hora antigua"));
-                    }
-                    break;
-                case FALTAN_HORAS:
-                    mailEvent.fire(
-                            new MailEvent(mailsAdmins,
-                                    MailService.generarEmailAviso(notificacion),
-                                    "MARQ: Alerta, faltan horas"));
-                    break;
-                default:
-                    break;
-            }
-        } catch (Exception e) {
-            logger.severe(e.getMessage());
-        }
+        logger.info(notificacionDao.save(notificacion).toString());
     }
 }
