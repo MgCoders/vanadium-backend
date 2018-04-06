@@ -202,10 +202,12 @@ public class StartupBean {
         });
 
         List<String> mailsAdmins = configuracionDao.getDestinatariosNotificacionesAdmins();
-        mailEvent.fire(
-                new MailEvent(mailsAdmins,
-                        stringBuilder.toString(),
-                        "MARQ: Notificaciones"));
+        if (!stringBuilder.toString().isEmpty()) {
+            mailEvent.fire(
+                    new MailEvent(mailsAdmins,
+                            stringBuilder.toString(),
+                            "MARQ: Notificaciones"));
+        }
 
     }
 
