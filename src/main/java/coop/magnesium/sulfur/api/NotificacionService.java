@@ -89,7 +89,7 @@ public class NotificacionService {
     @JWTTokenNeeded
     @RoleNeeded({Role.ADMIN})
     @ApiOperation(value = "Disparar alerta horas sin cargar", response = Response.class)
-    public Response alertas() {
+    public Response findByColaborador() {
         try {
             startupBean.alertaHorasSinCargar();
             return Response.ok().build();
@@ -97,20 +97,5 @@ public class NotificacionService {
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
-
-    @PUT
-    @Path("alertas/mails")
-    @JWTTokenNeeded
-    @RoleNeeded({Role.ADMIN})
-    @ApiOperation(value = "Disparar alerta horas sin cargar", response = Response.class)
-    public Response mails() {
-        try {
-            startupBean.enviarMailsConNotificaciones();
-            return Response.ok().build();
-        } catch (Exception e) {
-            return Response.serverError().entity(e.getMessage()).build();
-        }
-    }
-
 
 }
