@@ -1,9 +1,6 @@
 package coop.magnesium.sulfur.system;
 
-import coop.magnesium.sulfur.db.dao.ColaboradorDao;
-import coop.magnesium.sulfur.db.dao.ConfiguracionDao;
-import coop.magnesium.sulfur.db.dao.HoraDao;
-import coop.magnesium.sulfur.db.dao.RecuperacionPasswordDao;
+import coop.magnesium.sulfur.db.dao.*;
 import coop.magnesium.sulfur.db.entities.Colaborador;
 import coop.magnesium.sulfur.db.entities.Notificacion;
 import coop.magnesium.sulfur.db.entities.RecuperacionPassword;
@@ -19,11 +16,11 @@ import javax.inject.Inject;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import static coop.magnesium.sulfur.system.TimerType.NOTIFICACION_ALERTA;
-import static coop.magnesium.sulfur.system.TimerType.RECUPERACION_CONTRASENA;
+import static coop.magnesium.sulfur.system.TimerType.*;
 
 /**
  * Created by rsperoni on 18/11/17.
@@ -42,18 +39,23 @@ public class StartupBean {
     @EJB
     ColaboradorDao colaboradorDao;
     @Inject
-    Event<Notificacion> notificacionEvent;
-    @Inject
     ConfiguracionDao configuracionDao;
     @Inject
     String jbossNodeName;
     @Inject
     RecuperacionPasswordDao recuperacionPasswordDao;
+    @Inject
+    NotificacionDao notificacionDao;
+    @Inject
+    Event<MailEvent> mailEvent;
+    @Inject
+    Event<Notificacion> notificacionEvent;
 
     @PostConstruct
     public void init() {
         System.setProperty("user.timezone", "America/Montevideo");
         logger.warning("FECHA HORA DE JVM: " + LocalDateTime.now());
+
         try {
             if (colaboradorDao.findByEmail("info@magnesium.coop") == null) {
                 colaboradorDao.save(new Colaborador("info@magnesium.coop", "root", null, PasswordUtils.digestPassword(UUID.randomUUID().toString()), "ADMIN"));
@@ -63,7 +65,12 @@ public class StartupBean {
         }
         configuraciones();
         setMyselfAsNodoMaster();
-        setTimerNotificaciones();
+        //Solo si soy master
+        if (configuracionDao.getEntityManager().equals(jbossNodeName)) {
+            setTimerNotificaciones();
+            setTimerCleanRecuperacionContrasena();
+            setTimerEnvioMails();
+        }
     }
 
     public void setTimerNotificaciones() {
@@ -73,6 +80,20 @@ public class StartupBean {
             timerConfig.setInfo(new DataTimer(TimerType.NOTIFICACION_ALERTA, null));
             timerService.createSingleActionTimer(Date.from(instant), timerConfig);
         }
+    }
+
+    public void setTimerCleanRecuperacionContrasena() {
+        Instant instant = Instant.now().plus(1, ChronoUnit.HOURS);
+        TimerConfig timerConfig = new TimerConfig();
+        timerConfig.setInfo(new DataTimer(TimerType.RECUPERACION_CONTRASENA, null));
+        timerService.createSingleActionTimer(Date.from(instant), timerConfig);
+    }
+
+    public void setTimerEnvioMails() {
+        Instant instant = Instant.from(LocalTime.of(9, 30));
+        TimerConfig timerConfig = new TimerConfig();
+        timerConfig.setInfo(new DataTimer(TimerType.ENVIO_MAIL, null));
+        timerService.createSingleActionTimer(Date.from(instant), timerConfig);
     }
 
     public void setMyselfAsNodoMaster() {
@@ -90,13 +111,13 @@ public class StartupBean {
         if (configuracionDao.getDestinatariosNotificacionesAdmins().isEmpty()) {
             configuracionDao.addDestinatarioNotificacionesAdmins("info@magnesium.coop");
         }
-        if (configuracionDao.getMailFrom()==null) {
+        if (configuracionDao.getMailFrom() == null) {
             configuracionDao.setMailFrom("no-reply@mm.com");
         }
-        if (configuracionDao.getMailHost()==null) {
+        if (configuracionDao.getMailHost() == null) {
             configuracionDao.setMailPort("1025");
         }
-        if (configuracionDao.getMailPort()==null) {
+        if (configuracionDao.getMailPort() == null) {
             configuracionDao.setMailHost("ip-172-31-6-242");
         }
     }
@@ -113,11 +134,13 @@ public class StartupBean {
                     break;
                 case RECUPERACION_CONTRASENA:
                     logger.info("Timeout: " + RECUPERACION_CONTRASENA.name());
-                    recuperacionPasswordDao.findAll().forEach(recuperacionPassword -> {
-                        if (recuperacionPassword.getExpirationDate().isBefore(LocalDateTime.now())) {
-                            recuperacionPasswordDao.delete(recuperacionPassword);
-                        }
-                    });
+                    cleanRecuperacionContrasena();
+                    setTimerCleanRecuperacionContrasena();
+                    break;
+                case ENVIO_MAIL:
+                    logger.info("Timeout: " + ENVIO_MAIL.name());
+                    enviarMailsConNotificaciones();
+                    setTimerEnvioMails();
                     break;
             }
         }
@@ -141,22 +164,49 @@ public class StartupBean {
         }
     }
 
-    public void alertaHorasSinCargar() {
+    public void cleanRecuperacionContrasena() {
         //Solo si soy master
-        if (configuracionDao.getEntityManager().equals(jbossNodeName)) {
-            LocalDate hoy = LocalDate.now();
-            //Solo días de semana
-            if (!hoy.getDayOfWeek().equals(DayOfWeek.SATURDAY) && !hoy.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
-                colaboradorDao.findAll().stream().filter(colaborador -> colaborador.getCargo() != null)
-                        .forEach(colaborador -> {
-                            //Si hace más de 3 días que no hay horas
-                            if (horaDao.findAllByColaborador(colaborador, LocalDate.now().minusDays(3), LocalDate.now()).isEmpty()) {
-                                notificacionEvent.fire(new Notificacion(TipoNotificacion.FALTAN_HORAS, colaborador, "Más de dos días sin ingresar horas"));
-                            }
-                        });
+
+        logger.info("Master cleaning Recuperacion Contraseña");
+        recuperacionPasswordDao.findAll().forEach(recuperacionPassword -> {
+            if (recuperacionPassword.getExpirationDate().isBefore(LocalDateTime.now())) {
+                recuperacionPasswordDao.delete(recuperacionPassword);
             }
-        }
+        });
+
     }
 
+    public void alertaHorasSinCargar() {
+
+        logger.info("Master generando notificaciones");
+        LocalDate hoy = LocalDate.now();
+        //Solo días de semana
+        if (!hoy.getDayOfWeek().equals(DayOfWeek.SATURDAY) && !hoy.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
+            colaboradorDao.findAll().stream().filter(colaborador -> colaborador.getCargo() != null)
+                    .forEach(colaborador -> {
+                        //Si hace más de 3 días que no hay horas
+                        if (horaDao.findAllByColaborador(colaborador, LocalDate.now().minusDays(3), LocalDate.now()).isEmpty()) {
+                            notificacionEvent.fire(new Notificacion(TipoNotificacion.FALTAN_HORAS, colaborador, colaborador.getNombre() + " no cargó horas en más de 2 días."));
+                        }
+                    });
+        }
+
+    }
+
+    public void enviarMailsConNotificaciones() {
+        logger.info("Master enviando mails");
+        StringBuilder stringBuilder = new StringBuilder();
+        notificacionDao.findAllNoEnviadas().forEach(notificacion -> {
+            stringBuilder.append("- ").append(notificacion.getTexto()).append("\n");
+            notificacion.setEnviado(true);
+        });
+
+        List<String> mailsAdmins = configuracionDao.getDestinatariosNotificacionesAdmins();
+        mailEvent.fire(
+                new MailEvent(mailsAdmins,
+                        stringBuilder.toString(),
+                        "MARQ: Notificaciones"));
+
+    }
 
 }

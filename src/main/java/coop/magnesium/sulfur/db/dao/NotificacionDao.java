@@ -49,6 +49,18 @@ public class NotificacionDao extends AbstractDao<Notificacion, Long> {
         return (List<Notificacion>) query.getResultList();
     }
 
+    public List<Notificacion> findAllNoEnviadas() {
+        CriteriaBuilder criteriaBuilder = this.getEntityManager().getCriteriaBuilder();
+        CriteriaQuery criteriaQuery = criteriaBuilder.createQuery();
+        Root entity = criteriaQuery.from(Notificacion.class);
+        criteriaQuery.select(entity);
+        Predicate noEnviadaIsOk = criteriaBuilder.equal(entity.get("enviado"), false);
+        criteriaQuery.where(noEnviadaIsOk);
+        criteriaQuery.orderBy(criteriaBuilder.desc(entity.get("fechaHora")));
+        Query query = this.getEntityManager().createQuery(criteriaQuery);
+        return (List<Notificacion>) query.getResultList();
+    }
+
     public List<Notificacion> findAll(LocalDateTime ini, LocalDateTime fin) {
         CriteriaBuilder criteriaBuilder = this.getEntityManager().getCriteriaBuilder();
         CriteriaQuery criteriaQuery = criteriaBuilder.createQuery();
