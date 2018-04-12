@@ -23,6 +23,7 @@ public class TipoTarea {
     @NotNull
     private String nombre;
     private Integer prioridad = 1;
+    private Boolean enabled = true;
 
     public TipoTarea() {
     }
@@ -64,6 +65,14 @@ public class TipoTarea {
         this.prioridad = prioridad;
     }
 
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
+
     @Override
     public String toString() {
         return "TipoTarea{" +
@@ -71,6 +80,7 @@ public class TipoTarea {
                 ", codigo='" + codigo + '\'' +
                 ", nombre='" + nombre + '\'' +
                 ", prioridad=" + prioridad +
+                ", enabled=" + enabled +
                 '}';
     }
 }
