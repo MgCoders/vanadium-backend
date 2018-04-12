@@ -65,12 +65,10 @@ public class StartupBean {
         }
         configuraciones();
         setMyselfAsNodoMaster();
-        //Solo si soy master
-        if (configuracionDao.getNodoMaster().equals(jbossNodeName)) {
-            setTimerNotificaciones();
-            setTimerCleanRecuperacionContrasena();
-            setTimerEnvioMails();
-        }
+        setTimerNotificaciones();
+        setTimerCleanRecuperacionContrasena();
+        setTimerEnvioMails();
+
     }
 
     public void setTimerNotificaciones() {
@@ -92,9 +90,9 @@ public class StartupBean {
     public void setTimerEnvioMails() {
         TimerConfig timerConfig = new TimerConfig();
         timerConfig.setInfo(new DataTimer(TimerType.ENVIO_MAIL, null));
-        Instant instant = LocalDateTime.of(LocalDate.now().plusDays(1),LocalTime.of(9,30)).atZone(ZoneId.systemDefault()).toInstant();
+        Instant instant = LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(9, 30)).atZone(ZoneId.systemDefault()).toInstant();
         Date dateFromOld = Date.from(instant);
-        logger.info("Set TIMER ENVIO MAILS: "+dateFromOld.toString());
+        logger.info("Set TIMER ENVIO MAILS: " + dateFromOld.toString());
         timerService.createSingleActionTimer(dateFromOld, timerConfig);
     }
 
@@ -126,24 +124,27 @@ public class StartupBean {
 
     @Timeout
     public void timeout(Timer timer) {
-        if (timer.getInfo().getClass().getCanonicalName().equals(DataTimer.class.getCanonicalName())) {
-            DataTimer dataTimer = ((DataTimer) timer.getInfo());
-            switch (dataTimer.timerType) {
-                case NOTIFICACION_ALERTA:
-                    logger.info("Timeout: " + NOTIFICACION_ALERTA.name());
-                    alertaHorasSinCargar();
-                    setTimerNotificaciones();
-                    break;
-                case RECUPERACION_CONTRASENA:
-                    logger.info("Timeout: " + RECUPERACION_CONTRASENA.name());
-                    cleanRecuperacionContrasena();
-                    setTimerCleanRecuperacionContrasena();
-                    break;
-                case ENVIO_MAIL:
-                    logger.info("Timeout: " + ENVIO_MAIL.name());
-                    enviarMailsConNotificaciones();
-                    setTimerEnvioMails();
-                    break;
+        //Solo si soy master
+        if (configuracionDao.getNodoMaster().equals(jbossNodeName)) {
+            if (timer.getInfo().getClass().getCanonicalName().equals(DataTimer.class.getCanonicalName())) {
+                DataTimer dataTimer = ((DataTimer) timer.getInfo());
+                switch (dataTimer.timerType) {
+                    case NOTIFICACION_ALERTA:
+                        logger.info("Timeout: " + NOTIFICACION_ALERTA.name());
+                        alertaHorasSinCargar();
+                        setTimerNotificaciones();
+                        break;
+                    case RECUPERACION_CONTRASENA:
+                        logger.info("Timeout: " + RECUPERACION_CONTRASENA.name());
+                        cleanRecuperacionContrasena();
+                        setTimerCleanRecuperacionContrasena();
+                        break;
+                    case ENVIO_MAIL:
+                        logger.info("Timeout: " + ENVIO_MAIL.name());
+                        enviarMailsConNotificaciones();
+                        setTimerEnvioMails();
+                        break;
+                }
             }
         }
     }
