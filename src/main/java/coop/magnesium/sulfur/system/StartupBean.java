@@ -66,7 +66,7 @@ public class StartupBean {
         configuraciones();
         setMyselfAsNodoMaster();
         //Solo si soy master
-        if (configuracionDao.getEntityManager().equals(jbossNodeName)) {
+        if (configuracionDao.getNodoMaster().equals(jbossNodeName)) {
             setTimerNotificaciones();
             setTimerCleanRecuperacionContrasena();
             setTimerEnvioMails();
