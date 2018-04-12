@@ -90,10 +90,12 @@ public class StartupBean {
     }
 
     public void setTimerEnvioMails() {
-        Instant instant = Instant.from(LocalTime.of(9, 30));
         TimerConfig timerConfig = new TimerConfig();
         timerConfig.setInfo(new DataTimer(TimerType.ENVIO_MAIL, null));
-        timerService.createSingleActionTimer(Date.from(instant), timerConfig);
+        Instant instant = LocalDateTime.of(LocalDate.now().plusDays(1),LocalTime.of(9,30)).atZone(ZoneId.systemDefault()).toInstant();
+        Date dateFromOld = Date.from(instant);
+        logger.info("Set TIMER ENVIO MAILS: "+dateFromOld.toString());
+        timerService.createSingleActionTimer(dateFromOld, timerConfig);
     }
 
     public void setMyselfAsNodoMaster() {
