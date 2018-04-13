@@ -1,4 +1,4 @@
-# vanadium
+# Vanadium.
 
 ## Development
 
