@@ -8,7 +8,7 @@
       "name" : "rsperoni@magnesium.coop"
     }
   },
-  "host" : "sulfur.magnesium.link",
+  "host" : "vanadium.magnesium.link",
   "basePath" : "/api",
   "tags" : [ {
     "name" : "notificaciones"

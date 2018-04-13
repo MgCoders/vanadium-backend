@@ -24,7 +24,7 @@ batch
 
 module add --name=org.postgresql --resources=postgresql-42.1.4.jar --dependencies=javax.api,javax.transaction.api
 /subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource)
-data-source add --jndi-name=java:jboss/sulfur --name=sulfur --connection-url=jdbc:postgresql://${env.DB_HOST:none}:5432/${env.DB_NAME:none} --driver-name=postgresql --user-name=${env.DB_USER:none} --password=${env.DB_PASS:none} --valid-connection-checker-class-name=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker --exception-sorter-class-name=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter
+data-source add --jndi-name=java:jboss/vanadium --name=vanadium --connection-url=jdbc:postgresql://${env.DB_HOST:none}:5432/${env.DB_NAME:none} --driver-name=postgresql --user-name=${env.DB_USER:none} --password=${env.DB_PASS:none} --valid-connection-checker-class-name=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker --exception-sorter-class-name=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter
 
 /socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=zoho-mail-smtp/:add(host=${env.ZOHO_MAIL_HOST:none}, port=${env.ZOHO_MAIL_PORT:465})
 /subsystem=mail/mail-session=zoho/:add(jndi-name=java:/zohoMail, from=${env.ZOHO_MAIL_FROM:none})

@@ -250,11 +250,11 @@ buildNumber.properties
 
 # End of https://www.gitignore.io/api/git,java,linux,maven,eclipse,intellij,intellij+iml,intellij+all
 
-/sulfur.iml
+/vanadium.iml
 !/resources/logstash-gelf-1.11.1.tar.gz
 !/resources/postgresql-42.1.4.jar
 /.env
 !/resources/wildfly-configuration/wildfly-conf.tar.gz
 !/resources/wildfly-configuration/postgresql-42.1.4.module.tar.gz
-/resources/deployments/sulfur.war.deployed
+/resources/deployments/vanadium.war.deployed
 /node_modules/

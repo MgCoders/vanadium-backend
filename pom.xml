@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>magnesium.coop</groupId>
-    <artifactId>sulfur-backend</artifactId>
+    <artifactId>vanadium-backend</artifactId>
     <version>1.2</version>
     <packaging>war</packaging>
     <dependencies>
@@ -76,7 +76,7 @@
         </dependency>
     </dependencies>
     <build>
-        <finalName>sulfur</finalName>
+        <finalName>vanadium</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -106,8 +106,8 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <version.jacoco>0.7.8</version.jacoco>
         <version.arquillian_jacoco>1.0.0.Alpha9</version.arquillian_jacoco>
-        <url.testing>sulfur.magnesium.coop</url.testing>
-        <url.prod>sulfur.magnesium.link</url.prod>
+        <url.testing>vanadium.magnesium.coop</url.testing>
+        <url.prod>vanadium.magnesium.link</url.prod>
     </properties>
     <dependencyManagement>
         <dependencies>

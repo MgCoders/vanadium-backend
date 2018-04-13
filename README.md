@@ -1,4 +1,4 @@
-# sulfur
+# vanadium
 
 ## Development
 
@@ -15,7 +15,7 @@
     
 * Status
 
-    `http://host:port/sulfur/api/status`
+    `http://host:port/vanadium/api/status`
     
 
 ## Configuration

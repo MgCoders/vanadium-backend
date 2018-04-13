@@ -3,17 +3,17 @@ version: '3.1'
 services:
 
     wildfly:
-      image: sulfur-backend
+      image: vanadium-backend
       build: .
       environment:
         TZ: America/Montevideo
         DB_HOST: db
-        DB_NAME: sulfur
-        DB_USER: sulfur_user
-        DB_PASS: sulfur_pass
+        DB_NAME: vanadium
+        DB_USER: vanadium_user
+        DB_PASS: vanadium_pass
         LOGSTASH_HOST: logstash
       ports:
-        - 8080:8080
+        - 8083:8080
         - 9990:9990
       links:
         - db
@@ -23,9 +23,9 @@ services:
     db:
         image: postgres
         environment:
-            POSTGRES_USER: sulfur_user
-            POSTGRES_PASSWORD: sulfur_pass
-            POSTGRES_DB: sulfur
+            POSTGRES_USER: vanadium_user
+            POSTGRES_PASSWORD: vanadium_pass
+            POSTGRES_DB: vanadium
 
     adminer:
         image: adminer
